@@ -1,0 +1,299 @@
+#!/usr/bin/env python
+
+from manimlib.imports import *
+from phasorlib.constants import *
+from phasorlib.tools import *
+from functools import partial
+import sys
+import datetime
+
+
+# To watch one of these scenes, run the following:
+# python -m manim example_scenes.py SquareToCircle -pl
+#
+# Use the flat -l for a faster rendering at a lower
+# quality.
+# Use -s to skip to the end and just save the final frame
+# Use the -p to have the animation (or image, if -s was1
+# used) pop up once done.
+# Use -n <number> to skip ahead to the n'th animation of a scene.
+# Use -r <number> to specify a resolution (for example, -r 1080
+# for a 1920x1080 video)
+
+class OhmsLawScene(Scene):
+    
+
+
+class ACvsDCScene(Scene):
+    def construct(self):
+        # title
+        title = TextMobject("\\textbf{\\underline{The War of the Currents: AC vs. DC Power}}")
+        title.scale(TITLE_SCALE_FACTOR)
+        title.to_edge(UP, buff=TITLE_BUF)
+        self.play(FadeIn(title))
+
+        # tesla
+        tesla_img = ImageMobject("images/ep1/tesla.jpg")
+        tesla_img.to_corner(LEFT + UP, buff=TESLA_EDISON_BUF)
+        tesla_img.scale(TESLA_EDISON_SCALE_FACTOR)
+        tesla_img.shift(DOWN * 0.3 - 0.25 * RIGHT)
+        self.play(FadeIn(tesla_img))
+        tesla_label = TextMobject("Nikola Tesla")
+        tesla_label.next_to(tesla_img, direction=DOWN, buff=TESLA_EDISON_TEXT_BUF)
+        tesla_label.scale(NAME_LABEL_SCALE_FACTOR)
+        self.play(Write(tesla_label))
+
+        # edison
+        edison_img = ImageMobject("images/ep1/edison.jpg")
+        edison_img.to_corner(RIGHT + UP, buff=TESLA_EDISON_BUF)
+        edison_img.scale(TESLA_EDISON_SCALE_FACTOR)
+        edison_img.shift(DOWN * 0.3 + 0.25 * RIGHT)
+        self.play(FadeIn(edison_img))
+        edison_label = TextMobject("Thomas Edison")
+        edison_label.next_to(edison_img, direction=DOWN, buff=TESLA_EDISON_TEXT_BUF)
+        edison_label.scale(NAME_LABEL_SCALE_FACTOR)
+        self.play(Write(edison_label))
+
+        # notes
+        notes = TextMobject(
+            "\\begin{flushleft} $\\cdot$ Starting in the late 1880s, Thomas Edison and Nikola Tesla were embroiled in a battle now known as the War of the Currents.\\end{flushleft}",
+            "\\begin{flushleft} $\\cdot$ During the early years of electricity, DC (created by Edison) was the standard in the U.S.\\end{flushleft}",
+            "\\begin{flushleft} $\\cdot$ But there was one problem. Direct current is not easily converted to higher or lower voltages. Making it hard to transmit long distances; unlike AC.\\end{flushleft}",
+            "\\begin{flushleft} $\\cdot$ Edison, not wanting to lose royalties, began a campaign to discredit AC.\\end{flushleft}",
+            "\\begin{flushleft} $\\cdot$ The lower cost of AC power distribution prevailed, and now AC is a global standard.\\end{flushleft}"
+            )
+        notes.to_edge(DOWN, buff=0)
+        notes.scale(NOTES_SCALE_FACTOR)
+        for i in range(4):
+            self.play(FadeInFromDown(notes[i]))
+            self.wait(NOTES_DISP_DELAY)
+
+        # topsy photo
+        topsy_image = ImageMobject("images/ep1/topsy.png")
+        topsy_image.to_edge(UP, buff=TOPSY_BUF)
+        topsy_image.scale(TOPSY_SCALE)
+        topsy_image.shift(RIGHT * TOPSY_OFFSET)
+        self.play(FadeIn(topsy_image))
+        self.wait(NOTES_DISP_DELAY)
+
+        # last note
+        self.play(FadeInFromDown(notes[4]))
+        self.wait(NOTES_DISP_DELAY)
+
+        # transmission line
+        trans_line = ImageMobject("images/ep1/transmission-line.jpg")
+        trans_line.to_edge(UP, buff=TRANS_BUF)
+        trans_line.scale(TRANS_SCALE)
+        trans_line.shift(TRANS_OFFSET * LEFT)
+        self.play(FadeIn(trans_line))
+
+        self.wait(5)
+
+
+class WhatIsACScene(GraphScene):
+    def construct(self):
+        ##### DC ######
+        # DC definition
+        DC_text = TextMobject("Direct Current(DC)", " -  electric charge (current) only flows in one direction")
+        DC_text.to_corner(LEFT + UP)
+        DC_text.scale(DC_SCALE)
+        self.play(Write(DC_text[0]))
+        self.play(Write(DC_text[1]))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # battery
+        battery_image = ImageMobject("images/ep1/battery.jpg")
+        battery_image.next_to(DC_text[0], direction=DOWN, buff=BATTERY_IMAGE_BUF)
+        self.play(GrowFromEdge(battery_image, LEFT))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # DC circuit example
+        DC_circuit_img = ImageMobject("images/ep1/circuit_simple_DC.jpg")
+        DC_circuit_img.scale(DC_CIRCUIT_SCALE_FACTOR)
+        DC_circuit_img.next_to(battery_image, direction=RIGHT, buff=DC_CIRCUIT_BUF_X)
+        DC_circuit_img.shift(DC_CIRCUIT_BUF_Y * DOWN)
+        self.play(GrowFromEdge(DC_circuit_img, LEFT))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # DC circuit labeled
+        DC_circuit_img_labeled = ImageMobject("images/ep1/circuit_simple_DC_labeled.png")
+        DC_circuit_img_labeled.scale(DC_CIRCUIT_LABELED_SCALE_FACTOR)
+        DC_circuit_img_labeled.next_to(battery_image, direction=RIGHT, buff=DC_CIRCUIT_BUF_X)
+        DC_circuit_img_labeled.shift(DC_CIRCUIT_BUF_Y * DOWN)
+        self.play(FadeOut(DC_circuit_img))
+        self.play(FadeIn(DC_circuit_img_labeled))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        ##### AC #####
+        # AC definition
+        AC_text = TextMobject("Alternating Current(AC)", " - electric charge (current) changes direction periodically")
+        AC_text.to_corner(LEFT + UP)
+        AC_text.shift(AC_BUF_Y * DOWN)
+        AC_text.scale(DC_SCALE)
+        self.play(Write(AC_text[0]))
+        self.play(Write(AC_text[1]))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # transmission line
+        trans_image = ImageMobject("images/ep1/transmission-line.jpg")
+        trans_image.next_to(AC_text[0], direction=DOWN, buff=BATTERY_IMAGE_BUF)
+        trans_image.shift(0.8 * LEFT)
+        self.play(GrowFromEdge(trans_image, LEFT))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # AC circuit example
+        AC_circuit_img = ImageMobject("images/ep1/circuit_simple_AC.jpg")
+        AC_circuit_img.scale(AC_CIRCUIT_SCALE_FACTOR)
+        AC_circuit_img.next_to(trans_image, direction=RIGHT, buff=AC_CIRCUIT_BUF_X)
+        AC_circuit_img.shift(AC_CIRCUIT_BUF_Y * DOWN)
+        self.play(GrowFromEdge(AC_circuit_img, LEFT))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # AC circuit labeled
+        AC_circuit_img_labeled = ImageMobject("images/ep1/circuit_simple_AC_labeled.png")
+        AC_circuit_img_labeled.scale(AC_CIRCUIT_LABELED_SCALE_FACTOR)
+        AC_circuit_img_labeled.next_to(trans_image, direction=RIGHT, buff=AC_CIRCUIT_BUF_SCL_X)
+        AC_circuit_img_labeled.shift(AC_CIRCUIT_BUF_Y * DOWN)
+        self.play(FadeOut(AC_circuit_img))
+        self.play(FadeIn(AC_circuit_img_labeled))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        ##### final notation note ######
+        notation_text = TexMobject(
+            "10 V \\longleftrightarrow DC \\hspace{8mm} 10 \\angle 0^\\circ V \\longleftrightarrow AC")
+        notation_text.to_edge(DOWN)
+        self.play(Write(notation_text))
+
+        self.wait(5)
+
+
+class ACvsDCTimeDomainScene(GraphScene):
+    CONFIG = {
+        "x_min": 0,
+        "x_max": 16,
+        "x_axis_width": 20,
+        "x_tick_frequency": 2,
+        "x_leftmost_tick": None,  # Change if different from x_min
+        "x_labeled_nums": [i for i in range(8)],
+        "x_axis_label": "$t[s]$",
+        "y_min": -10,
+        "y_max": 35,
+        "y_axis_height": 10,
+        "y_tick_frequency": 5,
+        "y_bottom_tick": None,  # Change if different from y_min
+        "y_labeled_nums": [5*i for i in range(-2,7)],
+        "y_axis_label": "$V_{DC}/V_{AC} [V]$",
+        "axes_color": AXIS_COLOR,
+        "graph_origin": ORIGIN,
+        "exclude_zero_label": True,
+        "num_graph_anchor_points": 25,
+        "default_graph_colors": [BLUE, GREEN, RED],
+        "default_derivative_color": GREEN,
+        "default_input_color": RED,
+        "default_riemann_start_color": BLUE,
+        "default_riemann_end_color": GREEN,
+        "area_opacity": 0.8,
+        "num_rects": 50,
+    }
+
+    def __init__(self, **kwargs):
+        self.V = 10.0
+        self.dV = 0.01
+        self.N = int(self.V / self.dV)+1
+        super().__init__(**kwargs)
+
+    def construct(self):
+        # create grid
+        self.setup_axes(animate=True)
+
+        # show AC
+        ac_graph = self.get_graph(
+            partial(self.sin, ang_freq=1, ampl=10, phase=0),
+            WHITE
+        )
+        ac_graph.color_using_background_image("images/function_colors/func2.png")
+        # graph_lab = self.get_graph_label(self.sin, label="sin(x)")
+        self.play(ShowCreation(ac_graph))
+
+        self.play(
+            ac_graph.stretch, 0.5, 1
+        )
+
+        self.wait(NOTES_DISP_DELAY)
+
+        dc_graph = self.get_graph(
+            partial(self.constant_func, constant=10),
+            WHITE
+        )
+        dc_graph.color_using_background_image("images/function_colors/func_bg.png")
+        self.play(ShowCreation(dc_graph))
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # DC circuit labeled
+        DC_images = self.loadDCImages()
+        self.add(DC_images[1000])
+
+        # draw label
+        top_line = Line(4.35*LEFT+2.13*DOWN,2.75*LEFT+2.13*DOWN,stroke_width = 1.9)
+        self.add(top_line)
+        bottom_line = Line(4.35*LEFT + 3.95*DOWN, 2.75*LEFT + 3.95*DOWN, stroke_width=1.9)
+        self.add(bottom_line)
+        vdc_label = TextMobject("$V_{DC}$")
+        vdc_label.next_to(DC_images[0],RIGHT)
+        vdc_label.shift(0.2*UP+0.2*LEFT)
+        self.add(vdc_label)
+        plus_label = TextMobject("$+$")
+        plus_label.next_to(DC_images[0])
+        plus_label.shift(0.8*UP)
+        self.add(plus_label)
+        minus_label = TextMobject("$-$")
+        minus_label.next_to(DC_images[0])
+        minus_label.shift(0.35 * DOWN)
+        self.add(minus_label)
+
+        for i in range(1,int(self.N/100)):
+            self.wait(NOTES_DISP_DELAY)
+            self.add(DC_images[i])
+            self.remove(DC_images[i-1])
+            self.add(top_line,bottom_line)
+
+        self.wait(NOTES_DISP_DELAY)
+
+        # AC_circuit_img_labeled = ImageMobject("images/ep1/circuit_simple_AC_labeled.png")
+        # AC_circuit_img_labeled.scale(AC_CIRCUIT_LABELED_SCALE_FACTOR)
+        # AC_circuit_img_labeled.next_to(DC_circuit_img_labeled, direction=UP, buff=0)
+        # self.play(FadeIn(AC_circuit_img_labeled))
+
+
+        self.wait(7)
+
+    def loadDCImages(self):
+        images = [None]*self.N
+        for i in range(self.N):
+            curV = i*self.dV
+            cS = str("%1.2f"%curV)
+            image = ImageMobject("/home/pj/Desktop/manim-projects/acca-video-series/images/ep1/DC_VS_Sweep_2/DC-Ampl-" +cS+".png")
+            image.to_corner(LEFT+DOWN)
+            image.scale(DC_CIRCUIT_LABELED_SCALE_FACTOR)
+            image.shift(0.25*RIGHT)
+            images[i] = image
+        return images
+
+    # sine and cosine
+    def sin(self, t, ang_freq=1, ampl=1, phase=0):
+        return ampl * np.sin(ang_freq * t + phase)
+
+    def cos(self, t, ang_freq=1, ampl=1, phase=0):
+        return ampl * np.cos(ang_freq * t + phase)
+
+    def constant_func(self, t, constant=1):
+        return constant

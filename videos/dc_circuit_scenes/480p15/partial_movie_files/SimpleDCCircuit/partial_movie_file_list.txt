@@ -1,0 +1,2 @@
+file '/home/pj/code/manim-projects/acca-video-series/videos/dc_circuit_scenes/480p15/partial_movie_files/SimpleDCCircuit/00000.mp4'
+file '/home/pj/code/manim-projects/acca-video-series/videos/dc_circuit_scenes/480p15/partial_movie_files/SimpleDCCircuit/00001.mp4'
