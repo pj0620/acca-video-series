@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="637.5pt" height="750pt" viewBox="0 0 637.5 750" version="1.1">
+<defs>
+<clipPath id="clip1">
+  <path d="M 107 107 L 637.5 107 L 637.5 643 L 107 643 Z M 107 107 "/>
+</clipPath>
+</defs>
+<g id="surface1">
+<g clip-path="url(#clip1)" clip-rule="nonzero">
+<path style="fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 800 500 C 800 579.5625 768.390625 655.869792 712.130208 712.130208 C 655.869792 768.390625 579.5625 800 500 800 C 420.4375 800 344.130208 768.390625 287.869792 712.130208 C 231.609375 655.869792 200 579.5625 200 500 C 200 420.4375 231.609375 344.130208 287.869792 287.869792 C 344.130208 231.609375 420.4375 200 500 200 C 579.5625 200 655.869792 231.609375 712.130208 287.869792 C 768.390625 344.130208 800 420.4375 800 500 Z M 800 500 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+</g>
+<path style="fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 50 500 L 350 500 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+<path style="fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 350 325 L 350 675 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+<path style="fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 350 400 L 550 250 L 550 50 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+<path style="fill-rule:evenodd;fill:rgb(0%,0%,0%);fill-opacity:1;stroke-width:10.666667;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 486.927083 702.697917 L 407.567708 693.177083 L 455.567708 629.177083 Z M 486.927083 702.697917 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+<path style="fill:none;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 550 750 L 550 950 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+<path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 550 750 L 350.265625 598.260417 " transform="matrix(0.75,0,0,0.75,0,0)"/>
+</g>
+</svg>
