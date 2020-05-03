@@ -15,9 +15,9 @@ class CircuitsIntro(Scene):
         self.wait(5.67)
         # self.show_circuits_questions() #SS1
         self.define_circuit() #SS2,SS3,
-        self.label_simple_circuit() #SS4
-        self.introduce_ohms_law() #SS5
-        self.expand_ohms_law() #SS6
+        # self.label_simple_circuit() #SS4
+        # self.introduce_ohms_law() #SS5
+        # self.expand_ohms_law() #SS6
 
         self.wait(3)
 
@@ -433,15 +433,16 @@ class CircuitsIntro(Scene):
             TransformFromCopy(
                 self.R_text[0],
                 self.ohms_law[3],
-                run_time=1
+                run_time=0.61
             ),
             self.get_electron_anim(
                 freq=self.electron_freq_1,
-                run_time=1
+                run_time=0.61
             )
         )
 
     def expand_ohms_law(self):
+        # SS6.1
         self.lamp_circuit.remove_electrons()
         self.play(
             FadeOutAndShift(
@@ -455,10 +456,10 @@ class CircuitsIntro(Scene):
                     self.current_value,
                     self.current_arrow,
                 ),
-                direction=UP
+                direction=UP,
+                run_time=1.6
             )
         )
-
         ohms_law_title = TextMobject("\\underline{Ohm's Law}")\
             .scale(2.4)\
             .to_edge(UP)\
@@ -466,36 +467,46 @@ class CircuitsIntro(Scene):
         self.play(
             Transform(
                 self.ohms_law_label,
-                ohms_law_title
+                ohms_law_title,
+                run_time=1.6
             )
         )
-
         # move ohm's law formula
         self.play(
             ApplyMethod(
                 self.ohms_law.move_to,
-                ohms_law_title.get_center()+1.5*DOWN
+                ohms_law_title.get_center()+1.5*DOWN,
+                run_time=1.6
             )
         )
+        self.wait(0.033)
 
         # highlight each variable
+        # SS6.2
         v_rect = SurroundingRectangle(self.ohms_law[0]).set_stroke(self.voltage_color)
         v_text = TextMobject("Voltage",color=self.voltage_color).next_to(v_rect,direction=DOWN).scale(1.2).shift(0.35*LEFT)
         i_rect=SurroundingRectangle(self.ohms_law[2]).set_stroke(self.current_color)
-        i_text=TextMobject("Current", color=self.current_color).next_to(i_rect, direction=DOWN).scale(1.2).shift(0.2*LEFT)
+        i_text=TextMobject("Current", color=self.current_color  ).next_to(i_rect, direction=DOWN).scale(1.2).shift(0.2*LEFT)
         r_rect=SurroundingRectangle(self.ohms_law[3]).set_stroke(self.resistance_color)
         r_text=TextMobject("Resistance", color=self.resistance_color).next_to(r_rect, direction=DR).scale(1.2).shift(0.7*LEFT)
         self.play(
             ShowCreation(v_rect),
-            FadeInFrom(v_text,UP)
+            FadeInFrom(v_text,UP),
+            run_time=0.97
         )
+
+        # SS6.3
         self.play(
             ShowCreation(i_rect),
-            FadeInFrom(i_text, UP)
+            FadeInFrom(i_text, UP),
+            run_time=0.63
         )
+
+        # SS6.4
         self.play(
             ShowCreation(r_rect),
-            FadeInFrom(r_text, UP)
+            FadeInFrom(r_text, UP),
+            run_time=1
         )
 
         self.play(
