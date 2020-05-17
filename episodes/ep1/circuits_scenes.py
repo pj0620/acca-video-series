@@ -135,7 +135,7 @@ class CircuitsIntro(Scene):
         )
 
         # SS3.1
-        complex_circuit=ImageMobject("images/ep1/CircuitsIntro/complex_circuit.jpg")\
+        self.complex_circuit=ImageMobject("images/ep1/CircuitsIntro/complex_circuit.jpg")\
             .to_edge(RIGHT)\
             .scale(2)\
             .shift(1.5*LEFT)
@@ -149,29 +149,31 @@ class CircuitsIntro(Scene):
         )
         self.play(
             FadeInFrom(
-                complex_circuit,
+                self.complex_circuit,
                 direction=RIGHT,
                 run_time=2
             )
         )
-        self.wait(11.88)
 
-        self.play(
-            FadeOutAndShift(
-                definition,
-                direction=DOWN,
-                run_time=1
-            ),
-            FadeOutAndShift(
-                complex_circuit,
-                direction=RIGHT,
-                run_time=1
-            ),
-            ApplyMethod(
-                self.lamp_circuit.move_to,
-                1.5*RIGHT+UP
-            )
-        )
+        electrical_elem_rects = self.get_elec_element_rects()
+        self.add(electrical_elem_rects)
+
+        # self.play(
+        #     FadeOutAndShift(
+        #         definition,
+        #         direction=DOWN,
+        #         run_time=1
+        #     ),
+        #     FadeOutAndShift(
+        #         self.complex_circuit,
+        #         direction=RIGHT,
+        #         run_time=1
+        #     ),
+        #     ApplyMethod(
+        #         self.lamp_circuit.move_to,
+        #         1.5*RIGHT+UP
+        #     )
+        # )
 
     def label_simple_circuit(self):
         self.wait(4.92)
@@ -767,6 +769,70 @@ class CircuitsIntro(Scene):
             ),
             get_electron_anim()
         )
+
+    def get_elec_element_rects(self):
+        rects = VGroup()
+        kw={
+            'width': 0.36,
+            'height': 0.36,
+            'color': YELLOW_D,
+            'stroke_width': 3
+        }
+        kw_med = {
+            'width': 0.40,
+            'height': 0.36,
+            'color': YELLOW_D,
+            'stroke_width': 3
+        }
+        coors=[
+            (0.81, 2.46),
+            (1.23, 2.46),
+            (1.37, 2.04),
+            (1.80, 2.04),
+            (2.20, 1.08),
+            (2.50, 3.22),
+            (2.90, 1.08),
+            (3.18, 1.85),
+            (3.18, 2.20),
+            (3.70, 1.75),
+            (3.77, 2.10),
+            (3.79, 3.02),
+            (3.79, 3.40),
+            (4.13, 2.10),
+            (4.17, 1.00),
+            (4.42, 3.33),
+            (4.65, 2.10),
+            (5.28, 3.38),
+            (5.28, 2.90),
+            (5.28, 2.45),
+            (5.28, 1.80),
+            (5.28, 1.25),
+            (5.82, 2.57),
+            (5.82, 2.19),
+            (6.68, 2.57),
+            (6.68, 2.19),
+            (7.21, 2.23),
+            (7.26, 1.85),
+            (7.30, 3.40),
+            (7.65, 2.50),
+            (7.75, 3.40),
+            (7.78, 0.60),
+        ]
+        coors_med = [
+            (7.30, 0.60),
+            (7.93, 0.88),
+            (7.93, 3.70),
+        ]
+        for coor in coors:
+            rects.add(
+                Rectangle(**kw).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
+            )
+        for coor in coors_med:
+            rects.add(
+                Rectangle(**kw_med).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
+            )
+        rects[-1].set_color(GREEN_D)
+        return rects
 
     def get_electron_anim(self,freq=0.11,run_time=1):
         return ApplyMethod(

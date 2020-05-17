@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Kevin\Documents\acca-video-series\venv
+set VIRTUAL_ENV=C:\Users\pjsho\Documents\Circuit_Analyzer\video_series\acca-video-series\venv
 
 if not defined PROMPT set PROMPT=$P$G
 
