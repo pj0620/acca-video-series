@@ -64,17 +64,17 @@ class CircuitsIntro(Scene):
         )
 
     def define_circuit(self):
-        # show definition of circuit
-        definition=TextMobject("electrical circuit - interconnection of electrical elements",color=YELLOW)\
-            .scale(1.3)\
-            .to_corner(DOWN)
-        self.play(
-            Write(
-                definition,
-                run_time=2
-            )
-        )
-        self.wait(1.8)
+        # # show definition of circuit
+        # definition=TextMobject("electrical circuit - interconnection of electrical elements",color=YELLOW)\
+        #     .scale(1.3)\
+        #     .to_corner(DOWN)
+        # self.play(
+        #     Write(
+        #         definition,
+        #         run_time=2
+        #     )
+        # )
+        # self.wait(1.8)
 
         # show simple real world circuit
         self.lamp_circuit = BatteryLampCircuit()
@@ -86,27 +86,27 @@ class CircuitsIntro(Scene):
         )
         self.wait(7.28)
 
-        indicate_anim=partial(ShowPassingFlashAround,
-                              time_width=0.5,
-                              remover=True)
-
-        self.play(
-            indicate_anim(
-                self.lamp_circuit.outer_rect,
-                run_time=1
-            ),
-        )
-
-        self.play(
-            indicate_anim(
-                VGroup(
-                    self.lamp_circuit.base_big,
-                    self.lamp_circuit.base_small,
-                    self.lamp_circuit.light_bulb
-                ),
-                run_time=1
-            )
-        )
+        # indicate_anim=partial(ShowPassingFlashAround,
+        #                       time_width=0.5,
+        #                       remover=True)
+        #
+        # self.play(
+        #     indicate_anim(
+        #         self.lamp_circuit.outer_rect,
+        #         run_time=1
+        #     ),
+        # )
+        #
+        # self.play(
+        #     indicate_anim(
+        #         VGroup(
+        #             self.lamp_circuit.base_big,
+        #             self.lamp_circuit.base_small,
+        #             self.lamp_circuit.light_bulb
+        #         ),
+        #         run_time=1
+        #     )
+        # )
 
         kw = {'color':YELLOW}
         elements_label=VGroup(
@@ -784,6 +784,18 @@ class CircuitsIntro(Scene):
             'color': YELLOW_D,
             'stroke_width': 3
         }
+        kw_lrg = {
+            'width': 0.45,
+            'height': 0.45,
+            'color': YELLOW_D,
+            'stroke_width': 3
+        }
+        kw_lrg2 = {
+            'width': 0.49,
+            'height': 0.49,
+            'color': YELLOW_D,
+            'stroke_width': 3
+        }
         coors=[
             (0.81, 2.46),
             (1.23, 2.46),
@@ -823,6 +835,19 @@ class CircuitsIntro(Scene):
             (7.93, 0.88),
             (7.93, 3.70),
         ]
+        coors_lrg = [
+            (2.23, 2.40),
+            (2.81, 2.40),
+            (4.50, 2.87),
+            (3.85, 1.35),
+            (4.58, 1.37),
+        ]
+        coors_lrg2 = [
+            (5.86, 1.61),
+            (6.72, 1.58),
+            (5.86, 3.00),
+            (6.72, 3.00),
+        ]
         for coor in coors:
             rects.add(
                 Rectangle(**kw).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
@@ -831,7 +856,16 @@ class CircuitsIntro(Scene):
             rects.add(
                 Rectangle(**kw_med).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
             )
+        for coor in coors_lrg:
+            rects.add(
+                Rectangle(**kw_lrg).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
+            )
+        for coor in coors_lrg2:
+            rects.add(
+                Rectangle(**kw_lrg2).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
+            )
         rects[-1].set_color(GREEN_D)
+        # rects[-2].set_color(GREEN_D)
         return rects
 
     def get_electron_anim(self,freq=0.11,run_time=1):
