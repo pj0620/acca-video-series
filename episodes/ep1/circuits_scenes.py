@@ -12,10 +12,10 @@ class CircuitsIntro(Scene):
         "electron_freq_1" : 0.33
     }
     def construct(self):
-        self.wait(5.67)
+        # self.wait(5.67)
         # self.show_circuits_questions() #SS1
         self.define_circuit() #SS2,SS3,
-        # self.label_simple_circuit() #SS4
+        self.label_simple_circuit() #SS4
         # self.introduce_ohms_law() #SS5
         # self.expand_ohms_law() #SS6
 
@@ -64,17 +64,17 @@ class CircuitsIntro(Scene):
         )
 
     def define_circuit(self):
-        # # show definition of circuit
-        # definition=TextMobject("electrical circuit - interconnection of electrical elements",color=YELLOW)\
-        #     .scale(1.3)\
-        #     .to_corner(DOWN)
-        # self.play(
-        #     Write(
-        #         definition,
-        #         run_time=2
-        #     )
-        # )
-        # self.wait(1.8)
+        # show definition of circuit
+        definition=TextMobject("electrical circuit - interconnection of electrical elements",color=YELLOW)\
+            .scale(1.3)\
+            .to_corner(DOWN)
+        self.play(
+            Write(
+                definition,
+                run_time=2
+            )
+        )
+        self.wait(1.8)
 
         # show simple real world circuit
         self.lamp_circuit = BatteryLampCircuit()
@@ -86,53 +86,58 @@ class CircuitsIntro(Scene):
         )
         self.wait(7.28)
 
-        # indicate_anim=partial(ShowPassingFlashAround,
-        #                       time_width=0.5,
-        #                       remover=True)
-        #
-        # self.play(
-        #     indicate_anim(
-        #         self.lamp_circuit.outer_rect,
-        #         run_time=1
-        #     ),
-        # )
-        #
-        # self.play(
-        #     indicate_anim(
-        #         VGroup(
-        #             self.lamp_circuit.base_big,
-        #             self.lamp_circuit.base_small,
-        #             self.lamp_circuit.light_bulb
-        #         ),
-        #         run_time=1
-        #     )
-        # )
+        indicate_anim=partial(ShowPassingFlashAround,
+                              time_width=0.5,
+                              remover=True)
+
+        self.play(
+            indicate_anim(
+                self.lamp_circuit.outer_rect,
+                run_time=1
+            ),
+        )
+
+        self.play(
+            indicate_anim(
+                VGroup(
+                    self.lamp_circuit.base_big,
+                    self.lamp_circuit.base_small,
+                    self.lamp_circuit.light_bulb
+                ),
+                run_time=1
+            )
+        )
+
+        elements_label = VGroup()
+
+        # add simple element rectangles
+        elements_label.add(
+            SurroundingRectangle(
+                self.lamp_circuit.outer_rect
+            ),
+            SurroundingRectangle(
+                VGroup(
+                    self.lamp_circuit.base_big,
+                    self.lamp_circuit.base_small,
+                    self.lamp_circuit.light_bulb
+                )
+            )
+        )
 
         kw = {'color':YELLOW}
-        elements_label=VGroup(
-            TextMobject("Electrical Elements",**kw).to_corner(UR).shift(1*DOWN+4*LEFT).scale(2)
-        )
-        elements_label.add(
-            Arrow(start=elements_label[0].get_bottom(),
+        elements_text = TextMobject("Electrical Elements",**kw).to_corner(UR).shift(1*DOWN+4*LEFT).scale(1.25)
+        arrow1 = Arrow(start=elements_text.get_bottom(),
                   end=self.lamp_circuit.light_bulb.get_top(),**kw)
-        )
-        elements_label.add(
-            Arrow(start=elements_label[1].get_start(),
+        arrow2 = Arrow(start=arrow1.get_start(),
                   end=self.lamp_circuit.outer_rect.get_corner(UR),**kw)
-        )
+        elements_label.add(elements_text,arrow1,arrow2)
         self.play(
             FadeIn(
                 elements_label,
                 run_time=1
             )
         )
-        self.wait(4.55)
-        self.play(
-            FadeOut(
-                elements_label,
-                run_time=1
-            )
-        )
+        self.wait(9.21)
 
         # SS3.1
         self.complex_circuit=ImageMobject("images/ep1/CircuitsIntro/complex_circuit.jpg")\
@@ -141,7 +146,9 @@ class CircuitsIntro(Scene):
             .shift(1.5*LEFT)
         self.play(
             ApplyMethod(
-                self.lamp_circuit.to_edge,
+                VGroup(
+                    self.lamp_circuit,
+                    elements_label).to_edge,
                 LEFT,
                 buff=0.01,
                 run_time=1
@@ -155,25 +162,56 @@ class CircuitsIntro(Scene):
             )
         )
 
+        electrical_elem_label = TextMobject("44 Electrical Elements", color=YELLOW)\
+            .next_to(self.complex_circuit,direction=UP)\
+            .scale(1.25)
         electrical_elem_rects = self.get_elec_element_rects()
-        self.add(electrical_elem_rects)
+        self.play(
+            LaggedStartMap(
+                # SpinInFromNothing, FadeInFrom, FadeInFromLarge, ShowCreation, FadeIn, GrowFromCenter, Write, DrawBorderThenFill,
+                # FadeInFrom, FadeInFromLarge
+                SpinInFromNothing,
+                electrical_elem_rects,
+                run_time=10,
+                lag_ratio=0.25
+            ),
+            LaggedStart(
+                FadeInFrom(
+                    electrical_elem_label,
+                    direction=UP,
+                    lag_ratio=0.01
+                )
+            )
+        )
+        self.wait(4)
 
-        # self.play(
-        #     FadeOutAndShift(
-        #         definition,
-        #         direction=DOWN,
-        #         run_time=1
-        #     ),
-        #     FadeOutAndShift(
-        #         self.complex_circuit,
-        #         direction=RIGHT,
-        #         run_time=1
-        #     ),
-        #     ApplyMethod(
-        #         self.lamp_circuit.move_to,
-        #         1.5*RIGHT+UP
-        #     )
-        # )
+        self.play(
+            FadeOutAndShift(
+                definition,
+                direction=DOWN,
+                run_time=1
+            ),
+            FadeOutAndShift(
+                self.complex_circuit,
+                direction=RIGHT,
+                run_time=1
+            ),
+            FadeOutAndShift(
+                VGroup(
+                    electrical_elem_label,
+                    electrical_elem_rects,
+                    elements_label,
+                    arrow1,
+                    arrow2,
+                    elements_text
+                ),
+                direction=UP
+            ),
+            ApplyMethod(
+                self.lamp_circuit.move_to,
+                1.5*RIGHT+UP
+            )
+        )
 
     def label_simple_circuit(self):
         self.wait(4.92)
@@ -182,7 +220,7 @@ class CircuitsIntro(Scene):
         self.lamp_circuit.setup_electrons()
         self.play(
             self.get_electron_anim(
-                run_time=10.10
+                run_time=7.63
             )
         )
 
@@ -190,34 +228,19 @@ class CircuitsIntro(Scene):
         point1 = self.lamp_circuit.electron_vect_inter.interpolate(0.55)
         point2 = self.lamp_circuit.electron_vect_inter.interpolate(0.5)
         angle = np.arccos((point2[0]-point1[0])/np.linalg.norm(point2-point1))
-        self.current_arrow=ArrowTip(
-            start_angle=-1*angle,
+        self.current_arrow = ArrowTip(
+            start_angle=-1 * angle,
             color=self.current_color
-        )\
-            .scale(2.5)\
-            .move_to(point1+0.05*UR)
-        self.play(
-            FadeIn(
-                self.current_arrow,
-                run_time=1
-            ),
-            self.get_electron_anim(
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(
-                run_time=1.37
-            )
-        )
-
-        self.V_text=TextMobject(
+        ) \
+            .scale(2.5) \
+            .move_to(point1 + 0.05 * UR)
+        self.V_text = TextMobject(
             "V", "=",
             color=self.voltage_color
         ) \
             .next_to(self.lamp_circuit.outer_rect, direction=LEFT, buff=4) \
             .scale(2)
-        self.voltage_value=DecimalNumber(
+        self.voltage_value = DecimalNumber(
             12,
             unit="V",
             color=self.voltage_color,
@@ -225,147 +248,189 @@ class CircuitsIntro(Scene):
         ) \
             .scale(2) \
             .next_to(self.V_text, direction=RIGHT, buff=0.3)
-        self.voltage_tracker=ValueTracker(12)
+        self.voltage_tracker = ValueTracker(12)
         self.voltage_value.add_updater(
             lambda x:
             x.set_value(self.voltage_tracker.get_value())
         )
-        # current_text=TextMobject(
-        #     "current",
-        #     color=self.current_color)\
-        #     .next_to(current_arrow,direction=UR)\
-        #     .shift(0.5*RIGHT)\
-        #     .scale(2)
-        self.I_text=TextMobject(
-            "I","=",
+        self.current_text=TextMobject(
+            "current",
+            color=self.current_color)\
+            .next_to(self.current_arrow,direction=UR)\
+            .shift(0.5*RIGHT)\
+            .scale(2)
+        self.I_text = TextMobject(
+            "I", "=",
             color=self.current_color
         ) \
             .next_to(self.current_arrow, direction=UR) \
-            .shift(0.5*RIGHT)\
+            .shift(0.5 * RIGHT) \
             .scale(2)
         self.current_value = DecimalNumber(
             2,
             unit="A",
             color=self.current_color,
             num_decimal_places=2
-        )\
-            .scale(2)\
-            .next_to(self.I_text,direction=RIGHT,buff=0.3)
-        self.current_value.add_updater(
-            lambda x:
-            x.set_value(self.voltage_tracker.get_value()/6.)
-        )
-        self.play(
-            FadeIn(
-                self.I_text[0],
-                run_time=1
-            ),
-            self.get_electron_anim(
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(
-                run_time=1.83
-            )
-        )
-        self.play(
-            FadeIn(
-                self.I_text[1],
-                run_time=1
-            ),
-            FadeIn(
-                self.current_value,
-                run_time=1
-            ),
-            self.get_electron_anim(
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(
-                run_time=3.7
-            )
-        )
-
-        self.play(
-            FadeIn(
-                self.V_text,
-                run_time=1
-            ),
-            FadeIn(
-                self.voltage_value,
-                run_time=1
-            ),
-            self.get_electron_anim(
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(
-                run_time=1.1
-            )
-        )
-
-        self.R_text=TextMobject(
-            "R", "=",
-            color=self.resistance_color
-        ) \
-            .next_to(self.lamp_circuit.light_bulb, direction=DR, buff=0.2) \
-            .scale(2)
-        self.resistor_value=DecimalNumber(
-            6,
-            unit="\\Omega",
-            color=self.resistance_color,
-            num_decimal_places=0
         ) \
             .scale(2) \
-            .next_to(self.R_text, direction=RIGHT, buff=0.3)
+            .next_to(self.I_text, direction=RIGHT, buff=0.3)
+        self.current_value.add_updater(
+            lambda x:
+            x.set_value(self.voltage_tracker.get_value() / 6.)
+        )
+
+        arrow = CurvedArrow(
+            self.lamp_circuit.outer_rect.get_bottom() + 1.0 * RIGHT + 0 * DOWN,
+            self.lamp_circuit.outer_rect.get_top() + 1.0 * RIGHT + 0 * UP,
+            color=self.voltage_color,
+            angle=np.pi * 0.8
+        )
+        self.play(
+            ShowCreationThenFadeOut(
+                arrow,
+                run_time=2.5
+            ),
+            self.get_electron_anim(
+                run_time=2.5
+            )
+        )
+        self.play(
+            self.get_electron_anim(
+                run_time=2.79
+            )
+        )
+
         self.play(
             FadeIn(
-                self.R_text,
+                self.current_arrow,
                 run_time=1
             ),
             FadeIn(
-                self.resistor_value,
+                self.current_text,
                 run_time=1
             ),
             self.get_electron_anim(
                 run_time=1
             )
         )
-
         self.play(
             self.get_electron_anim(
-                run_time=3.06
+                run_time=9.27
             )
         )
 
-        tau = 5
-        f0 = self.electron_freq_0
-        f1 = self.electron_freq_1
-        my_rate_func = lambda t: ((f1-f0)/(f1+f0))*(t**2) + ((2*f0)/(f0+f1))*t
+        cut_point = self.lamp_circuit.electron_vect_inter.interpolate(0.19)
+        cut_rect = Rectangle(color=BLACK, width=0.7, height=1.5) \
+            .move_to(cut_point) \
+            .set_fill(BLACK, 1)
+        self.add(
+            cut_rect
+        )
+        self.lamp_circuit.set_light_bulb_state(False)
+        self.lamp_circuit.electons_flowing = False
+        # self.add_electron_arrows()
+        self.wait(5)
         self.play(
-            ApplyMethod(
-                self.voltage_tracker.increment_value,
-                12,
-                run_time=tau,
-                rate_func=linear
-            ),
-            ApplyMethod(
-                self.lamp_circuit.electron_loc.increment_value,
-                ((f0+f1)/2)*tau,
-                run_time=tau,
-                rate_func=my_rate_func
-            )
+            self.get_electron_anim(freq=0,run_time=15)
         )
 
-        self.play(
-            self.get_electron_anim(
-                freq=f1,
-                run_time=12.2
-            )
-        )
+        # self.play(
+        #     FadeIn(
+        #         self.I_text[1],
+        #         run_time=1
+        #     ),
+        #     FadeIn(
+        #         self.current_value,
+        #         run_time=1
+        #     ),
+        #     self.get_electron_anim(
+        #         run_time=1
+        #     )
+        # )
+        # self.play(
+        #     self.get_electron_anim(
+        #         run_time=3.7
+        #     )
+        # )
+        #
+        # self.play(
+        #     FadeIn(
+        #         self.V_text,
+        #         run_time=1
+        #     ),
+        #     FadeIn(
+        #         self.voltage_value,
+        #         run_time=1
+        #     ),
+        #     self.get_electron_anim(
+        #         run_time=1
+        #     )
+        # )
+        # self.play(
+        #     self.get_electron_anim(
+        #         run_time=1.1
+        #     )
+        # )
+        #
+        # self.R_text=TextMobject(
+        #     "R", "=",
+        #     color=self.resistance_color
+        # ) \
+        #     .next_to(self.lamp_circuit.light_bulb, direction=DR, buff=0.2) \
+        #     .scale(2)
+        # self.resistor_value=DecimalNumber(
+        #     6,
+        #     unit="\\Omega",
+        #     color=self.resistance_color,
+        #     num_decimal_places=0
+        # ) \
+        #     .scale(2) \
+        #     .next_to(self.R_text, direction=RIGHT, buff=0.3)
+        # self.play(
+        #     FadeIn(
+        #         self.R_text,
+        #         run_time=1
+        #     ),
+        #     FadeIn(
+        #         self.resistor_value,
+        #         run_time=1
+        #     ),
+        #     self.get_electron_anim(
+        #         run_time=1
+        #     )
+        # )
+        #
+        # self.play(
+        #     self.get_electron_anim(
+        #         run_time=3.06
+        #     )
+        # )
+        #
+        # tau = 5
+        # f0 = self.electron_freq_0
+        # f1 = self.electron_freq_1
+        # my_rate_func = lambda t: ((f1-f0)/(f1+f0))*(t**2) + ((2*f0)/(f0+f1))*t
+        # self.play(
+        #     ApplyMethod(
+        #         self.voltage_tracker.increment_value,
+        #         12,
+        #         run_time=tau,
+        #         rate_func=linear
+        #     ),
+        #     ApplyMethod(
+        #         self.lamp_circuit.electron_loc.increment_value,
+        #         ((f0+f1)/2)*tau,
+        #         run_time=tau,
+        #         rate_func=my_rate_func
+        #     )
+        # )
+        #
+        # self.play(
+        #     self.get_electron_anim(
+        #         freq=f1,
+        #         run_time=12.2
+        #     )
+        # )
 
     def introduce_ohms_law(self):
         self.ohms_law_label=TextMobject("Ohm's Law:")\
@@ -770,31 +835,64 @@ class CircuitsIntro(Scene):
             get_electron_anim()
         )
 
+    def add_electron_arrows(self):
+        loc = self.lamp_circuit.electron_loc.get_value()
+        num_electrons = self.lamp_circuit.num_of_electrons
+        da = 0.01
+        rot_matrix = np.array(
+            [[np.cos(np.pi / 2), -np.sin(np.pi / 2), 0],
+             [np.sin(np.pi / 2), np.cos(np.pi / 2), 0],
+             [0, 0, 0]]
+        )
+        for i in (1,2,5,7,9):
+            # current alpha
+            alpha = (loc + i / num_electrons + self.lamp_circuit.electron_disps[i]) % 1
+
+            # two points on curve
+            point1=self.lamp_circuit.electron_vect_inter.interpolate( alpha)
+            point2=self.lamp_circuit.electron_vect_inter.interpolate((alpha + da) % 1)
+
+            # unit vector in direction of path
+            direction=(point2-point1)/np.linalg.norm(point2-point1)
+
+            # get start point
+            start = -1*rot_matrix.dot(direction)+point1
+
+            # add arrow
+            self.add(
+                Arrow(
+                    color=RED_A,
+                    start=start,
+                    end=point1,
+                    buff=0
+                )
+            )
+
     def get_elec_element_rects(self):
         rects = VGroup()
         kw={
             'width': 0.36,
             'height': 0.36,
-            'color': YELLOW_D,
-            'stroke_width': 3
+            'color': YELLOW_E,
+            'stroke_width': 4
         }
         kw_med = {
             'width': 0.40,
             'height': 0.36,
-            'color': YELLOW_D,
-            'stroke_width': 3
+            'color': YELLOW_E,
+            'stroke_width': 4
         }
         kw_lrg = {
             'width': 0.45,
             'height': 0.45,
-            'color': YELLOW_D,
-            'stroke_width': 3
+            'color': YELLOW_E,
+            'stroke_width': 4
         }
         kw_lrg2 = {
             'width': 0.49,
             'height': 0.49,
-            'color': YELLOW_D,
-            'stroke_width': 3
+            'color': YELLOW_E,
+            'stroke_width': 4
         }
         coors=[
             (0.81, 2.46),
@@ -864,9 +962,9 @@ class CircuitsIntro(Scene):
             rects.add(
                 Rectangle(**kw_lrg2).move_to(self.complex_circuit.get_corner(DL) + coor[0] * RIGHT + coor[1] * UP)
             )
-        rects[-1].set_color(GREEN_D)
-        # rects[-2].set_color(GREEN_D)
+        rects.sort(point_to_num_func=lambda x: x[0])
         return rects
+
 
     def get_electron_anim(self,freq=0.11,run_time=1):
         return ApplyMethod(

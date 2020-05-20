@@ -18,6 +18,7 @@ class BatteryLampCircuit(SVGMobject):
         svg_file="images/svgs/battery_lamp_circuit.svg"
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
         self.scale(3.5)
+        random.seed(1234)
 
     def name_parts(self):
         self.outer_rect = self.submobjects[0]
@@ -137,6 +138,13 @@ class BatteryLampCircuit(SVGMobject):
             electron.clear_updaters()
             self.remove(electron)
 
+    # turn on/off light bulb
+    def set_light_bulb_state(self,new_state):
+        if new_state:
+            self.light_bulb.set_fill(YELLOW)
+        else:
+            self.light_bulb.set_fill(BLACK)
+
     def electron_updater(self, x, i):
         cur=(self.electron_loc.get_value() + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
@@ -148,7 +156,7 @@ class BatteryLampCircuit(SVGMobject):
             return
 
         # change due to random motion
-        diff=(2 * random.random() - 1) * 0.005
+        diff=(2 * random.random() - 1) * 0.006
 
         # # down move if inside voltage source
         # if 0.78 < (cur + diff) % 1 < 0.925:
