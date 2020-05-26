@@ -5,6 +5,7 @@ from functools import partial
 from accalib.particles import CopperAtom, Electron
 import hashlib
 
+
 class CircuitsIntro(Scene):
     CONFIG = {
         "current_color": GREEN_D,  # GREEN_C
@@ -19,7 +20,7 @@ class CircuitsIntro(Scene):
         self.electric_field_present = False
         self.play(
             FadeIn(
-                Dot().shift(10*UR),
+                Dot().shift(10 * UR),
                 run_time=20
             )
         )
@@ -228,7 +229,7 @@ class CircuitsIntro(Scene):
             ),
             ApplyMethod(
                 self.lamp_circuit.move_to,
-                0 * RIGHT + FRAME_WIDTH/2 - self.lamp_circuit.get_height()
+                0 * RIGHT + FRAME_WIDTH / 2 - self.lamp_circuit.get_height()
             )
         )
 
@@ -924,7 +925,7 @@ class CircuitsIntro(Scene):
         # self.small_zoom_rect = Rectangle(width=0.2, height=0.15, color=YELLOW) \
         #     .move_to(self.lamp_circuit.electron_vect_inter.interpolate(0.15))
         self.small_zoom_rect = Rectangle(width=0.2, height=0.15, color=YELLOW) \
-             .move_to(ORIGIN)
+            .move_to(ORIGIN)
         self.large_zoom_rect = Rectangle(width=5.33, height=4, color=YELLOW) \
             .next_to(self.small_zoom_rect, direction=DOWN, buff=0.5)
         self.zoom_lines = VGroup(
@@ -946,22 +947,21 @@ class CircuitsIntro(Scene):
         height_rect = self.large_zoom_rect.get_height()
         atom_scale = 0.5
         atom_width = CopperAtom().scale(atom_scale).get_width()
-        # nx = math.floor(width_rect/atom_width)
-        nx = 2
-        dx = width_rect/nx
-        # ny = math.floor(height_rect/atom_width)
-        ny = 2
-        dy = height_rect/ny
+        nx = math.floor(width_rect/atom_width)
+        dx = width_rect / nx
+        ny = math.floor(height_rect/atom_width)
+        dy = height_rect / ny
         self.atoms = VGroup()
         self.atoms_invisible = VGroup()
-        for ix in range(-1,nx+1):
-            for iy in range(-1,ny+1):
+        for ix in range(-1, nx + 1):
+            for iy in range(-1, ny + 1):
                 # make invisible if outer atom
                 if ix == -1 or ix == nx or iy == -1 or iy == ny:
                     self.atoms_invisible.add(
                         CopperAtom(include_valence=False)
-                        .scale(atom_scale)
-                        .move_to(self.large_zoom_rect.get_corner(DL) + dx*ix*RIGHT + dy*iy*UP + dx*0.5*RIGHT + dy*0.5*UP)
+                            .scale(atom_scale)
+                            .move_to(self.large_zoom_rect.get_corner(
+                            DL) + dx * ix * RIGHT + dy * iy * UP + dx * 0.5 * RIGHT + dy * 0.5 * UP)
                     )
                 else:
                     self.atoms.add(
@@ -977,12 +977,12 @@ class CircuitsIntro(Scene):
         self.free_electrons = VGroup()
         for i in range(len(self.atoms)):
             # skip this electron with certain probability
-            if random.random() < 0.3:
+            if random.random() < 0.4:
                 continue
 
-            rand_theta = 2*PI*random.random()
-            free_electron=Electron(include_sign=False).move_to(
-                self.atoms[i].get_center() + (np.cos(rand_theta)*RIGHT+np.sin(rand_theta)*UP)*(atom_width/2)
+            rand_theta = 2 * PI * random.random()
+            free_electron = Electron(include_sign=False).move_to(
+                self.atoms[i].get_center() + (np.cos(rand_theta) * RIGHT + np.sin(rand_theta) * UP) * (atom_width / 2)
             ).scale(0.27)
             free_electron.current_center = self.atoms[i].get_center()
 
@@ -991,20 +991,20 @@ class CircuitsIntro(Scene):
 
         self.vel_matrix = np.array(
             [[0, -1, 0],
-             [1,  0, 0],
-             [0,  0, 0]]
+             [1, 0, 0],
+             [0, 0, 0]]
         )
         for i, free_electron in enumerate(self.free_electrons):
             free_electron.add_updater(self.free_electron_updater)
 
-    def free_electron_updater(self, free_electron, max_wait_theta=3*PI):
-        dtheta = 0.16
-        dt = 0.03
+    def free_electron_updater(self, free_electron, max_wait_theta=2 * PI):
+        dtheta = 0.18
+        dt = 0.04
 
         # find nearest / second nearest atom
         dists_map = {}
         for atom in self.atoms:
-            dist = np.linalg.norm(atom.get_center()-free_electron.get_center())
+            dist = np.linalg.norm(atom.get_center() - free_electron.get_center())
             dists_map[dist] = atom.get_center()
         dists_sorted = sorted(dists_map)
         closest_center = dists_map[dists_sorted[0]]
@@ -1012,14 +1012,14 @@ class CircuitsIntro(Scene):
 
         # setup wait theta if not set
         if free_electron.wait_theta is None:
-            free_electron.wait_theta = max_wait_theta*random.random()
+            free_electron.wait_theta = max_wait_theta * random.random()
 
         # make invisible if electron is not in rectangle
         zoom_rect_corner = self.large_zoom_rect.get_corner(DL)
         width_rect = self.large_zoom_rect.get_width()
         height_rect = self.large_zoom_rect.get_height()
-        if zoom_rect_corner[0] < free_electron.get_center()[0] < zoom_rect_corner[0]+width_rect and \
-           zoom_rect_corner[1] < free_electron.get_center()[1] < zoom_rect_corner[1]+height_rect:
+        if zoom_rect_corner[0] < free_electron.get_center()[0] < zoom_rect_corner[0] + width_rect and \
+                zoom_rect_corner[1] < free_electron.get_center()[1] < zoom_rect_corner[1] + height_rect:
             free_electron.set_opacity(1)
             free_electron.set_stroke(opacity=0)
         else:
@@ -1028,9 +1028,9 @@ class CircuitsIntro(Scene):
         # handle electron moving toward next atom
         if free_electron.next_center is not None:
             vel_vect = free_electron.next_center - free_electron.get_center()
-            free_electron.shift(dt*vel_vect)
-            dist_to_next = np.linalg.norm(free_electron.next_center-free_electron.get_center())
-            if dist_to_next <= self.atoms[0].get_width()/2:
+            free_electron.shift(dt * vel_vect)
+            dist_to_next = np.linalg.norm(free_electron.next_center - free_electron.get_center())
+            if dist_to_next <= self.atoms[0].get_width() / 2:
                 # fix if not exactly at right radius
                 dist_to_next = np.linalg.norm(free_electron.get_center() - closest_center)
                 if (self.atoms[0].get_width() / 2) - dist_to_next > 0.01:
@@ -1041,7 +1041,7 @@ class CircuitsIntro(Scene):
                 # reset waiting and update current center
                 free_electron.current_center = free_electron.next_center
                 free_electron.next_center = None
-                free_electron.wait_theta = max_wait_theta*random.random()
+                free_electron.wait_theta = max_wait_theta * random.random()
                 free_electron.total_theta = 0
             return
 
@@ -1050,10 +1050,10 @@ class CircuitsIntro(Scene):
             # rotate electron around nearest atom
             xp = free_electron.get_center()[0] - closest_center[0]
             yp = free_electron.get_center()[1] - closest_center[1]
-            new_x = xp*np.cos(dtheta) - yp*np.sin(dtheta)
-            new_y = yp*np.cos(dtheta) + xp*np.sin(dtheta)
+            new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
+            new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
             free_electron.move_to(
-                new_x*RIGHT + new_y*UP + closest_center
+                new_x * RIGHT + new_y * UP + closest_center
             )
             free_electron.total_theta += dtheta
         # set next center to move to
@@ -1062,27 +1062,38 @@ class CircuitsIntro(Scene):
             if not self.electric_field_present:
                 # do not move to next atom if it already has a valence electron
                 for free_electron_i in self.free_electrons:
-                    if free_electron_i.current_center is None or \
-                       free_electron_i.next_center is None:
-                        continue
-                    if np.linalg.norm(free_electron_i.current_center-sec_closest_center) < 0.01 or \
-                       np.linalg.norm(free_electron_i.next_center-sec_closest_center) < 0.01:
+                    if free_electron_i.current_center is not None and \
+                            np.linalg.norm(free_electron_i.current_center - sec_closest_center) < 0.01:
                         free_electron.next_center = None
                         free_electron.wait_theta = max_wait_theta * random.random()
                         free_electron.total_theta = 0
+                        # rotate electron around nearest atom
+                        xp = free_electron.get_center()[0] - closest_center[0]
+                        yp = free_electron.get_center()[1] - closest_center[1]
+                        new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
+                        new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
+                        free_electron.move_to(
+                            new_x * RIGHT + new_y * UP + closest_center
+                        )
+                        free_electron.total_theta += dtheta
                         return
-                print("############")
-                for free_electron_i in self.free_electrons:
-                    if free_electron is free_electron_i:
-                        continue
-                    print(f"next = {free_electron_i.next_center}")
-                    print(f"cur =  {free_electron_i.current_center}")
-                print(f"choosing {sec_closest_center}")
+                    if free_electron_i.next_center is not None and \
+                            np.linalg.norm(free_electron_i.next_center - sec_closest_center) < 0.01:
+                        free_electron.next_center = None
+                        free_electron.wait_theta = max_wait_theta * random.random()
+                        free_electron.total_theta = 0
+                        # rotate electron around nearest atom
+                        xp = free_electron.get_center()[0] - closest_center[0]
+                        yp = free_electron.get_center()[1] - closest_center[1]
+                        new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
+                        new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
+                        free_electron.move_to(
+                            new_x * RIGHT + new_y * UP + closest_center
+                        )
+                        free_electron.total_theta += dtheta
+                        return
                 free_electron.current_center = None
                 free_electron.next_center = sec_closest_center
-
-
-
 
     def get_elec_element_rects(self):
         rects = VGroup()
