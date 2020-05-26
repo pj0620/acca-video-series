@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="copper_atom2.svg"
+   height="860"
+   width="800"
+   viewBox="-1000 -1150 2000 2150"
+   id="Electron shell Copper"
+   zoomAndPan="magnify"
+   preserveAspectRatio="xMidYMid meet"
+   version="1.1">
+  <metadata
+     id="metadata55">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:current-layer="Electron shell Copper"
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="1432"
+     inkscape:cy="308.58824"
+     inkscape:cx="400"
+     inkscape:zoom="0.98837209"
+     showgrid="false"
+     id="namedview53"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <defs
+     id="defs3">
+    <circle
+       r="30"
+       stroke="none"
+       fill="#77868b"
+       id="electron" />
+  </defs>
+  <circle
+     id="circle5"
+     stroke-width="10"
+     stroke="#343434"
+     r="200"
+     fill="#ffc0c0" />
+  <g
+     id="g15"
+     font="arial"
+     font-weight="bold"
+     font-size="100">
+    <text
+       id="text13"
+       text-anchor="middle"
+       font-size="150"
+       y="50"
+       x="0">Cu</text>
+  </g>
+  <g
+     id="g50"
+     fill="none"
+     stroke-width="8"
+     stroke="#77868b">
+    <circle
+       r="300"
+       id="shell_1" />
+    <use
+       y="-300"
+       xlink:href="#electron"
+       id="electron_0_shell_1" />
+    <use
+       transform="rotate(180)"
+       xlink:href="#electron_0_shell_1"
+       id="electron_1_shell_1" />
+    <circle
+       r="400"
+       id="shell_2" />
+    <use
+       y="-400"
+       xlink:href="#electron"
+       id="electron_0_shell_2" />
+    <use
+       transform="rotate(45)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_1_shell_2" />
+    <use
+       transform="rotate(90)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_2_shell_2" />
+    <use
+       transform="rotate(135)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_3_shell_2" />
+    <use
+       transform="rotate(180)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_4_shell_2" />
+    <use
+       transform="rotate(225)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_5_shell_2" />
+    <use
+       transform="rotate(270)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_6_shell_2" />
+    <use
+       transform="rotate(315)"
+       xlink:href="#electron_0_shell_2"
+       id="electron_7_shell_2" />
+    <circle
+       r="500"
+       id="shell_3" />
+    <use
+       y="-500"
+       xlink:href="#electron"
+       id="electron_0_shell_3" />
+    <use
+       transform="rotate(20)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_1_shell_3" />
+    <use
+       transform="rotate(40)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_2_shell_3" />
+    <use
+       transform="rotate(60)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_3_shell_3" />
+    <use
+       transform="rotate(80)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_4_shell_3" />
+    <use
+       transform="rotate(100)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_5_shell_3" />
+    <use
+       transform="rotate(120)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_6_shell_3" />
+    <use
+       transform="rotate(140)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_7_shell_3" />
+    <use
+       transform="rotate(160)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_8_shell_3" />
+    <use
+       transform="rotate(180)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_9_shell_3" />
+    <use
+       transform="rotate(200)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_10_shell_3" />
+    <use
+       transform="rotate(220)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_11_shell_3" />
+    <use
+       transform="rotate(240)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_12_shell_3" />
+    <use
+       transform="rotate(260)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_13_shell_3" />
+    <use
+       transform="rotate(280)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_14_shell_3" />
+    <use
+       transform="rotate(300)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_15_shell_3" />
+    <use
+       transform="rotate(320)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_16_shell_3" />
+    <use
+       transform="rotate(340)"
+       xlink:href="#electron_0_shell_3"
+       id="electron_17_shell_3" />
+    <circle
+       r="600"
+       id="shell_4" />
+    <use
+       y="-600"
+       xlink:href="#electron"
+       id="electron_0_shell_4" />
+  </g>
+</svg>

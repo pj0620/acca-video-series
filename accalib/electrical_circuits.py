@@ -18,7 +18,6 @@ class BatteryLampCircuit(SVGMobject):
         svg_file="images/svgs/battery_lamp_circuit.svg"
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
         self.scale(3.5)
-        random.seed(1234)
 
     def name_parts(self):
         self.outer_rect = self.submobjects[0]
@@ -109,7 +108,7 @@ class BatteryLampCircuit(SVGMobject):
 
         self.electron_vect_inter=VectorInterpolator(points)
 
-        self.electons_flowing=True
+        self.electrons_flowing=True
         self.electron_disps=[0] * self.num_of_electrons
         self.electrons=[]
         self.electron_loc=ValueTracker(0)
@@ -149,7 +148,7 @@ class BatteryLampCircuit(SVGMobject):
         cur=(self.electron_loc.get_value() + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
         # always move if electrons are flowing
-        if self.electons_flowing:
+        if self.electrons_flowing:
             x.move_to(
                 self.electron_vect_inter.interpolate(cur)
             )
@@ -252,7 +251,7 @@ class GeneratorLampCircuit(SVGMobject):
 
         self.electron_vect_inter=VectorInterpolator(points)
 
-        self.electons_flowing=True
+        self.electrons_flowing=True
         self.electron_disps=[0] * self.num_of_electrons
         self.electrons=[]
         self.electron_loc=ValueTracker(0)
@@ -277,7 +276,7 @@ class GeneratorLampCircuit(SVGMobject):
         cur=(self.electron_loc.get_value() + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
         # always move if electrons are flowing
-        if self.electons_flowing:
+        if self.electrons_flowing:
             x.move_to(
                 self.electron_vect_inter.interpolate(cur)
             )
