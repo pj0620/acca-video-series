@@ -596,7 +596,6 @@ class TangentLine(Line):
         )
         self.scale(self.length / self.get_length())
 
-
 class Elbow(VMobject):
     CONFIG = {
         "width": 0.2,

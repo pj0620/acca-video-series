@@ -16,26 +16,13 @@ class CircuitsIntro(Scene):
     }
 
     def construct(self):
-        self.add_wire_zoomed_in()
-        self.electric_field_present = False
-        self.play(
-            FadeIn(
-                Dot().shift(10 * UR),
-                run_time=20
-            )
-        )
-        # self.electric_field_present = True
-        # self.play(
-        #     FadeIn(
-        #         Dot().shift(10*UR),
-        #         run_time=10
-        #     )
-        # )
-
-        # self.wait(5.67)
-        # self.show_circuits_questions() #SS1
-        # self.define_circuit()  # SS2,SS3,
-        # self.label_simple_circuit()  # SS4
+        self.wait(5.67)
+        self.show_circuits_questions() #SS1
+        self.define_circuit()  # SS2,SS3,
+        self.label_simple_circuit()  # SS4
+        self.introduce_current()
+        self.remove_battery()
+        # self.show_zoomed_in_section_of_wire()
         # self.introduce_ohms_law() #SS5
         # self.expand_ohms_law() #SS6
 
@@ -205,6 +192,9 @@ class CircuitsIntro(Scene):
         )
         self.wait(4)
 
+        new_loc = (-FRAME_WIDTH/2 + self.lamp_circuit.get_width()/2 + 0.5)*RIGHT + \
+                  (FRAME_HEIGHT/2 - self.lamp_circuit.get_height()/2)*UP
+
         self.play(
             FadeOutAndShift(
                 definition,
@@ -229,7 +219,7 @@ class CircuitsIntro(Scene):
             ),
             ApplyMethod(
                 self.lamp_circuit.move_to,
-                0 * RIGHT + FRAME_WIDTH / 2 - self.lamp_circuit.get_height()
+                new_loc
             )
         )
 
@@ -274,7 +264,7 @@ class CircuitsIntro(Scene):
             x.set_value(self.voltage_tracker.get_value())
         )
         self.current_text = TextMobject(
-            "current",
+            "current", "=",
             color=self.current_color) \
             .next_to(self.current_arrow, direction=UR) \
             .shift(0.5 * RIGHT) \
@@ -326,7 +316,7 @@ class CircuitsIntro(Scene):
                 run_time=1
             ),
             FadeIn(
-                self.current_text,
+                self.current_text[0],
                 run_time=1
             ),
             self.get_electron_anim(
@@ -335,86 +325,9 @@ class CircuitsIntro(Scene):
         )
         self.play(
             self.get_electron_anim(
-                run_time=9.27
+                run_time=2.7
             )
         )
-
-        # remove battery
-        battery = VGroup(
-            self.lamp_circuit.top_rect,
-            self.lamp_circuit.bot_rect,
-            self.lamp_circuit.outer_rect,
-            self.lamp_circuit.plus_sign,
-            self.lamp_circuit.minus_sign,
-            self.lamp_circuit.horz_line,
-            self.lamp_circuit.lightning_bolt,
-        )
-        for i in (2, 3, 4):
-            self.lamp_circuit.electrons[i].clear_updaters()
-            self.lamp_circuit.remove(self.lamp_circuit.electrons[i])
-        self.lamp_circuit.electrons_flowing = False
-        self.lamp_circuit.set_light_bulb_state(False)
-        self.play(
-            FadeOutAndShift(
-                battery,
-                direction=LEFT,
-                run_time=1
-            ),
-            self.get_electron_anim(
-                freq=0,
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(freq=0, run_time=15)
-        )
-
-        self.add_wire_zoomed_in()
-
-        # # add "no net flow" label
-        # no_flow_label = TextMobject("$\\bullet$ Electrons move in random directions",
-        #                             "$\\bullet$ No net flow of electrons\\\\",
-        #                             "$\\bullet$ Free electrons are a result of Thermal Energy",
-        #                             color=YELLOW_C)\
-        #     .scale(1)\
-        #     .arrange(DOWN,aligned_edge=LEFT)\
-        #     .to_edge(DOWN)
-        # self.play(
-        #     Write(
-        #         no_flow_label[0]
-        #     ),
-        #     self.get_electron_anim(
-        #         freq=0,
-        #         run_time=1
-        #     )
-        # )
-        # self.play(
-        #     Write(
-        #         no_flow_label[1]
-        #     ),
-        #     self.get_electron_anim(
-        #         freq=0,
-        #         run_time=1
-        #     )
-        # )
-        # self.play(
-        #     Write(
-        #         no_flow_label[2]
-        #     ),
-        #     self.get_electron_anim(
-        #         freq=0,
-        #         run_time=1
-        #     )
-        # )
-        # self.play(
-        #     Write(
-        #         no_flow_label[3]
-        #     ),
-        #     self.get_electron_anim(
-        #         freq=0,
-        #         run_time=1
-        #     )
-        # )
 
         # self.play(
         #     FadeIn(
@@ -513,6 +426,457 @@ class CircuitsIntro(Scene):
         #         run_time=12.2
         #     )
         # )
+
+    def introduce_current(self):
+        current_def = TextMobject(
+            "Current - measure of electrons passing through a circuit per second",
+            color=YELLOW
+        ) \
+            .scale(1.15) \
+            .to_corner(DOWN)
+        self.play(
+            Write(
+                current_def
+            ),
+            self.get_electron_anim(
+                run_time=5.13
+            )
+        )
+
+        # label current passing through circuit in e-/s
+        current_val_text = TextMobject(
+            "$1.2483 \\times 10^{19}$",
+            "$\\frac{\\text{electrons}}{\\text{sec}}$",
+            color=self.current_color
+        ) \
+            .arrange(RIGHT)\
+            .next_to(self.current_text, direction=RIGHT)
+        current_val_text[0].scale(1.8).shift(1.4*RIGHT+0.1*UP)
+        current_val_text[1].scale(1.55).shift(3.0*RIGHT+0.0*DOWN)
+        self.play(
+            Write(
+                self.current_text[1]
+            ),
+            Write(
+                current_val_text
+            ),
+            self.get_electron_anim(
+                run_time=5.2
+            )
+        )
+        current_val_word_text = TextMobject(
+            "12.483 Quintillion",
+            color=self.current_color
+        )\
+            .scale(1.35)\
+            .move_to(current_val_text[0].get_center()+0.1*RIGHT+0.1*DOWN)
+        self.play(
+            Transform(
+                current_val_text[0],
+                current_val_word_text
+            ),
+            self.get_electron_anim(
+                run_time=12.67
+            )
+        )
+
+        # show amp in terms of e-/s
+        ampere_label = TextMobject(
+            "1", "Ampere", "\\textbf{=}", "6.242 Quintillion","$\\frac{\\text{electrons}}{\\text{sec}}$",
+            color=self.current_color
+        )
+        ampere_label[0].scale(1.5)
+        ampere_label[1].scale(1.5)
+        ampere_label[2].scale(2)
+        ampere_label[3].scale(1.35)
+        ampere_label[4].scale(1.55)
+        ampere_label.arrange(RIGHT)
+        ampere_label.to_edge(RIGHT,buff=2).shift(2*DOWN)
+        amp_text = TextMobject(
+            "Amp",
+            color=self.current_color
+        ) \
+            .scale(1.5) \
+            .move_to(ampere_label[1].get_center())
+        self.play(
+            Write(
+                ampere_label[1]
+            ),
+            self.get_electron_anim(
+                run_time=3.93
+            )
+        )
+
+        # replace Ampere with Amp
+        self.play(
+            ReplacementTransform(
+                ampere_label[1],
+                amp_text
+            ),
+            self.get_electron_anim(
+                run_time=1.83
+            )
+        )
+
+        # write ampere in e-/s
+        self.play(
+            Write(
+                VGroup(
+                    ampere_label[0],
+                    ampere_label[2:]
+                )
+            ),
+            self.get_electron_anim(
+                run_time=6.8
+            )
+        )
+
+        # replace with calculation
+        division_text = TextMobject(
+            "$\\frac{\\text{12.483 Quintillion}}{\\text{6.242 Quintillion}}$",
+            color=self.current_color
+        ) \
+            .scale(1.4) \
+            .move_to(current_val_text[0].get_center())
+        self.play(
+            Transform(
+                current_val_text[0],
+                division_text
+            ),
+            self.get_electron_anim(
+                run_time=7.93
+            )
+        )
+
+        # Replace current value to Ampere equivalent
+        self.current_in_amps = DecimalNumber(
+            2,
+            unit="Amps",
+            color=self.current_color,
+            num_decimal_places=0
+        )\
+            .scale(2.2) \
+            .next_to(self.current_text, direction=RIGHT)
+        self.current_in_amps.shift(0.2*UP)
+        self.current_in_amps.unit_sign.shift(0.2*DOWN+0.2*RIGHT)
+        self.play(
+            ReplacementTransform(
+                current_val_text,
+                self.current_in_amps
+            ),
+            self.get_electron_anim(
+                run_time=5
+            )
+        )
+
+        self.wait()
+
+    def remove_battery(self):
+        # remove battery
+        battery = VGroup(
+            self.lamp_circuit.top_rect,
+            self.lamp_circuit.bot_rect,
+            self.lamp_circuit.outer_rect,
+            self.lamp_circuit.plus_sign,
+            self.lamp_circuit.minus_sign,
+            self.lamp_circuit.horz_line,
+            self.lamp_circuit.lightning_bolt,
+        )
+        for i in (7,8,9):
+            self.lamp_circuit.electrons[i].set_opacity(0)
+        self.lamp_circuit.electrons_flowing = False
+        self.lamp_circuit.set_light_bulb_state(False)
+        self.current_in_amps.shift(0.2 * UP)
+        self.current_in_amps.unit_sign.shift(1.0 * DOWN + 0.2 * RIGHT)
+        self.play(
+            ApplyMethod(
+                self.current_in_amps.set_value, 0,
+                run_time=1
+            ),
+            FadeOutAndShift(
+                battery,
+                direction=LEFT,
+                run_time=1
+            ),
+            self.get_electron_anim(
+                freq=0,
+                run_time=1
+            )
+        )
+        self.play(
+            self.get_electron_anim(
+                freq=0,
+                run_time=4.7
+            )
+        )
+
+        # self.play(
+        #     FadeInFrom(c
+        #         battery,
+        #         direction=LEFT,
+        #         run_time=1
+        #     ),
+        #     FadeInFrom(
+        #         self.current_arrow,
+        #         direction=UP,
+        #         run_time=1
+        #     ),
+        #     FadeInFrom(
+        #         self.current_text,
+        #         direction=UP,
+        #         run_time=1
+        #     ),
+        #     self.get_electron_anim(
+        #         run_time=1,
+        #         freq=0
+        #     )
+        # )
+        # for i in (7,8,9):
+        #     self.lamp_circuit.electrons[i].set_opacity(1)
+        #     self.lamp_circuit.electrons[i].init_colors()
+        # self.lamp_circuit.electrons_flowing = True
+        # self.lamp_circuit.set_light_bulb_state(True)
+        # self.play(
+        #     self.get_electron_anim(
+        #         run_time=10
+        #     )
+        # )
+
+    def show_zoomed_in_section_of_wire(self):
+        # add wire zoomed in
+        self.electric_field_present = False
+        self.add_wire_zoomed_in()
+        self.play(
+            FadeIn(
+                Dot().shift(10*UR),
+                run_time=6.13
+            ),
+            *[
+                Rotating(
+                    atom,
+                    run_time=6.13
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=6.13
+            )
+        )
+
+        # add Copper text
+        conductors_list = TextMobject(
+            "\\underline{Conductors}\\\\",
+            "Copper\\\\",
+            "Iron\\\\",
+            color=YELLOW
+        ) \
+            .scale(1.4) \
+            .arrange(DOWN, aligned_edge=LEFT) \
+            .next_to(self.large_zoom_rect, direction=LEFT, aligned_edge=UP)
+        insulators_list = TextMobject(
+            "\\underline{Insulators}\\\\",
+            "Glass\\\\",
+            "Wood\\\\",
+            color=GREEN_C
+        ) \
+            .scale(1.4) \
+            .arrange(DOWN, aligned_edge=LEFT) \
+            .next_to(conductors_list, direction=UP, aligned_edge=LEFT,buff=1)
+        self.play(
+            Write(
+                conductors_list[1]
+            ),
+            *[
+                Rotating(
+                    atom,
+                    run_time=3.57
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=3.57
+            )
+        )
+
+        # label static atoms
+        red_electron_atoms = VGroup()
+        for atom in self.atoms_visible:
+            red_electron_atoms.add(
+                CopperAtom(include_valence=False, electron_color="#FF0000")
+                .scale(0.5)
+                .move_to(atom.get_center())
+            )
+        self.add(red_electron_atoms)
+        self.add(self.e_field_arrows)
+        self.play(
+            *[
+                Rotating(
+                    atom,
+                    run_time=3.93
+                )
+                for atom in self.atoms_visible
+            ],
+            *[
+                Rotating(
+                    atom,
+                    run_time=3.93
+                )
+                for atom in red_electron_atoms
+            ],
+            self.get_electron_anim(
+                run_time=3.93
+            )
+        )
+
+        self.remove(red_electron_atoms)
+        self.free_electrons.set_color("#FF0000")
+        sea_of_elec_text = TextMobject(
+            "sea of electrons\\\\",
+            "delocalized electrons\\\\",
+            "free electrons\\\\",
+            color="#FF0000") \
+            .arrange(DOWN,aligned_edge=LEFT) \
+            .scale(1.2) \
+            .next_to(self.large_zoom_rect, direction=RIGHT, aligned_edge=UP)
+        self.play(
+            Write(sea_of_elec_text[0]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=3.63
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=3.63
+            )
+        )
+        self.play(
+            Write(sea_of_elec_text[1]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=2
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=2
+            )
+        )
+        self.play(
+            Write(sea_of_elec_text[2]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=2
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=2
+            )
+        )
+        self.play(
+            *[
+                Rotating(
+                    atom,
+                    run_time=8.97
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=8.97
+            )
+        )
+
+        # write Iron
+        self.play(
+            Write(conductors_list[2]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=5.1
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=5.1
+            )
+        )
+
+        # write Glass
+        self.play(
+            Write(insulators_list[1]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=1
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=1
+            )
+        )
+
+        # write Wood
+        self.play(
+            Write(insulators_list[2]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=5.67
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=5.67
+            )
+        )
+
+        # write Conductors
+        self.play(
+            Write(conductors_list[0]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=5
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=5
+            )
+        )
+
+        # write Insulators
+        self.play(
+            Write(insulators_list[0]),
+            *[
+                Rotating(
+                    atom,
+                    run_time=1
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=1
+            )
+        )
+
+        self.play(
+            *[
+                Rotating(
+                    atom,
+                    run_time=2
+                )
+                for atom in self.atoms_visible
+            ],
+            self.get_electron_anim(
+                run_time=2
+            )
+        )
 
     def introduce_ohms_law(self):
         self.ohms_law_label = TextMobject("Ohm's Law:") \
@@ -921,11 +1285,11 @@ class CircuitsIntro(Scene):
         )
 
     def add_wire_zoomed_in(self):
-        # # setup rectangles
-        # self.small_zoom_rect = Rectangle(width=0.2, height=0.15, color=YELLOW) \
-        #     .move_to(self.lamp_circuit.electron_vect_inter.interpolate(0.15))
+        # setup rectangles
         self.small_zoom_rect = Rectangle(width=0.2, height=0.15, color=YELLOW) \
-            .move_to(ORIGIN)
+            .move_to(self.lamp_circuit.electron_vect_inter.interpolate(0.15))
+        # self.small_zoom_rect = Rectangle(width=0.2, height=0.15, color=YELLOW) \
+        #     .move_to(ORIGIN)
         self.large_zoom_rect = Rectangle(width=5.33, height=4, color=YELLOW) \
             .next_to(self.small_zoom_rect, direction=DOWN, buff=0.5)
         self.zoom_lines = VGroup(
@@ -949,10 +1313,11 @@ class CircuitsIntro(Scene):
         atom_width = CopperAtom().scale(atom_scale).get_width()
         nx = math.floor(width_rect/atom_width)
         dx = width_rect / nx
-        ny = math.floor(height_rect/atom_width)
+        ny = math.floor(height_rect/atom_width)-1
         dy = height_rect / ny
         self.atoms = VGroup()
         self.atoms_invisible = VGroup()
+        self.atoms_visible = VGroup()
         for ix in range(-1, nx + 1):
             for iy in range(-1, ny + 1):
                 # make invisible if outer atom
@@ -964,55 +1329,85 @@ class CircuitsIntro(Scene):
                             DL) + dx * ix * RIGHT + dy * iy * UP + dx * 0.5 * RIGHT + dy * 0.5 * UP)
                     )
                 else:
-                    self.atoms.add(
+                    self.atoms_visible.add(
                         CopperAtom(include_valence=False)
                             .scale(atom_scale)
                             .move_to(self.large_zoom_rect.get_corner(
                             DL) + dx * ix * RIGHT + dy * iy * UP + dx * 0.5 * RIGHT + dy * 0.5 * UP)
                     )
-        self.add(*self.atoms)
+        self.add(*self.atoms_visible)
         self.atoms.add(*self.atoms_invisible)
+        self.atoms.add(*self.atoms_visible)
+
+        def in_atom(loc):
+            for atom in self.atoms_visible:
+                if np.linalg.norm(atom.get_center()-loc) < atom_width*0.5:
+                    return True
+            return False
 
         # add electrons
         self.free_electrons = VGroup()
-        for i in range(len(self.atoms)):
-            # skip this electron with certain probability
-            if random.random() < 0.4:
-                continue
-
-            rand_theta = 2 * PI * random.random()
-            free_electron = Electron(include_sign=False).move_to(
-                self.atoms[i].get_center() + (np.cos(rand_theta) * RIGHT + np.sin(rand_theta) * UP) * (atom_width / 2)
-            ).scale(0.27)
-            free_electron.current_center = self.atoms[i].get_center()
-
+        num_of_electrons_initial = 500
+        # num_of_electrons_initial = 10
+        backward_dist = 50
+        for i in range(num_of_electrons_initial):
+            loc = None
+            while loc is None or in_atom(loc):
+                xrand = (width_rect+backward_dist)*random.random() - backward_dist
+                yrand = random.random() * height_rect
+                loc = xrand * RIGHT + yrand * UP + self.large_zoom_rect.get_corner(DL)
+            free_electron = Electron(include_sign=False).move_to(loc).scale(0.27)
             self.free_electrons.add(free_electron)
         self.add(*self.free_electrons)
+        self.electric_field_present = True
 
-        self.vel_matrix = np.array(
-            [[0, -1, 0],
-             [1, 0, 0],
-             [0, 0, 0]]
-        )
-        for i, free_electron in enumerate(self.free_electrons):
+        # add updater to electrons
+        for free_electron in self.free_electrons:
             free_electron.add_updater(self.free_electron_updater)
 
+        # add electric field arrow
+        arrows_left = self.large_zoom_rect.get_corner(DL)[0]
+        arrows_right = self.large_zoom_rect.get_corner(DR)[0]
+        arrows_y = self.large_zoom_rect.get_center()[1]
+        e_field_kw = {
+            "stroke_opacity": 0.7,
+            "stroke_width": 20,
+            "tip_length": 0.6,
+            "color": GREEN_D,
+            "direction": LEFT,
+            "tip_style": {
+                "fill_opacity": 0.7,
+                "stroke_width": 0,
+            }
+        }
+        self.e_field_arrows = VGroup(
+            Arrow(
+                RIGHT * arrows_right + UP * arrows_y + UP * 1.1,
+                RIGHT * arrows_left + UP * arrows_y + UP * 1.1,
+                **e_field_kw),
+            Arrow(
+                RIGHT * arrows_right + UP * arrows_y + UP * 0,
+                RIGHT * arrows_left + UP * arrows_y + UP * 0,
+                **e_field_kw),
+            Arrow(
+                RIGHT * arrows_right + UP * arrows_y + DOWN * 1.1,
+                RIGHT * arrows_left + UP * arrows_y + DOWN * 1.1,
+                **e_field_kw),
+        )
+        self.add(self.e_field_arrows)
+
     def free_electron_updater(self, free_electron, max_wait_theta=2 * PI):
-        dtheta = 0.18
-        dt = 0.04
-
-        # find nearest / second nearest atom
-        dists_map = {}
-        for atom in self.atoms:
-            dist = np.linalg.norm(atom.get_center() - free_electron.get_center())
-            dists_map[dist] = atom.get_center()
-        dists_sorted = sorted(dists_map)
-        closest_center = dists_map[dists_sorted[0]]
-        sec_closest_center = dists_map[dists_sorted[1]]
-
-        # setup wait theta if not set
-        if free_electron.wait_theta is None:
-            free_electron.wait_theta = max_wait_theta * random.random()
+        # move in random direction
+        #  affected by if electric field is present
+        ampl_min = 0.05
+        ampl_max = 0.15
+        rand_ampl = random.random() * (ampl_max - ampl_min) + ampl_min
+        if self.electric_field_present:
+            rand_theta = np.random.normal(loc=0, scale=PI/2)
+        else:
+            rand_theta = random.random()*TAU
+        disp_vec = rand_ampl * (np.cos(rand_theta) * RIGHT + np.sin(rand_theta) * UP)
+        free_electron.shift(disp_vec)
 
         # make invisible if electron is not in rectangle
         zoom_rect_corner = self.large_zoom_rect.get_corner(DL)
@@ -1024,76 +1419,6 @@ class CircuitsIntro(Scene):
             free_electron.set_stroke(opacity=0)
         else:
             free_electron.circle.set_opacity(0)
-
-        # handle electron moving toward next atom
-        if free_electron.next_center is not None:
-            vel_vect = free_electron.next_center - free_electron.get_center()
-            free_electron.shift(dt * vel_vect)
-            dist_to_next = np.linalg.norm(free_electron.next_center - free_electron.get_center())
-            if dist_to_next <= self.atoms[0].get_width() / 2:
-                # fix if not exactly at right radius
-                dist_to_next = np.linalg.norm(free_electron.get_center() - closest_center)
-                if (self.atoms[0].get_width() / 2) - dist_to_next > 0.01:
-                    coef = (self.atoms[0].get_width() / 2 - dist_to_next) / dist_to_next
-                    free_electron.shift(
-                        coef * (free_electron.get_center() - closest_center)
-                    )
-                # reset waiting and update current center
-                free_electron.current_center = free_electron.next_center
-                free_electron.next_center = None
-                free_electron.wait_theta = max_wait_theta * random.random()
-                free_electron.total_theta = 0
-            return
-
-        # rotate if not moving to next atom
-        if free_electron.total_theta < free_electron.wait_theta:
-            # rotate electron around nearest atom
-            xp = free_electron.get_center()[0] - closest_center[0]
-            yp = free_electron.get_center()[1] - closest_center[1]
-            new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
-            new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
-            free_electron.move_to(
-                new_x * RIGHT + new_y * UP + closest_center
-            )
-            free_electron.total_theta += dtheta
-        # set next center to move to
-        else:
-            # choose next center if no electric field is present
-            if not self.electric_field_present:
-                # do not move to next atom if it already has a valence electron
-                for free_electron_i in self.free_electrons:
-                    if free_electron_i.current_center is not None and \
-                            np.linalg.norm(free_electron_i.current_center - sec_closest_center) < 0.01:
-                        free_electron.next_center = None
-                        free_electron.wait_theta = max_wait_theta * random.random()
-                        free_electron.total_theta = 0
-                        # rotate electron around nearest atom
-                        xp = free_electron.get_center()[0] - closest_center[0]
-                        yp = free_electron.get_center()[1] - closest_center[1]
-                        new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
-                        new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
-                        free_electron.move_to(
-                            new_x * RIGHT + new_y * UP + closest_center
-                        )
-                        free_electron.total_theta += dtheta
-                        return
-                    if free_electron_i.next_center is not None and \
-                            np.linalg.norm(free_electron_i.next_center - sec_closest_center) < 0.01:
-                        free_electron.next_center = None
-                        free_electron.wait_theta = max_wait_theta * random.random()
-                        free_electron.total_theta = 0
-                        # rotate electron around nearest atom
-                        xp = free_electron.get_center()[0] - closest_center[0]
-                        yp = free_electron.get_center()[1] - closest_center[1]
-                        new_x = xp * np.cos(dtheta) - yp * np.sin(dtheta)
-                        new_y = yp * np.cos(dtheta) + xp * np.sin(dtheta)
-                        free_electron.move_to(
-                            new_x * RIGHT + new_y * UP + closest_center
-                        )
-                        free_electron.total_theta += dtheta
-                        return
-                free_electron.current_center = None
-                free_electron.next_center = sec_closest_center
 
     def get_elec_element_rects(self):
         rects = VGroup()

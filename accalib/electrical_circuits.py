@@ -9,7 +9,8 @@ from functools import partial
 class BatteryLampCircuit(SVGMobject):
     CONFIG={
         "battery_orange": "#f99420",
-        "num_of_electrons": 10,
+        # "num_of_electrons": 10,
+        "num_of_electrons": 1,
         "bezier_approx_samples": 50
     }
 
@@ -157,9 +158,9 @@ class BatteryLampCircuit(SVGMobject):
         # change due to random motion
         diff=(2 * random.random() - 1) * 0.006
 
-        # # down move if inside voltage source
-        # if 0.78 < (cur + diff) % 1 < 0.925:
-        #     return
+        # down move if inside voltage source
+        if 0.755 < (cur + diff) % 1 < 1:
+            return
 
         x.move_to(
             self.electron_vect_inter.interpolate(
