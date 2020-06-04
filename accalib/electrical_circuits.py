@@ -9,8 +9,8 @@ from functools import partial
 class BatteryLampCircuit(SVGMobject):
     CONFIG={
         "battery_orange": "#f99420",
-        # "num_of_electrons": 10,
-        "num_of_electrons": 1,
+        "num_of_electrons": 10,
+        # "num_of_electrons": 1,
         "bezier_approx_samples": 50
     }
 

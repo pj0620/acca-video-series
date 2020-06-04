@@ -3,6 +3,7 @@ from accalib.electrical_circuits import BatteryLampCircuit, GeneratorLampCircuit
 from accalib import geometry
 from functools import partial
 from accalib.particles import CopperAtom, Electron
+from accalib.numbers import MyDecimalNumber
 import hashlib
 
 
@@ -549,16 +550,15 @@ class CircuitsIntro(Scene):
         )
 
         # Replace current value to Ampere equivalent
-        self.current_in_amps = DecimalNumber(
+        self.current_in_amps = MyDecimalNumber(
             2,
             unit="Amps",
             color=self.current_color,
-            num_decimal_places=0
+            num_decimal_places=0,
+            use_my_alignment=True
         )\
             .scale(2.2) \
             .next_to(self.current_text, direction=RIGHT)
-        self.current_in_amps.shift(0.2*UP)
-        self.current_in_amps.unit_sign.shift(0.2*DOWN+0.2*RIGHT)
         self.play(
             ReplacementTransform(
                 current_val_text,
@@ -586,8 +586,6 @@ class CircuitsIntro(Scene):
             self.lamp_circuit.electrons[i].set_opacity(0)
         self.lamp_circuit.electrons_flowing = False
         self.lamp_circuit.set_light_bulb_state(False)
-        self.current_in_amps.shift(0.2 * UP)
-        self.current_in_amps.unit_sign.shift(1.0 * DOWN + 0.2 * RIGHT)
         self.play(
             ApplyMethod(
                 self.current_in_amps.set_value, 0,
@@ -610,37 +608,31 @@ class CircuitsIntro(Scene):
             )
         )
 
-        # self.play(
-        #     FadeInFrom(c
-        #         battery,
-        #         direction=LEFT,
-        #         run_time=1
-        #     ),
-        #     FadeInFrom(
-        #         self.current_arrow,
-        #         direction=UP,
-        #         run_time=1
-        #     ),
-        #     FadeInFrom(
-        #         self.current_text,
-        #         direction=UP,
-        #         run_time=1
-        #     ),
-        #     self.get_electron_anim(
-        #         run_time=1,
-        #         freq=0
-        #     )
-        # )
-        # for i in (7,8,9):
-        #     self.lamp_circuit.electrons[i].set_opacity(1)
-        #     self.lamp_circuit.electrons[i].init_colors()
-        # self.lamp_circuit.electrons_flowing = True
-        # self.lamp_circuit.set_light_bulb_state(True)
-        # self.play(
-        #     self.get_electron_anim(
-        #         run_time=10
-        #     )
-        # )
+        self.play(
+            ApplyMethod(
+                self.current_in_amps.set_value, 2,
+                run_time=1
+            ),
+            FadeInFrom(
+                battery,
+                direction=LEFT,
+                run_time=1
+            ),
+            self.get_electron_anim(
+                run_time=1,
+                freq=0
+            )
+        )
+        for i in (7,8,9):
+            self.lamp_circuit.electrons[i].set_opacity(1)
+            self.lamp_circuit.electrons[i].init_colors()
+        self.lamp_circuit.electrons_flowing = True
+        self.lamp_circuit.set_light_bulb_state(True)
+        self.play(
+            self.get_electron_anim(
+                run_time=10
+            )
+        )
 
     def show_zoomed_in_section_of_wire(self):
         # add wire zoomed in
