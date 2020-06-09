@@ -156,7 +156,7 @@ class BatteryLampCircuit(SVGMobject):
             return
 
         # change due to random motion
-        diff=(2 * random.random() - 1) * 0.006
+        diff=(2 * random.random() - 1) * 0.01
 
         # down move if inside voltage source
         if 0.755 < (cur + diff) % 1 < 1:

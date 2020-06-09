@@ -17,7 +17,7 @@ class CircuitsIntro(Scene):
     }
 
     def construct(self):
-        self.wait(5.67)
+        self.wait(6.47)
         self.show_circuits_questions() #SS1
         self.define_circuit()  # SS2,SS3,
         self.label_simple_circuit()  # SS4
@@ -42,18 +42,18 @@ class CircuitsIntro(Scene):
         self.play(
             Write(
                 questions[0],
-                run_time=1
+                run_time=2
             )
         )
-        self.wait(1.22)
+        self.wait(0.25)
 
         self.play(
             Write(
                 questions[1],
-                run_time=1
+                run_time=2
             )
         )
-        self.wait(1.68)
+        self.wait(1.05)
 
         # SS1.3
         self.play(
@@ -82,7 +82,7 @@ class CircuitsIntro(Scene):
                 run_time=2
             )
         )
-        self.wait(1.8)
+        self.wait(8.16)
 
         # show simple real world circuit
         self.lamp_circuit = BatteryLampCircuit()
@@ -92,7 +92,7 @@ class CircuitsIntro(Scene):
                 run_time=1
             )
         )
-        self.wait(7.28)
+        self.wait(5.36)
 
         indicate_anim = partial(ShowPassingFlashAround,
                                 time_width=0.5,
@@ -231,7 +231,7 @@ class CircuitsIntro(Scene):
         self.lamp_circuit.setup_electrons()
         self.play(
             self.get_electron_anim(
-                run_time=7.63
+                run_time=4.53
             )
         )
 
@@ -326,7 +326,7 @@ class CircuitsIntro(Scene):
         )
         self.play(
             self.get_electron_anim(
-                run_time=2.7
+                run_time=1.4
             )
         )
 
@@ -437,16 +437,17 @@ class CircuitsIntro(Scene):
             .to_corner(DOWN)
         self.play(
             Write(
-                current_def
+                current_def,
+                run_time=3
             ),
             self.get_electron_anim(
-                run_time=5.13
+                run_time=6.2
             )
         )
 
         # label current passing through circuit in e-/s
         current_val_text = TextMobject(
-            "$1.2483 \\times 10^{19}$",
+            "$1.24 \\times 10^{19}$",
             "$\\frac{\\text{electrons}}{\\text{sec}}$",
             color=self.current_color
         ) \
@@ -456,17 +457,18 @@ class CircuitsIntro(Scene):
         current_val_text[1].scale(1.55).shift(3.0*RIGHT+0.0*DOWN)
         self.play(
             Write(
-                self.current_text[1]
+                self.current_text[1],
+                run_time=2
             ),
             Write(
                 current_val_text
             ),
             self.get_electron_anim(
-                run_time=5.2
+                run_time=8.47
             )
         )
         current_val_word_text = TextMobject(
-            "12.483 Quintillion",
+            "12.48 Quintillion",
             color=self.current_color
         )\
             .scale(1.35)\
@@ -477,7 +479,7 @@ class CircuitsIntro(Scene):
                 current_val_word_text
             ),
             self.get_electron_anim(
-                run_time=12.67
+                run_time=14
             )
         )
 
@@ -504,7 +506,7 @@ class CircuitsIntro(Scene):
                 ampere_label[1]
             ),
             self.get_electron_anim(
-                run_time=3.93
+                run_time=5.46
             )
         )
 
@@ -515,7 +517,7 @@ class CircuitsIntro(Scene):
                 amp_text
             ),
             self.get_electron_anim(
-                run_time=1.83
+                run_time=2.6
             )
         )
 
@@ -528,7 +530,7 @@ class CircuitsIntro(Scene):
                 )
             ),
             self.get_electron_anim(
-                run_time=6.8
+                run_time=15.97
             )
         )
 
@@ -545,7 +547,7 @@ class CircuitsIntro(Scene):
                 division_text
             ),
             self.get_electron_anim(
-                run_time=7.93
+                run_time=4.6
             )
         )
 
@@ -582,8 +584,14 @@ class CircuitsIntro(Scene):
             self.lamp_circuit.horz_line,
             self.lamp_circuit.lightning_bolt,
         )
-        for i in (7,8,9):
+        for i in (6,7):
             self.lamp_circuit.electrons[i].set_opacity(0)
+            # self.add(
+            #             #     TextMobject(str(i)).next_to(
+            #             #         self.lamp_circuit.electrons[i],
+            #             #         direction=UR
+            #             #     )
+            #             # )
         self.lamp_circuit.electrons_flowing = False
         self.lamp_circuit.set_light_bulb_state(False)
         self.play(
@@ -598,13 +606,7 @@ class CircuitsIntro(Scene):
             ),
             self.get_electron_anim(
                 freq=0,
-                run_time=1
-            )
-        )
-        self.play(
-            self.get_electron_anim(
-                freq=0,
-                run_time=4.7
+                run_time=38.73
             )
         )
 
@@ -623,14 +625,14 @@ class CircuitsIntro(Scene):
                 freq=0
             )
         )
-        for i in (7,8,9):
+        for i in (6,7):
             self.lamp_circuit.electrons[i].set_opacity(1)
             self.lamp_circuit.electrons[i].init_colors()
         self.lamp_circuit.electrons_flowing = True
         self.lamp_circuit.set_light_bulb_state(True)
         self.play(
             self.get_electron_anim(
-                run_time=10
+                run_time=14
             )
         )
 
