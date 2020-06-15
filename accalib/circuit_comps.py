@@ -501,3 +501,198 @@ class Resistor(SVGMobject):
         self.rotate(-np.pi / 2)
 
         return self
+
+class BatterySymbol(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file="images/svgs/battery_symbol.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+
+    def name_parts(self):
+        self.thin_lines = VGroup()
+        self.thick_lines = VGroup()
+
+        self.thin_lines.add(self.submobjects[0])
+        self.thick_lines.add(self.submobjects[1])
+        self.thin_lines.add(*self.submobjects[2:6])
+        self.thick_lines.add(self.submobjects[6])
+        self.thin_lines.add(self.submobjects[7])
+        self.thick_lines.add(self.submobjects[8])
+        self.thin_lines.add(*self.submobjects[9:12])
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        # for mob in self.submobjects:
+        #     mob.set_stroke(BLACK, opacity=0)
+        #     mob.set_fill(BLACK, opacity=0)
+
+        self.thin_lines.set_fill(self.get_color(), opacity=1)
+        self.thin_lines.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.thick_lines.set_fill(self.get_color(), opacity=1)
+        self.thick_lines.set_stroke(self.get_color(), self.get_stroke_width()*2.2, opacity=1)
+
+        return self
+
+class IronCoreInductor(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file="images/svgs/iron_core_inductor.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+
+    def name_parts(self):
+        pass
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        # for mob in self.submobjects:
+        #     mob.set_stroke(BLACK, opacity=0)
+        #     mob.set_fill(BLACK, opacity=0)
+
+        self.set_fill(self.get_color(), opacity=0)
+        self.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+
+        return self
+
+class VacuumTube(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file = "images/svgs/vacuum_tube.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+
+    def name_parts(self):
+        pass
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        # for mob in self.submobjects:
+        #     mob.set_stroke(BLACK, opacity=0)
+        #     mob.set_fill(BLACK, opacity=0)
+
+        self.set_fill(self.get_color(), opacity=0)
+        self.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+
+        return self
+
+class Potentiometer(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file = "images/svgs/potentiometer.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+
+    def name_parts(self):
+        pass
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        # for mob in self.submobjects:
+        #     mob.set_stroke(BLACK, opacity=0)
+        #     mob.set_fill(BLACK, opacity=0)
+
+        self.set_fill(self.get_color(), opacity=0)
+        self.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+
+        return self
+
+class FullBridgeRectifier(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file = "images/svgs/full_bridge_rectifier.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+
+    def name_parts(self):
+        self.small_lines = VGroup()
+        self.triangles = VGroup()
+
+        self.small_lines.add(*self.submobjects[0:8])
+        self.triangles.add(self.submobjects[8])
+        self.small_lines.add(self.submobjects[9])
+        self.triangles.add(self.submobjects[10])
+        self.small_lines.add(self.submobjects[11])
+        self.triangles.add(self.submobjects[12])
+        self.small_lines.add(self.submobjects[13])
+        self.triangles.add(self.submobjects[14])
+        self.small_lines.add(*self.submobjects[15:21])
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        self.small_lines.set_fill(self.get_color(), opacity=0)
+        self.small_lines.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.triangles.set_fill(self.get_color(), opacity=1)
+        self.triangles.set_stroke(self.get_color(), self.get_stroke_width()*0.8, opacity=1)
+
+        return self
+
+class Triac(SVGMobject):
+    CONFIG = {
+        "stroke_width" : DEFAULT_WIRE_THICKNESS,
+    }
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file = "images/svgs/triac.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+        self.lines[-1].shift(0.1 * UP)
+        for triangle in self.triangles:
+            triangle.scale(0.9)
+
+    def name_parts(self):
+        self.lines = VGroup()
+        self.triangles = VGroup()
+
+        self.triangles.add(self.submobjects[0])
+        self.lines.add(self.submobjects[1])
+        self.triangles.add(self.submobjects[2])
+        self.lines.add(*self.submobjects[3:7])
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        for mob in self.submobjects:
+            mob.set_stroke(BLACK, opacity=0)
+            mob.set_fill(BLACK, opacity=0)
+
+        # self.new.set_fill(GREEN, opacity=0)
+        # self.new.set_stroke(GREEN, self.get_stroke_width(), opacity=1)
+        self.lines.set_fill(self.get_color(), opacity=0)
+        self.lines.set_stroke(self.get_color(), 1*self.get_stroke_width(), opacity=1)
+        self.triangles.set_fill(self.get_color(), opacity=1)
+        self.triangles.set_stroke(self.get_color(), self.get_stroke_width()*0.2, opacity=0)
+
+        return self

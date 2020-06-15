@@ -169,7 +169,6 @@ class BatteryLampCircuit(SVGMobject):
         )
         self.electron_disps[i]+=diff
 
-
 class GeneratorLampCircuit(SVGMobject):
     CONFIG={
         "num_of_electrons": 8,
@@ -296,3 +295,67 @@ class GeneratorLampCircuit(SVGMobject):
             )
         )
         self.electron_disps[i]+=diff
+
+class ComplexCircuitTimeDomain(SVGMobject):
+    CONFIG = {
+        "stroke_width": 3,
+        "current_color": GREEN,
+        "voltage_color": RED,
+        "unit_color": ORANGE
+    }
+
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named = False
+        svg_file = "images/ep1/DiffyEqToComplex/circuit_timedomain.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+        self.scale(4)
+        self.volt_text.shift(0.3*RIGHT)
+
+    def name_parts(self):
+        self.lines = VGroup(*self.submobjects[0:22])
+        self.plus_minus = VGroup(*self.submobjects[22:26])
+        self.capacitor = VGroup(*self.submobjects[26:30])
+        self.inductor = self.submobjects[30]
+        self.dots = VGroup(*self.submobjects[31:35])
+        self.volt_text = VGroup(*self.submobjects[35:49])
+        self.other_text = VGroup(*self.submobjects[49:73])
+        self.arrows = VGroup(*self.submobjects[73:80])
+        self.i_text = VGroup(*self.submobjects[80:94])
+        self.v_text = VGroup(*self.submobjects[94:104])
+        self.ground = VGroup(*self.submobjects[104:109])
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        # set opacity of every submobject to 0
+        for mob in self.submobjects:
+            mob.set_stroke(self.get_color(), self.get_stroke_width(), opacity=0)
+            mob.set_fill(RED, opacity=0)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        self.lines.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.lines.set_fill(YELLOW, opacity=0)
+        self.plus_minus.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.plus_minus.set_fill(YELLOW, opacity=0)
+        self.capacitor.set_stroke(self.get_color(), self.get_stroke_width()*2, opacity=1)
+        self.capacitor.set_fill(YELLOW, opacity=0)
+        self.inductor.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.inductor.set_fill(YELLOW, opacity=0)
+        self.dots.set_stroke(self.get_color(), self.get_stroke_width(), opacity=0)
+        self.dots.set_fill(self.get_color(), opacity=1)
+        self.volt_text.set_stroke(self.unit_color, self.get_stroke_width(), opacity=0)
+        self.volt_text.set_fill(self.unit_color, opacity=1)
+        self.other_text.set_stroke(self.unit_color, self.get_stroke_width(), opacity=0)
+        self.other_text.set_fill(self.unit_color, opacity=1)
+        self.arrows.set_stroke(self.current_color, self.get_stroke_width(), opacity=0)
+        self.arrows.set_fill(self.current_color, opacity=1)
+        self.i_text.set_stroke(self.current_color, self.get_stroke_width(), opacity=0)
+        self.i_text.set_fill(self.current_color, opacity=1)
+        self.v_text.set_stroke(self.voltage_color, self.get_stroke_width(), opacity=0)
+        self.v_text.set_fill(self.voltage_color, opacity=1)
+        self.ground.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
+        self.ground.set_fill(YELLOW, opacity=0)
+
+        return self
