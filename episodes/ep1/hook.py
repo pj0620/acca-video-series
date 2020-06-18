@@ -1,5 +1,5 @@
 from manimlib.imports import *
-from accalib.electrical_circuits import ComplexCircuitTimeDomain
+from accalib.electrical_circuits import ComplexCircuitTimeDomain, ComplexCircuitFreqDomain
 
 class Stienmitz(Scene):
     def construct(self):
@@ -147,7 +147,7 @@ class ComplexQuantitiesPaper(Scene):
         )
 
         # add pages to screen
-        pages = self.get_paper(cs_image,n_pages=3)
+        pages = self.get_paper(cs_image, n_pages=5)
         self.play(
             *[
                 FadeIn(page)
@@ -166,8 +166,8 @@ class ComplexQuantitiesPaper(Scene):
             .shift(1*DOWN)
         self.play(
             ApplyMethod(
-               pages.shift, 20 * UP,
-               run_time=5.96,
+               pages.shift, 35 * UP,
+               run_time=10.05,
                rate_func=linear,
             ),
             FadeIn(
@@ -203,137 +203,330 @@ class DiffyEqToComplex(Scene):
     CONFIG = {
         "stroke_width": 3,
         "current_color": GREEN_C,
-        "voltage_color": RED_C,
-        "unit_color": ORANGE
+        # "voltage_color": RED_C,
+        "voltage_colors": [GREEN ,RED, BLUE, TEAL_C, PURPLE_C],
+        "unit_color": ORANGE,
+        "j_color": YELLOW,
+        "dt_color": YELLOW
     }
     def construct(self):
         time_domain_circuit = ComplexCircuitTimeDomain(
             current_color=self.current_color,
-            voltage_color=self.voltage_color)\
-            .scale(0.47)\
+            voltages_color=self.voltage_colors,
+        )\
+            .scale(0.5)\
             .to_corner(UL, buff=0)\
             .shift(0.1*DOWN)
         diff_eqs = self.get_diff_eqs()\
-            .scale(0.57)\
-            .next_to(time_domain_circuit, direction=RIGHT)
-        self.add(time_domain_circuit,diff_eqs)
+            .scale(0.56)\
+            .next_to(time_domain_circuit, direction=DOWN, aligned_edge=LEFT)
+        self.play(
+            FadeIn(time_domain_circuit)
+        )
+        self.play(
+            Write(diff_eqs)
+        )
+        self.wait(0.53)
 
-        self.add(
-            Rectangle(
-                width=FRAME_WIDTH,
-                height=FRAME_HEIGHT
+        not_easy = TextMobject(
+            "Not an easy to solve"
+        )\
+            .scale(1.5)\
+            .next_to(diff_eqs, direction=RIGHT)
+        self.play(
+            FadeInFrom(
+                not_easy,
+                direction=RIGHT
             )
         )
+
+        self.wait(6)
+
+        freq_domain_circuit = ComplexCircuitFreqDomain(
+            current_color=self.current_color,
+            voltage_colors=self.voltage_colors,
+            j_color=self.j_color
+        ) \
+            .scale(0.5) \
+            .to_corner(UR, buff=0) \
+            .shift(0.1 * DOWN + 2.1 * LEFT)
+        freq_eqs = self.get_freq_eqs()\
+            .scale(0.56)\
+            .next_to(freq_domain_circuit, direction=DOWN, aligned_edge=LEFT)
+
+        arrow1 = CurvedArrow(
+            start_point=time_domain_circuit.get_right()+0.2*RIGHT,
+            end_point=freq_domain_circuit.get_left()+0.5*RIGHT,
+            angle=-TAU / 4
+        )
+        complex_num_text = TextMobject(
+            "Using Complex Numbers"
+        )\
+            .scale(0.7)\
+            .next_to(arrow1, direction=UP)
+        self.remove(not_easy)
+        self.play(
+            ShowCreation(arrow1),
+            FadeIn(complex_num_text),
+        )
+        self.wait(0.33)
+
+        self.play(
+            FadeIn(freq_domain_circuit),
+            FadeIn(freq_eqs),
+        )
+
+        self.wait(9.83)
+
+        # easier_to_solve = TextMobject(
+        #     "Much easier to solve"
+        # ) \
+        #     .scale(0.8) \
+        #     .next_to(freq_eqs, direction=LEFT, aligned_edge=DOWN) \
+        #     .shift(0.5 * LEFT)
+        # arrow2 = Arrow(
+        #     start=easier_to_solve.get_right(),
+        #     end=freq_eqs.get_corner(DL) + UP + 0.5 * RIGHT
+        # )
+        # self.play(
+        #     Write(easier_to_solve),
+        #     ShowCreation(arrow2)
+        # )
+        # self.wait(5.37)
+        #
+        # linear_algebra = TextMobject(
+        #     "Solved with Linear Algebra"
+        # ) \
+        #     .scale(0.8) \
+        #     .next_to(freq_eqs, direction=LEFT, aligned_edge=DOWN) \
+        #     .shift(0.5 * LEFT)
+        # self.play(
+        #     Transform(
+        #         easier_to_solve,
+        #         linear_algebra
+        #     )
+        # )
+        # self.wait(6.74)
+
+        # self.play(
+        #     Indicate(
+        #         self.dt_texs,
+        #         run_time=2
+        #     )
+        # )
+        # self.wait(4.63)
+        #
+        # # fade out everything except freq_eqs
+        # self.play(
+        #     FadeOut(diff_eqs),
+        #     FadeOut(freq_domain_circuit),
+        #     FadeOut(time_domain_circuit),
+        #     FadeOut(linear_algebra),
+        #     FadeOut(easier_to_solve),
+        #     FadeOut(arrow1),
+        #     FadeOut(arrow2),
+        #     FadeOut(complex_num_text),
+        #     ApplyMethod(
+        #         freq_eqs.to_edge,
+        #         UL
+        #     )
+        # )
+
+        # # TO SKIP SETUP UNCOMMENT
+        # freq_eqs = self.get_freq_eqs() \
+        #     .scale(0.56)\
+        #     .to_edge(UL)
+        # self.add(freq_eqs)
+
+        # replace last freq_eq
+        # new_last_eq = TexMobject(
+        #     "V_0", " = ",
+        #     "20 \\angle 15^{\\circ}",
+        # ) \
+        #     .scale(0.56)\
+        #     .move_to(self.last_eq)
+        # new_last_eq.align_to(self.second_last_eq, direction=LEFT)
+        # new_last_eq[0].set_color(self.voltage_color)
+        # new_last_eq[2].set_color(self.unit_color)
+        # self.play(
+        #     ReplacementTransform(
+        #         self.last_eq,
+        #         new_last_eq
+        #     )
+        # )
+
+        # matrix_group = self.setup_matrices()\
+        #     .to_corner(DL)
+        # self.add(
+        #     self.a_matrix,
+        #     self.equals_matrix,
+        #     self.M_matrix,
+        #     self.V_matrix
+        # )
+        #
+        # unknown_variables = VGroup(
+        #     *[
+        #         SingleStringTexMobject(f"V_{i}")
+        #         for i in range(5)
+        #     ]
+        # ) \
+        #     .scale(1) \
+        #     .arrange(RIGHT, buff=0.5) \
+        #     .next_to(freq_eqs, direction=RIGHT, buff=2)
+        #
+        # self.play(
+        #     AnimationGroup(
+        #         *[
+        #             TransformFromCopy(
+        #                 self.V_texs[i],
+        #                 unknown_variables[i]
+        #             )
+        #             for i in range(5)
+        #         ],
+        #         lag_ratio=1
+        #     )
+        # )
 
         self.wait()
 
-    def get_branch_currents(self):
-        branch_currents = VGroup(
-            TexMobject(
-                "i_1", "=", "{v_0", "-", "v_1", "\\over", "150}"
-            ),
-            TexMobject(
-                "i_2", "=", "0.001", "{d", "\\over", "dt}", "(", "v_3", "-", "v_1", ")"
-            ),
-            TexMobject(
-                "i_3", "=", "{v_2", "-", "v_1", "\\over", "100}"
-            ),
-            TexMobject(
-                "i_4", "=", "0.002", "{d", "v_1", "\\over", "dt}"
-            ),
-            TexMobject(
-                "5", "{d", "i_5", "\\over", "dt}", "=", "v_2", "-", "v_4"
-            ),
-            TexMobject(
-                "i_6", "=", "{v_4", "\\over", "100}"
-            ),
-            TexMobject(
-                "i_7", "=", "{v_2", "-", "v_3", "\\over", "200}"
-            ),
+    def setup_matrices(self):
+        self.a_matrix = Matrix(
+            [["0"],
+             ["0"],
+             ["0"],
+             ["0"],
+             ["20 \\angle 15^\\circ"],
+             ],
+            element_alignment_corner=0*RIGHT,
+        )
+        self.M_matrix = Matrix(
+            [
+                ["0.0067", "- 0.0167 - j0.0012", "0.01", "j0.004", "0"],
+                ["0", "-0.0067", "0.015 - j0.05", "-0.005", "j0.05"],
+                ["0", "j0.004", "0.005", "-0.005-j0.004", "0"],
+                ["0", "0", "-j0.05", "0.005", "-0.001+j0.05"],
+                ["1", "0", "0", "0", "0"]
+            ],
+            element_alignment_corner=0 * RIGHT,
+            h_buff=3.7,
+        )
+        self.V_matrix = Matrix(
+            [
+                ["V_0"],
+                ["V_1"],
+                ["V_2"],
+                ["V_3"],
+                ["V_4"],
+            ],
+            element_alignment_corner=0 * RIGHT,
+        )
+        self.equals_matrix = TexMobject("=")
+
+        volt_mobs = list(self.V_matrix.get_mob_matrix().flatten())
+        for mob in volt_mobs:
+            mob.set_color(self.voltage_color)
+
+        matrix_mobs = list(self.M_matrix.get_mob_matrix().flatten())
+        for i in (0, 1, 2, 3, 6, 7, 8, 9, 11, 12, 13, 17, 18, 19, 20):
+            matrix_mobs[i].set_color(self.unit_color)
+
+        a_mobs = list(self.a_matrix.get_mob_matrix().flatten())
+        for mob in a_mobs:
+            mob.set_color(self.unit_color)
+
+        return VGroup(
+            self.a_matrix,
+            self.equals_matrix,
+            self.M_matrix,
+            self.V_matrix
         )\
-            .arrange(DOWN, aligned_edge=LEFT)
-        VGroup(
-            *[branch_currents[0][i] for i in (2, 4)],
-            *[branch_currents[1][i] for i in (7, 9)],
-            *[branch_currents[2][i] for i in (2, 4)],
-            branch_currents[3][4],
-            *[branch_currents[4][i] for i in (6, 8)],
-            branch_currents[5][2],
-            *[branch_currents[6][i] for i in (2, 4)],
-        )\
-            .set_color(self.voltage_color)
-        VGroup(
-            branch_currents[0][6],
-            branch_currents[1][2],
-            branch_currents[2][-1],
-            branch_currents[3][2],
-            branch_currents[4][0],
-            branch_currents[5][-1],
-            branch_currents[6][-1],
-        ) \
-            .set_color(self.unit_color)
-        VGroup(
-            branch_currents[0][0],
-            branch_currents[1][0],
-            branch_currents[2][0],
-            branch_currents[3][0],
-            branch_currents[4][2],
-            branch_currents[5][0],
-            branch_currents[6][0],
-        )\
-            .set_color(self.current_color)
-        branch_currents = self.get_branch_currents()
-        branch_currents_brace = Brace(branch_currents, direction=LEFT)
-        branch_currents_text = branch_currents_brace.get_text("Branch Currents")
-        bc_group = VGroup(
-            branch_currents_text,
-            branch_currents_brace,
-            branch_currents,
+            .scale(0.7)\
+            .arrange(RIGHT)
+
+
+    def get_freq_eqs(self):
+        eq1 = TexMobject(
+            "0 = ",
+            "{1", "\\over", "150}", "V_0", "+",
+            "\\Bigg(-", "{1", "\\over", "150}", "-", "{1", "\\over", "100}", "-", "j", "0.012", "\\Bigg)", "V_1", "+",
+            "{1", "\\over", "100}", "V_2", "+",
+            "j", "0.004", "V_3"
+        )
+        eq2 = TexMobject(
+            "0 = ",
+            "-{1", "\\over", "100}", "V_1", "+",
+            "\\Bigg(", "{1", "\\over", "200}", "+", "{1", "\\over", "100}", "-", "j", "0.05", "\\Bigg)", "V_2", "+",
+            "-{1", "\\over", "200}", "V_3", "+",
+            "j", "0.05", "V_4"
+        )
+        eq3 = TexMobject(
+            "0 = ",
+            "j", "0.004", "V_1", "+"
+            "{1", "\\over", "200}", "V_2", "+",
+            "\\Bigg(", "-{1", "\\over", "200}", "-", "j", "0.004", "\\Bigg)", "V_3",
+        )
+        eq4 = TexMobject(
+            "0 = ",
+            "-", "j", "0.05", "V_2", "+",
+            "\\Bigg(", "-{1", "\\over", "100}", "+", "j", "0.05", "\\Bigg)", "V_4",
+        )
+        eq5 = TexMobject(
+            "0 = ",
+            "20 \\angle 15^{\\circ}", "-", "V_0",
+        )
+        self.second_last_eq = eq4
+        self.last_eq = eq5
+
+        self.V_texs = VGroup(
+            VGroup(eq1[4], eq5[-1]),
+            VGroup(eq1[18], eq2[4], eq3[3]),
+            VGroup(eq1[-5], eq2[-10], eq3[-11], eq4[4]),
+            VGroup(eq1[-1], eq2[-5], eq3[-1]),
+            VGroup(eq2[-1], eq4[-1]),
+        )
+        for i in range(5):
+            self.V_texs[i].set_color(self.voltage_colors[i])
+
+        eqs = VGroup(eq1, eq2, eq3, eq4, eq5)\
+            .arrange(DOWN,aligned_edge=LEFT)
+        self.j_texs = VGroup(
+            *[eq1[i] for i in (15, -3)],
+            *[eq2[i] for i in (15, -3)],
+            *[eq3[i] for i in (1, -4)],
+            *[eq4[i] for i in (2, -4)],
+        )
+        self.j_texs.set_color(self.j_color)
+        # voltage_texs = VGroup(
+        #     *[eq1[i] for i in (4, 18, 23, 27)],
+        #     *[eq2[i] for i in (4, 18, 23, 27)],
+        #     *[eq3[i] for i in (3, 7, -1)],
+        #     *[eq4[i] for i in (4, -1)],
+        #     eq5[-1]
+        # )
+        # voltage_texs.set_color(self.voltage_color)
+        unit_texs = VGroup(
+            *[eq1[i] for i in (3, 9, 13, 16, 22, 26)],
+            *[eq2[i] for i in (3, 9, 13, 16, 22, 26)],
+            *[eq3[i] for i in (2, 6, 12, 15)],
+            *[eq4[i] for i in (3, 9, 12)],
+            eq5[1]
+        )
+        unit_texs.set_color(self.unit_color)
+
+        brace = Brace(eqs, direction=LEFT)
+        eqs_group = VGroup(
+            brace,
+            eqs
         )
 
-        return bc_group
-
-    def get_KCLS(self):
-        i_texts = VGroup(
-            TexMobject(
-                "0 = ", "i_1", "+", "i_2", "+", "i_3", "-", "i_4"
-            ),
-            TexMobject(
-                "0 = ", "-", "i_7", "-", "i_3", "-", "i_5"
-            ),
-            TexMobject(
-                "0 = ", "i_7", "-", "i_2"
-            ),
-            TexMobject(
-                "0 = ", "i_5", "-", "i_6"
-            )
-        ) \
-            .arrange(DOWN, aligned_edge=LEFT)
-        VGroup(
-            *[i_texts[0][i] for i in (1, 3, 5, 7)],
-            *[i_texts[1][i] for i in (2, 4, 6)],
-            *[i_texts[2][i] for i in (1, 3)],
-            *[i_texts[3][i] for i in (1, 3)],
-        ).set_color(self.current_color)
-
-        KCLs = self.get_KCLS()
-        KCLs_brace = Brace(KCLs, direction=LEFT)
-        KCLs_text = KCLs_brace.get_text("KCLs")
-        KCL_group = VGroup(
-            KCLs_text,
-            KCLs_brace,
-            KCLs
-        )
-
-        return KCL_group
+        return eqs_group
 
     def get_diff_eqs(self):
         diff_eq1 = TexMobject(
             "0 = ",
             "{1", "\\over", "150}", "v_0", " + ",
             "\\Bigg(-", "{1", "\\over", "150}", "-", "{1", "\\over", "100}", "\\Bigg)", "v_1", "+"
-                                                                                               "{1", "\\over", "100}",
-            "v_2", "-",
+            "{1", "\\over", "100}", "v_2", "-",
             "0.003", "{d", "v_1", "\\over", "dt}", "+",
             "0.001", "{d", "v_3", "\\over", "dt}",
         )
@@ -359,29 +552,49 @@ class DiffyEqToComplex(Scene):
             "{1", "\\over", "5}", "v_4", "+",
             "{1", "\\over", "100}", "{d", "v_4", "\\over", "dt}",
         )
+        diff_eq5 = TexMobject(
+            "0 =",
+            "20", "cos(", "4", "t - ", "15^{\\circ}", ")", "-", "v_0"
+        )
 
         # coloring
+        self.V_texs = VGroup(
+            VGroup(diff_eq1[4], diff_eq5[-1]),
+            VGroup(diff_eq1[15], diff_eq2[5], diff_eq1[-9], diff_eq3[-3]),
+            VGroup(diff_eq1[19], diff_eq2[-6], diff_eq2[-21], diff_eq3[4], diff_eq4[3]),
+            VGroup(diff_eq1[-3], diff_eq2[-13], diff_eq3[-9], diff_eq3[-13]),
+            VGroup(diff_eq2[-1], diff_eq4[-3], diff_eq4[-9])
+        )
+        for i in range(5):
+            self.V_texs[i].set_color(self.voltage_colors[i])
+
+        self.dt_texs = VGroup(
+            *[diff_eq1[i] for i in (-1, -2, -4, -7, -8, -10)],
+            *[diff_eq2[i] for i in (4, 6, 7, 18, 20, 21, 26, 28, 29)],
+            *[diff_eq3[i] for i in (12, 14, 15, 18, 20, 21)],
+            *[diff_eq4[i] for i in (-1, -2, -4)],
+        )
+        self.dt_texs.set_color(self.dt_color)
         unit_texs = VGroup(
-            *[diff_eq1[i] for i in (3, 9, 13, 19, 18, 21, 27)],
+            *[diff_eq1[i] for i in (3, 9, 13, 18, 21, 27)],
             *[diff_eq2[i] for i in (3, 12, 16, 25, 33, 38)],
             *[diff_eq3[i] for i in (3, 8, 11, 17)],
             *[diff_eq4[i] for i in (2, 7, 12)],
+            *[diff_eq5[i] for i in (1, 3, 5)],
         )
         unit_texs.set_color(self.unit_color)
-        voltage_texs = VGroup(
-            *[diff_eq1[i] for i in (4, 15, 19, 23, 29)],
-            *[diff_eq2[i] for i in (5, 19, 27, 34, 39)],
-            *[diff_eq3[i] for i in (4, 9, 13, 19)],
-            *[diff_eq4[i] for i in (3, 8, 14)],
-        )
-        voltage_texs.set_color(self.voltage_color)
-        diff_eqs = VGroup(diff_eq1, diff_eq2, diff_eq3, diff_eq4) \
-            .arrange(DOWN, aligned_edge=LEFT)
-
+        # voltage_texs = VGroup(
+        #     *[diff_eq1[i] for i in (4, 15, 19, 23, 29)],
+        #     *[diff_eq2[i] for i in (5, 19, 27, 34, 39)],
+        #     *[diff_eq3[i] for i in (4, 9, 13, 19)],
+        #     *[diff_eq4[i] for i in (3, 8, 14)],
+        #     diff_eq5[-1]
+        # )
+        # voltage_texs.set_color(self.voltage_color)
+        diff_eqs = VGroup(diff_eq1, diff_eq2, diff_eq3, diff_eq4, diff_eq5) \
+            .arrange(DOWN, aligned_edge=LEFT, buff=0.5)
         diff_eqs_brace = Brace(diff_eqs, direction=LEFT)
-        diff_eqs_text = diff_eqs_brace.get_text("Differential Equations")
         diff_eqs_group = VGroup(
-            diff_eqs_text,
             diff_eqs_brace,
             diff_eqs
         )

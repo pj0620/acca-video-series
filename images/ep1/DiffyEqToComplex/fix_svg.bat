@@ -1,3 +1,5 @@
+@echo off
+
 set svg_file=%1%
 set temp_file="temp.svg"
 
