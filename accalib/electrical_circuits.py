@@ -456,7 +456,7 @@ class SimpleCircuitTimeDomain(SVGMobject):
 
     def __init__(self, mode="plain", **kwargs):
         self.parts_named = False
-        svg_file = "images/ep1/DiffyEqToComplex/circuit_simple_time.svg"
+        svg_file = "images/ep1/ACCAApplication/circuit_simple_time.svg"
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
         self.scale(4)
         # self.vs_label.shift(0.3*RIGHT)
@@ -509,5 +509,71 @@ class SimpleCircuitTimeDomain(SVGMobject):
         self.vs_text.set_fill(self.unit_color, opacity=1)
         self.ground.set_stroke(self.get_color(), self.get_stroke_width(), opacity=1)
         self.ground.set_fill(YELLOW, opacity=0)
+
+        return self
+
+class SimpleCircuitFreqDomain(SVGMobject):
+    CONFIG = {
+        "stroke_width": 3,
+        "current_color": GREEN_C,
+        "voltage_color": RED_C,
+        "inductor_color": ORANGE,
+        "resistor_color": BLUE_C
+    }
+
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named = False
+        svg_file = "images/ep1/ACCAApplication/circuit_simple_freq.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+        self.scale(3.5)
+        # self.vs_label.shift(0.3*RIGHT)
+
+    def name_parts(self):
+        self.arrow_base = self.submobjects[0]
+        self.arrow_tip_small = self.submobjects[1]
+        self.lines = VGroup(*self.submobjects[2:11])
+        self.arrow_current = self.submobjects[11]
+        self.L_text = VGroup(*self.submobjects[12:14])
+        self.R_text = VGroup(*self.submobjects[14:16])
+        self.vs_text = VGroup(*self.submobjects[16:28])
+        self.ground = VGroup(*self.submobjects[28:32])
+        self.v_label = self.submobjects[32]
+        self.i_label = self.submobjects[33]
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        # set opacity of every submobject to 0
+        for mob in self.submobjects:
+            mob.set_stroke(self.get_color(), self.get_stroke_width(), opacity=0)
+            mob.set_fill(RED, opacity=0)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        # for i in range(2):
+        #     self.v_texts[i].set_stroke(self.voltage_colors[i], self.get_stroke_width(), opacity=0)
+        #     self.v_texts[i].set_fill(self.voltage_colors[i], opacity=1)
+
+        self.arrow_base.set_stroke(WHITE, self.get_stroke_width(), opacity=1)
+        self.arrow_base.set_fill(YELLOW, opacity=0)
+        self.arrow_tip_small.set_stroke(WHITE, self.get_stroke_width(), opacity=1)
+        self.arrow_tip_small.set_fill(WHITE, opacity=1)
+        self.lines.set_stroke(WHITE, self.get_stroke_width(), opacity=1)
+        self.lines.set_fill(YELLOW, opacity=0)
+        self.arrow_current.set_stroke(WHITE, self.get_stroke_width(), opacity=0)
+        self.arrow_current.set_fill(self.current_color, opacity=1)
+        self.L_text.set_stroke(self.inductor_color, self.get_stroke_width(), opacity=0)
+        self.L_text.set_fill(self.inductor_color, opacity=1)
+        self.R_text.set_stroke(self.resistor_color, self.get_stroke_width(), opacity=0)
+        self.R_text.set_fill(self.resistor_color, opacity=1)
+        self.vs_text.set_stroke(self.current_color, self.get_stroke_width(), opacity=0)
+        self.vs_text.set_fill(self.current_color, opacity=1)
+        self.ground.set_stroke(WHITE, self.get_stroke_width(), opacity=1)
+        self.ground.set_fill(YELLOW, opacity=0)
+        self.v_label.set_stroke(self.voltage_color, self.get_stroke_width(), opacity=0)
+        self.v_label.set_fill(self.voltage_color, opacity=1)
+        self.i_label.set_stroke(self.current_color, self.get_stroke_width(), opacity=0)
+        self.i_label.set_fill(self.current_color, opacity=1)
 
         return self

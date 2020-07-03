@@ -497,6 +497,8 @@ class HowIWantYouToThinkAboutVectors(Scene):
         ))
         self.wait(3)
 
+        plane = NumberPlane()
+        # axis_labels = plane.get_axis_labels()
         x_axis, y_axis = plane.get_axes().split()
         x_label = axis_labels.split()[0]
         x_axis = x_axis.copy()

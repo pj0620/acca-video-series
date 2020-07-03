@@ -9,7 +9,7 @@
 
 :: 480p15
 :: circuits scenes
-python manim.py episodes\ep1\circuits_scenes.py IntroduceCircuit -l
-python manim.py episodes\ep1\circuits_scenes.py CircuitDefinition -l
-python manim.py episodes\ep1\circuits_scenes.py CompsDisplay -l
-python manim.py episodes\ep1\circuits_scenes.py ComplexCircuitOverview -l
+:: python manim.py episodes\ep1\circuits_scenes.py IntroduceCircuit -l
+:: python manim.py episodes\ep1\circuits_scenes.py CircuitDefinition -l
+:: python manim.py episodes\ep1\circuits_scenes.py CompsDisplay -l
+:: python manim.py episodes\ep1\circuits_scenes.py ComplexCircuitOverview -l

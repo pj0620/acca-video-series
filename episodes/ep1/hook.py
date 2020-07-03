@@ -1,139 +1,314 @@
 from manimlib.imports import *
-from accalib.electrical_circuits import ComplexCircuitTimeDomain, ComplexCircuitFreqDomain, SimpleCircuitTimeDomain
+from accalib.animations import EllipsesFlash
+from accalib.electrical_circuits import SimpleCircuitFreqDomain
 
-class Stienmitz(Scene):
+class ComplexNumbersTitle(Scene):
     def construct(self):
-        self.wait(4.53)
+        complex_number = TextMobject(
+            "Complex Numbers",
+            color=WHITE
+        )\
+            .scale(2.5)
 
-        # show inventors
-        inventors=self.get_inventor_images()
+        self.add(
+            complex_number
+        )
         self.play(
-            AnimationGroup(
-                FadeIn(
-                    inventors[0],
-                    0.97
-                ),
-                FadeIn(
-                    inventors[1],
-                    0.97
-                ),
-                FadeIn(
-                    inventors[2],
-                    0.97
-                ),
-                lag_ratio=1
+            EllipsesFlash(
+                complex_number,
+                flash_radius_x=7,
+                flash_radius_y=4,
+                line_length=1.7,
+                num_lines=16,
+                run_time=1
+                # line_stroke_width=5,
             )
         )
-        self.wait(1.9)
+        self.wait()
 
-        # reduce height, move up inventors
+class ApplicationsOfComplexNumbers(Scene):
+    def construct(self):
+        title = Title(
+            "Applications of Complex Numbers",
+            scale_factor=1.25
+        )
+        self.add(
+            title
+        )
+
+        i_text = TexMobject(
+            "i", "&=\\sqrt{-1}",
+            substrings_to_isolate=["$i$"]
+        )\
+            .scale(1.4)\
+            .next_to(title, direction=DOWN, aligned_edge=RIGHT)\
+            .shift(0.75*DL)
+        i_text.get_part_by_tex("i").set_color(YELLOW)
+        i_rect = SurroundingRectangle(
+            i_text,
+            buff=0.5,
+            color=PURPLE
+        )
         self.play(
-            *[
+            Write(i_text),
+            Write(i_rect)
+        )
+        self.wait(2.73)
+
+        qm_text = TextMobject(
+            "Quantum Mechanics:"
+        )\
+            .scale(1.35)\
+            .next_to(title, direction=DOWN, aligned_edge=LEFT, buff=0.5)
+        self.play(
+            Write(
+                qm_text,
+                run_time=0.75
+            )
+        )
+
+        schrodinger_eq = TexMobject(
+            "i", "\\hbar {\\partial \\Psi \\over \\partial t}","=",
+            "\\hat{H} \\Psi",
+            substrings_to_isolate=["$i$"]
+        )\
+            .scale(1.5)\
+            .next_to(qm_text, direction=DR)\
+            .shift(2*LEFT)
+        schrodinger_eq.get_part_by_tex("i").set_color(YELLOW)
+        self.play(Write(schrodinger_eq))
+        self.wait(0.57)
+
+        ft_text = TextMobject(
+            "Fourier Analysis:"
+        )\
+            .scale(1.35)\
+            .next_to(qm_text, direction=DOWN, aligned_edge=LEFT, buff=2.5)
+        self.play(
+            Write(
+                ft_text,
+                run_time=0.75
+            )
+        )
+
+        ft_equation = TexMobject(
+            "G(f) = ",
+            "\\int_{-\\infty}^{\\infty} g(t)",
+            "e^{-", "i", "2\\pi f t}dt",
+            substrings_to_isolate=["$i$"]
+        )\
+            .scale(1.5)\
+            .next_to(ft_text, direction=DR)\
+            .shift(2*LEFT)
+        ft_equation[3].set_color(YELLOW)
+        self.play(
+            Write(
+                ft_equation,
+                run_time=1
+            )
+        )
+
+        many_more = TextMobject(
+            "many more ..."
+        )\
+            .scale(1.35)\
+            .next_to(ft_text, direction=DOWN, aligned_edge=LEFT, buff=2.5)
+        self.play(Write(many_more))
+
+        self.wait(5.6)
+
+class EEApplication(Scene):
+    CONFIG = {
+        "axes_config": {
+            "number_line_config": {
+                "include_tip": False,
+            },
+            "x_axis_config": {
+                # "tick_frequency": 1,
+                # "unit_size": 4,
+            },
+            "x_min": 0,
+            "x_max": 5,
+            "y_min": 0,
+            "y_max": 5,
+            "center_point": 3*DOWN+0*LEFT,
+        },
+        "current_color": GREEN_C,
+        "voltage_color": RED_C,
+        "inductor_color": ORANGE,
+        "resistor_color": BLUE_C,
+        "impedence_color": "#A4A88E",
+        "I_phase": 50,
+        "IM": 2,
+        "R": 2.2,
+        "L": 0.6,
+        "w": 2
+    }
+    def construct(self):
+        title = Title(
+            "Electrical Engineering",
+            scale_factor=1.25
+        )
+        self.play(
+            Write(title)
+        )
+
+        circuit = SimpleCircuitFreqDomain()\
+            .scale(0.75)\
+            .to_edge(LEFT)
+        self.play(
+            FadeInFrom(
+                circuit,
+                direction=LEFT,
+                run_time=0.95
+            )
+        )
+
+        axes = Axes(**self.axes_config)
+        axes_origin = self.axes_config["center_point"]
+        im_label = axes.get_y_axis_label("\\text{Imaginary}").shift(0.8*UP+0.4*LEFT)
+        re_label = axes.get_x_axis_label("\\text{Real}")
+        self.play(
+            FadeIn(
+                VGroup(axes, im_label, re_label),
+                run_time=0.95
+            )
+        )
+        deg_to_rad = 2*PI/365
+        unit_vec = lambda t: np.cos(deg_to_rad*t)*RIGHT + np.sin(deg_to_rad*t)*UP
+
+        # setup current phasor
+        I_line = Arrow(
+            buff=0,
+            start=axes_origin,
+            end=axes_origin+self.IM*unit_vec(self.I_phase),
+            color=self.current_color
+        )
+        I_label = TexMobject(
+            "I", " &= ", "I_M", "e^{", "j", "\\varphi", "}",
+            color=WHITE,
+            substrings_to_isolate=["j", "I", "\\varphi"]
+        )\
+            .next_to(I_line.get_end(), direction=RIGHT)\
+            .shift(0.4*UP+0.3*LEFT)
+        I_label.get_part_by_tex("j").set_color(YELLOW)
+        I_label.get_part_by_tex("I").set_color(self.current_color)
+        I_label[2].set_color(self.current_color)
+        I_label[3].set_color(self.current_color)
+        I_label.get_part_by_tex("\\varphi").set_color(self.current_color)
+        I_phase_arc = Arc(
+            angle=deg_to_rad * self.I_phase,
+            arc_center=axes_origin,
+            color=self.current_color
+        )
+        I_phase_label = TexMobject(
+            "\\varphi",
+            color=self.current_color
+        )\
+            .move_to(axes_origin+1.25*unit_vec(self.I_phase*0.75))
+        self.play(
+            TransformFromCopy(
+                circuit.vs_text,
+                VGroup(I_line, I_label, I_phase_arc, I_phase_label),
+                run_time=0.95
+            )
+        )
+
+        # impedence vector
+        Z_phase = np.arctan((self.w*self.L)/self.R)/deg_to_rad
+        Z_ampl = ((self.w*self.L)**2+self.R**2)**0.5
+        # print(f"({self.R},{self.w*self.L}): {Z_phase} -> {Z_ampl}")
+        Z_line = Arrow(
+            buff=0,
+            start=axes_origin,
+            end=axes_origin + Z_ampl * unit_vec(Z_phase),
+            color=self.impedence_color
+        )
+        Z_label = TexMobject(
+            "Z", " &= ", "R", "+", "j", "\\omega", "L",
+            substrings_to_isolate=["Z", "R", "j", "L", "\\omega"],
+            color=WHITE
+        ) \
+            .next_to(Z_line.get_end(), direction=RIGHT)\
+            .shift(0.2*DOWN+0.1*LEFT)
+        Z_label.get_part_by_tex("Z").set_color(self.impedence_color)
+        Z_label.get_part_by_tex("R").set_color(self.resistor_color)
+        Z_label.get_part_by_tex("j").set_color(YELLOW)
+        Z_label.get_part_by_tex("L").set_color(self.inductor_color)
+        Z_label.get_part_by_tex("\\omega").set_color(self.current_color)
+        Z_phase_arc = Arc(
+            angle=deg_to_rad * Z_phase,
+            arc_center=axes_origin,
+            color=self.impedence_color,
+            radius=1.5
+        )
+        Z_phase_label = TexMobject(
+            "\\theta",
+            color=self.impedence_color
+        ) \
+            .move_to(axes_origin + 1.75 * unit_vec(Z_phase / 2))
+        self.play(
+            TransformFromCopy(
+                VGroup(circuit.L_text, circuit.R_text),
+                VGroup(Z_line, Z_label, Z_phase_arc, Z_phase_label),
+                run_time=0.95
+            )
+        )
+
+        V_line = Arrow(
+            buff=0,
+            start=axes_origin,
+            end=axes_origin + Z_ampl * unit_vec(Z_phase),
+            color=self.impedence_color
+        )
+        V_arc2 = Z_phase_arc.copy()
+        V_ang_label2 = Z_phase_label.copy()
+        self.add(V_line, V_arc2, V_ang_label2)
+        print(V_line.get_start())
+        self.play(
+            Rotate(
+                VGroup(V_line, V_arc2, V_ang_label2),
+                angle=self.I_phase*deg_to_rad,
+                about_point=axes_origin,
+                run_time=0.95
+            )
+        )
+        self.play(
             ApplyMethod(
-                inventor.set_height,
-                2.9,
-                run_time=1.7
-            )
-            for inventor in inventors
-            ]
+                V_line.scale_about_point,
+                self.IM, axes_origin,
+                run_time=0.95
+            ),
         )
         self.play(
-            *[
-                ApplyMethod(
-                    inventor.shift,
-                    (FRAME_HEIGHT*0.5 - inventor.get_height()*0.5 - 1)*UP,
-                    buff=2
-                )
-                for inventor in inventors
-            ]
-        )
-        self.wait(3.23)
-
-        # label early architects
-        architects_label = TextMobject("\\underline{Chief Architects}")
-        architects_label.next_to(inventors[0],direction=UP)
-        self.play(
-            FadeInFrom(
-                architects_label,direction=UP
+            ApplyMethod(
+                V_line.set_color,
+                self.voltage_color,
+                run_time=0.95
             )
         )
-        self.wait(2.7)
 
-        # add steinmitz/einstien photo
-        ae_cs_image = self.get_einstien_steinmitz_image()
-        ae_cs_image.to_edge(DOWN)
+        V_label = TexMobject(
+            "V", "= ", "I", "Z", "=|", "Z", "|", "I_M", "e^{", "j", "(", "\\varphi", "+", "\\theta", ")}",
+            substrings_to_isolate=["V","|Z|", "j", "I_M", "\\varphi", "\\theta", "I", "Z"],
+            color=WHITE
+        ) \
+            .next_to(V_line.get_end(), direction=RIGHT)\
+            .shift(0.3*DOWN)
+        V_label.get_part_by_tex("I").set_color(self.current_color)
+        V_label.get_parts_by_tex("Z").set_color(self.impedence_color)
+        V_label.get_part_by_tex("V").set_color(self.voltage_color)
+        V_label.get_part_by_tex("j").set_color(YELLOW)
+        V_label[7].set_color(self.current_color)
+        V_label[8].set_color(self.current_color)
+        V_label.get_part_by_tex("\\varphi").set_color(self.current_color)
+        V_label.get_part_by_tex("\\theta").set_color(self.impedence_color)
         self.play(
-            FadeInFrom(
-                ae_cs_image, direction=DOWN
-            )
-        )
-        self.wait(0.43)
-
-        # circle stienmitz
-        R = 0.32
-        cs_circ = Circle(radius=R,stroke_width=4,color=WHITE)\
-            .shift(ae_cs_image.get_center() - 0.05*RIGHT + 0.7*UP)
-        cs_arrow = Arrow(stroke_width=1000,color=WHITE)
-        circ_point = cs_circ.get_center() + R*self.unit_vec(-1*PI/8)
-        dir_vec = 0.7*self.unit_vec(-0.15*PI)
-        cs_arrow.put_start_and_end_on(circ_point+dir_vec, circ_point)
-        cs_text = TextMobject("Charles\\\\Stienmitz")\
-            .scale(1.14)\
-            .next_to(circ_point+dir_vec,direction=DR)\
-            .shift(0.28*UP + 0.4*LEFT)
-        self.play(
-            GrowArrow(cs_arrow),
-            ShowCreation(cs_circ),
-            Write(cs_text)
-        )
-        self.wait(3.97)
-
-        # circle einstein
-        ae_circ=Circle(radius=R, stroke_width=4, color=WHITE)
-        ae_circ.shift(ae_cs_image.get_center() + 1 * LEFT + 1.2 * UP)
-        ae_arrow=Arrow(stroke_width=5, color=WHITE)
-        ae_circ_point=ae_circ.get_center() + R * self.unit_vec(1.25*PI)
-        ae_dir_vec=0.65 * self.unit_vec(-0.75 * PI)
-        ae_arrow.put_start_and_end_on(ae_circ_point + ae_dir_vec, ae_circ_point)
-        ae_text=TextMobject("Albert\\\\Einstein!")
-        ae_text.scale(1.14)
-        ae_text.next_to(ae_circ_point + ae_dir_vec, direction=DOWN)
-        ae_text.shift(0.1 * UP )
-        self.play(
-            GrowArrow(ae_arrow),
-            ShowCreation(ae_circ),
-            Write(ae_text)
+            FadeIn(V_label),
+            run_time=0.95
         )
 
-        self.wait(2.2)
-
-    def unit_vec(self,angle):
-        return math.cos(angle)*RIGHT + math.sin(angle)*UP
-
-    def get_einstien_steinmitz_image(self):
-        cs_ae_image = ImageMobject("images/ep1/Steinmitz/steinmetz-einstien-3.jpg")
-        cs_ae_image.scale(2)
-        return cs_ae_image
-
-    def get_inventor_images(self, initial_height=8,scale_factor=2.8):
-        ben_franklin=ImageMobject("images/ep1/Steinmitz/ben-franklin.jpg")
-        ben_franklin.scale(scale_factor)
-        ben_franklin.set_height(initial_height)
-        tesla=ImageMobject("images/ep1/Steinmitz/tesla.jpg")
-        tesla.scale(scale_factor)
-        tesla.add_updater(
-            lambda x: x.next_to(ben_franklin, direction=RIGHT, buff=0.1)
-        )
-        tesla.set_height(initial_height)
-        edison=ImageMobject("images/ep1/Steinmitz/edison.jpg")
-        edison.scale(scale_factor)
-        edison.add_updater(
-            lambda x: x.next_to(ben_franklin, direction=LEFT, buff=0.1)
-        )
-        edison.set_height(initial_height)
-
-        return [ben_franklin, tesla, edison]
-
+        self.wait()
 
 class ComplexQuantitiesPaper(Scene):
     def construct(self):
@@ -147,7 +322,7 @@ class ComplexQuantitiesPaper(Scene):
         )
 
         # add pages to screen
-        pages = self.get_paper(cs_image, n_pages=5)
+        pages = self.get_paper(cs_image, n_pages=7)
         self.play(
             *[
                 FadeIn(page)
@@ -166,8 +341,8 @@ class ComplexQuantitiesPaper(Scene):
             .shift(1*DOWN)
         self.play(
             ApplyMethod(
-               pages.shift, 35 * UP,
-               run_time=10.05,
+               pages.shift, 40 * UP,
+               run_time=12.37,
                rate_func=linear,
             ),
             FadeIn(
@@ -199,482 +374,310 @@ class ComplexQuantitiesPaper(Scene):
         cs_image.scale(4)
         return cs_image
 
-class DiffyEqToComplex1(Scene):
-    def construct(self):
-        self.add(
-            SimpleCircuitTimeDomain()
-        )
-        self.wait()
-
-class DiffyEqToComplex(Scene):
+class PoleZeroPlot(Scene):
     CONFIG = {
-        "stroke_width": 3,
-        "current_color": GREEN_C,
-        # "voltage_color": RED_C,
-        "voltage_colors": [GREEN ,RED, BLUE, TEAL_C, PURPLE_C],
-        "unit_color": ORANGE,
-        "j_color": YELLOW,
-        "dt_color": YELLOW
+        "time_axes_config": {
+            "number_line_config": {
+                "include_tip": False,
+            },
+            "x_axis_config": {
+                "color": BLUE_C,
+            },
+            "y_axis_config": {
+                "color": BLUE_C,
+            },
+            "x_min": 0,
+            "x_max": 7,
+            "y_min": -2.5,
+            "y_max": 2.5,
+            "center_point": RIGHT_SIDE+7*LEFT+0.5*UP,
+        },
+        "pole_zero_axes_config": {
+            "number_line_config": {
+                "include_tip": True,
+            },
+            "x_axis_config": {
+                "color": RED_C,
+            },
+            "y_axis_config": {
+                "color": RED_C,
+            },
+            "x_min": -3,
+            "x_max": 3,
+            "y_min": -3,
+            "y_max": 3,
+            "center_point": LEFT_SIDE+5*RIGHT+0.5*UP,
+        }
     }
     def construct(self):
-        time_domain_circuit = ComplexCircuitTimeDomain(
-            current_color=self.current_color,
-            voltages_color=self.voltage_colors,
-        )\
-            .scale(0.5)\
-            .to_corner(UL, buff=0)\
-            .shift(0.1*DOWN)
-        diff_eqs = self.get_diff_eqs()\
-            .scale(0.56)\
-            .next_to(time_domain_circuit, direction=DOWN, aligned_edge=LEFT)
-        self.play(
-            FadeIn(time_domain_circuit)
-        )
-        self.play(
-            Write(diff_eqs)
-        )
-        self.wait(0.53)
+        time_axes = Axes(**self.time_axes_config)
+        y_label = time_axes.get_y_axis_label("\\text{h(t)}").shift(0.5*UP)
+        time_label = time_axes.get_x_axis_label("\\text{time}").set_color(BLUE_C)
+        self.add(time_axes, time_label, y_label)
 
-        not_easy = TextMobject(
-            "Not an easy to solve"
-        )\
-            .scale(1.5)\
-            .next_to(diff_eqs, direction=RIGHT)
-        self.play(
-            FadeInFrom(
-                not_easy,
-                direction=RIGHT
-            )
+        pole_zero_axes = Axes(**self.pole_zero_axes_config)
+        pole_zero_origin = self.pole_zero_axes_config["center_point"]
+        re_label = pole_zero_axes.get_x_axis_label("\\text{Real}").set_color(RED_C)
+        im_label = pole_zero_axes.get_y_axis_label("\\text{Imaginary}").set_color(RED_C)
+        self.add(pole_zero_axes, re_label, im_label)
+
+        vals = self.get_vals()
+        # print(f"vals = {vals}")
+        zero_label = Circle(color=WHITE)\
+            .scale(0.1)\
+            .move_to(pole_zero_origin)
+        pole_labels = VGroup(
+            self.get_pole_marker()
+                .move_to(pole_zero_origin),
+            self.get_pole_marker()
+                .move_to(pole_zero_origin),
         )
 
-        self.wait(6)
+        # initialize pole zero plot to (0,0,0)
+        time_graph = time_axes.get_graph(self.get_time_graph(0, 0, 0))
+        self.add(zero_label, pole_labels,  time_graph)
 
-        freq_domain_circuit = ComplexCircuitFreqDomain(
-            current_color=self.current_color,
-            voltage_colors=self.voltage_colors,
-            j_color=self.j_color
-        ) \
-            .scale(0.5) \
-            .to_corner(UR, buff=0) \
-            .shift(0.1 * DOWN + 2.1 * LEFT)
-        freq_eqs_group = self.get_freq_eqs()\
-            .scale(0.56)\
-            .next_to(freq_domain_circuit, direction=DOWN, aligned_edge=LEFT)
-
-        arrow1 = CurvedArrow(
-            start_point=time_domain_circuit.get_right()+0.2*RIGHT,
-            end_point=freq_domain_circuit.get_left()+0.5*RIGHT,
-            angle=-TAU / 4
-        )
-        complex_num_text = TextMobject(
-            "Using Complex Numbers"
-        )\
-            .scale(0.7)\
-            .next_to(arrow1, direction=UP)
-        self.remove(not_easy)
-        self.play(
-            ShowCreation(arrow1),
-            FadeIn(complex_num_text),
-        )
-        self.wait(0.33)
-
-        self.play(
-            FadeIn(freq_domain_circuit),
-            FadeIn(freq_eqs_group),
+        self.add(
+            Title("Pole-Zero Plot")
         )
 
-        self.wait(9.83)
-
-        easier_to_solve = TextMobject(
-            "Much easier to solve"
-        ) \
-            .scale(0.8) \
-            .next_to(freq_eqs_group, direction=LEFT, aligned_edge=DOWN) \
-            .shift(0.5 * LEFT)
-        arrow2 = Arrow(
-            start=easier_to_solve.get_right(),
-            end=freq_eqs_group.get_corner(DL) + UP + 0.5 * RIGHT
-        )
-        self.play(
-            Write(easier_to_solve),
-            ShowCreation(arrow2)
-        )
-        self.wait(5.37)
-
-        linear_algebra = TextMobject(
-            "Solved with Linear Algebra"
-        ) \
-            .scale(0.8) \
-            .next_to(freq_eqs_group, direction=LEFT, aligned_edge=DOWN) \
-            .shift(0.5 * LEFT)
-        self.play(
-            Transform(
-                easier_to_solve,
-                linear_algebra
-            )
-        )
-        self.wait(6.74)
-
-        self.play(
-            Indicate(
-                self.dt_texs,
-                run_time=2
-            )
-        )
-        self.wait(4.63)
-
-        # fade out everything except freq_eqs
-        self.play(
-            FadeOut(diff_eqs),
-            FadeOut(freq_domain_circuit),
-            FadeOut(time_domain_circuit),
-            FadeOut(linear_algebra),
-            FadeOut(easier_to_solve),
-            FadeOut(arrow1),
-            FadeOut(arrow2),
-            FadeOut(complex_num_text),
-            ApplyMethod(
-                freq_eqs_group.to_edge,
-                UL
-            )
+        system_diagram = self.get_system_diagram()\
+            .to_corner(DR)
+        self.add(
+            system_diagram
         )
 
-        # # TO SKIP SETUP, UNCOMMENT
-        # freq_eqs_group = self.get_freq_eqs() \
-        #     .scale(0.56)\
-        #     .to_edge(UL)
-        # self.add(freq_eqs_group)
-
-        matrix_group = self.setup_matrices()\
-            .scale(0.8) \
-            .to_corner(DL)
-
-        # add unknown variables
-        unknown_variables = VGroup(
-            *[
-                SingleStringTexMobject(f"V_{i}").set_color(self.voltage_colors[i])
-                for i in range(5)
-            ]
-        ) \
-            .scale(1) \
-            .arrange(RIGHT, buff=0.5) \
-            .next_to(freq_eqs_group, direction=RIGHT, buff=2)
-        self.play(
-            AnimationGroup(
-                *[
-                    TransformFromCopy(
-                        self.V_texs[i],
-                        unknown_variables[i]
-                    )
-                    for i in range(5)
-                ],
-                lag_ratio=0
-            )
-        )
-
-        # label unknown variables
-        uv_brace = Brace(unknown_variables, direction=UP)
-        uv_text = uv_brace.get_text("Unknown Variables")
-        self.play(
-            GrowFromCenter(uv_brace),
-            Write(uv_text)
-        )
-
-        # transform lhs of matrix equation elements (no brackets)
-        lhs_elems = VGroup(
-            *[
-                eq[0]
-                for eq in self.freq_eqs
-            ]
-        )
-        lhs_entries = self.a_matrix.get_entries()
-        self.play(
-            AnimationGroup(
-                *[
-                    TransformFromCopy(
-                        lhs_elems[i],
-                        lhs_entries[i]
-                    )
-                    for i in range(5)
-                ],
-                lag_ratio=0
-            )
-        )
-
-        # transform coefficients in equations to matrix
-        eq_coef = [
-            [VGroup(*self.freq_eq1[2:5]), VGroup(*self.freq_eq1[8:18]), VGroup(*self.freq_eq1[21:24]), VGroup(*self.freq_eq1[25:32]), None],
-            [None, VGroup(*self.freq_eq2[2:5]), VGroup(*self.freq_eq2[8:18]), VGroup(*self.freq_eq2[21:24]), VGroup(*self.freq_eq2[26:32]), None],
-            [None, VGroup(*self.freq_eq3[2:4]), VGroup(*self.freq_eq3[6:8]), VGroup(*self.freq_eq3[11:17]), None],
-            [None, None, VGroup(*self.freq_eq4[2:5]), None, VGroup(*self.freq_eq4[8:14]), None],
-            [None, None, None, None, None, None]
-        ]
-        for i in range(5):
-            row_anims = []
-            for j in range(5):
-                if eq_coef[i][j] is None:
-                    row_anims.append(
-                        FadeIn(self.M_matrix.get_mob_matrix()[i, j])
-                    )
-                else:
-                    row_anims.append(
-                        TransformFromCopy(
-                            eq_coef[i][j], self.M_matrix.get_mob_matrix()[i, j]
-                        )
-                    )
-            self.play(AnimationGroup(*row_anims, lag_ratio=0))
-
-        self.play(
-            *[
-                TransformFromCopy(
-                    unknown_variables[i],
-                    list(self.V_matrix.get_mob_matrix().flatten())[i]
+        run_time = 0.055
+        for s, w, z in vals:
+            # print(f"({s}, {w}, {z})")
+            self.play(
+                ApplyMethod(
+                    zero_label.move_to,
+                    pole_zero_origin + RIGHT * z,
+                    run_time=run_time
+                ),
+                ApplyMethod(
+                    pole_labels[0].move_to,
+                    pole_zero_origin + RIGHT * s + UP * w,
+                    run_time=run_time
+                ),
+                ApplyMethod(
+                    pole_labels[1].move_to,
+                    pole_zero_origin + RIGHT * s - UP * w,
+                    run_time=run_time
+                ),
+                Transform(
+                    time_graph,
+                    time_axes.get_graph(self.get_time_graph(s, w, z)),
+                    run_time=run_time
                 )
-                for i in range(5)
-            ]
-        )
-
-        self.play(
-            *[
-                Write(matrix.brackets)
-                for matrix in (self.a_matrix, self.M_matrix, self.V_matrix)
-            ],
-            FadeIn(
-                self.equals_matrix
             )
+            # self.wait()
 
+        self.wait(3.79)
+
+    def get_vals(self):
+        vals = []
+
+        def triangle(n, xmin, xmax, num_points):
+            l = int((xmin/(xmin+xmax))*num_points)
+            q = num_points - l
+            m1 = (2*xmin)/l
+            if q > 0:
+                m2 = (2*xmax)/q
+            else:
+                m2 = 0
+            # print(f"m1 = {m1}, m2 = {m2}, l = {l}, q = {q}")
+            if n <= l/2:
+                return -m1*n
+            if l/2 < n <= l:
+                return -xmin + m1*(n-l/2)
+            if l < n <= l + q/2:
+                return (n - l)*m2
+            else:
+                return xmax - (n - l - q/2)*m2
+
+        # move left then right
+        num_points_lr = 100
+        xmin = 2
+        xmax = 1
+        for n in range(num_points_lr):
+            s = triangle(n, xmin, xmax, num_points_lr)
+            # z = triangle(n//2, zmin, zmax, num_points_lr)
+            vals += [(s, 0, 0)]
+        vals += [(0, 0, 0)]
+
+        # move up then down
+        num_points_ud = 100
+        ymin = 2.5
+        ymax = 0
+        for n in range(num_points_ud):
+            # w = triangle(n, ymin, ymax, num_points_ud)
+            w = n * (ymin/num_points_ud)
+            # z = triangle(n//2, zmin, zmax, num_points_ud)
+            vals += [(0, w, 0)]
+        vals += [(0, ymin, 0)]
+
+        # circular point
+        num_points = 50
+        radius_x = 1
+        radius_y = 2.5
+        for theta in np.append(np.linspace(PI/2, 0, num_points//2),
+                               np.linspace(0, int(0.95*PI), int(0.95*num_points))):
+            s = radius_x*np.cos(theta)
+            w = radius_y*np.sin(theta)
+            vals += [(s, w, 0)]
+
+        last_s = vals[-1][0]
+        last_w = vals[-1][1]
+        num_points_z = 50
+        zmin = 3
+        zmax = 3
+        for n in range(num_points_z):
+            z = triangle(n, zmin, zmax, num_points_z)
+            vals += [(last_s, last_w, z)]
+
+        return vals
+
+    def get_system_diagram(self):
+        rect = Rectangle().scale(0.75)
+        tf = TexMobject("h(t)").move_to(rect.get_center())
+        arrow_in = Arrow(
+            start=rect.get_left()+LEFT,
+            end=rect.get_left(),
+            buff=0
         )
-
-        self.wait()
-
-    def setup_matrices(self):
-        self.a_matrix = Matrix(
-            [["0"],
-             ["0"],
-             ["0"],
-             ["0"],
-             ["20 \\angle 15^\\circ"],
-             ],
-            element_alignment_corner=0*RIGHT,
-            v_buff=1.5
+        arrow_out = Arrow(
+            start=rect.get_right(),
+            end=rect.get_right() + RIGHT,
+            buff=0
         )
-        self.M_matrix = Matrix(
-            [
-                ["{1\\over150}", "-{1\\over150}-{1\\over100}-j0.012", "{1\\over100}", "j0.004", "0"],
-                ["0", "-{1\\over100}", "{1\\over200}+{1\\over100}-j0.05", "-{1\\over200}", "j0.05"],
-                ["0", "j0.004", "{1\\over200}", "-{1\\over200}-j0.004", "0"],
-                ["0", "0", "-j0.05", "0", "-{1\\over100}+j0.05"],
-                ["1", "0", "0", "0", "0"]
-            ],
-            element_alignment_corner=0 * RIGHT,
-            h_buff=4.5,
-            v_buff=1.5
-        )
-        self.V_matrix = Matrix(
-            [
-                ["V_0"],
-                ["V_1"],
-                ["V_2"],
-                ["V_3"],
-                ["V_4"],
-            ],
-            element_alignment_corner=0 * RIGHT,
-            v_buff=1.5
-        )
-        self.equals_matrix = TexMobject("=")
+        in_func = TexMobject("x(t)")\
+            .next_to(arrow_in, direction=LEFT)
+        out_func = TexMobject("y(t)") \
+            .next_to(arrow_out, direction=RIGHT)
+        return VGroup(rect, tf, arrow_in, arrow_out, in_func, out_func)
 
-        volt_mobs = list(self.V_matrix.get_mob_matrix().flatten())
-        for i, mob in enumerate(volt_mobs):
-            mob.set_color(self.voltage_colors[i])
-
-        unit_locs = [
-            (0, 2), (0, 3), (0, 4),
-            (1, 3), (1, 4), (1, 5), (1, 9), (1, 10), (1, 11), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18),
-            (2, 2), (2, 3), (2, 4),
-            (3, 1), (3, 2), (3, 3), (3, 4), (3, 5),
-            (6, 3), (6, 4), (6, 5),
-            (7, 2), (7, 3), (7, 4), (7, 8), (7, 9), (7, 10), (7, 13), (7, 14), (7, 15), (7, 16),
-            (8, 3), (8, 4), (8, 5),
-            (9, 1), (9, 2), (9, 3), (9, 4),
-            (11, 1), (11, 2), (11, 3), (11, 4), (11, 5),
-            (12, 2), (12, 3), (12, 4),
-            (13, 3), (13, 4), (13, 5), (13, 8), (13, 9), (13, 10), (13, 11), (13, 12),
-            (17, 2), (17, 3), (17, 4), (17, 5),
-            (19, 3), (19, 4), (19, 5), (19, 8), (19, 9), (19, 10), (19, 11),
-            (20, 0),
-        ]
-        matrix_mobs = list(self.M_matrix.get_mob_matrix().flatten())
-        for x, y in unit_locs:
-            matrix_mobs[x].submobjects[0].submobjects[y].set_color(self.unit_color)
-
-        j_locs = [
-            (1, 13),
-            (3, 0),
-            (7, 12),
-            (9, 0),
-            (11, 0),
-            (13, 7),
-            (17, 1),
-            (19, 7)
-        ]
-        for x, y in j_locs:
-            matrix_mobs[x].submobjects[0].submobjects[y].set_color(self.j_color)
-
-        # color 20 \angle 15^\circ
-        list(self.a_matrix.get_mob_matrix().flatten())[-1].set_color(self.unit_color)
-
+    def get_pole_marker(self):
         return VGroup(
-            self.a_matrix,
-            self.equals_matrix,
-            self.M_matrix,
-            self.V_matrix
+            Line(
+                start=DL, end=UR
+            ),
+            Line(
+                start=UL, end=DR
+            )
         )\
-            .scale(0.7)\
-            .arrange(RIGHT)
+            .scale(0.1)
 
-    def get_freq_eqs(self):
-        self.freq_eq1 = TexMobject(
-            "0", "=",
-            "{1", "\\over", "150}", "V_0", "+",
-            "\\Bigg(-", "{1", "\\over", "150}", "-", "{1", "\\over", "100}", "-", "j", "0.012", "\\Bigg)", "V_1", "+",
-            "{1", "\\over", "100}", "V_2", "+",
-            "j", "0.004", "V_3"
-        )
-        self.freq_eq2 = TexMobject(
-            "0", "=",
-            "-{1", "\\over", "100}", "V_1", "+",
-            "\\Bigg(", "{1", "\\over", "200}", "+", "{1", "\\over", "100}", "-", "j", "0.05", "\\Bigg)", "V_2", "+",
-            "-{1", "\\over", "200}", "V_3", "+",
-            "j", "0.05", "V_4"
-        )
-        self.freq_eq3 = TexMobject(
-            "0", "=",
-            "j", "0.004", "V_1", "+"
-                                 "{1", "\\over", "200}", "V_2", "+",
-            "\\Bigg(", "-{1", "\\over", "200}", "-", "j", "0.004", "\\Bigg)", "V_3",
-        )
-        self.freq_eq4 = TexMobject(
-            "0", "=",
-            "-", "j", "0.05", "V_2", "+",
-            "\\Bigg(", "-{1", "\\over", "100}", "+", "j", "0.05", "\\Bigg)", "V_4",
-        )
-        self.freq_eq5 = TexMobject(
-            "20 \\angle 15^{\\circ}", "=", "V_0",
-        )
-        self.second_last_eq = self.freq_eq4
-        self.last_eq = self.freq_eq5
+    # get impulse response
+    def get_time_graph(self, s, w, z, freq_mult=3):
+        ''' multiply w by freq_mult to increase frequency '''
+        # zero frequency case
+        if w == 0:
+            return lambda t: 2*np.exp(s*t)*(s*t-z*t+1)
 
-        self.V_texs = VGroup(
-            VGroup(self.freq_eq1[5], self.freq_eq5[-1]),
-            VGroup(self.freq_eq1[19], self.freq_eq2[5], self.freq_eq3[4]),
-            VGroup(self.freq_eq1[-5], self.freq_eq2[-10], self.freq_eq3[-11], self.freq_eq4[5]),
-            VGroup(self.freq_eq1[-1], self.freq_eq2[-5], self.freq_eq3[-1]),
-            VGroup(self.freq_eq2[-1], self.freq_eq4[-1]),
-        )
-        for i in range(5):
-            self.V_texs[i].set_color(self.voltage_colors[i])
+        return lambda t: \
+            2*(((s-z)/(freq_mult*w))*np.sin((freq_mult*w)*t) + np.cos((freq_mult*w)*t))*np.exp(s*t)
 
-        self.freq_eqs = VGroup(self.freq_eq1, self.freq_eq2, self.freq_eq3, self.freq_eq4, self.freq_eq5) \
-            .arrange(DOWN, aligned_edge=LEFT)
-        self.j_texs = VGroup(
-            *[self.freq_eq1[i] for i in (16, -3)],
-            *[self.freq_eq2[i] for i in (16, -3)],
-            *[self.freq_eq3[i] for i in (2, -4)],
-            *[self.freq_eq4[i] for i in (3, -4)],
+class CompareToClassroom(Scene):
+    def construct(self):
+        # add line dividing screen
+        dividing_line = DashedLine(
+            start=FRAME_HEIGHT*0.5*DOWN,
+            end=FRAME_HEIGHT*0.5*UP,
+            dash_length=0.25
         )
-        self.j_texs.set_color(self.j_color)
-        unit_texs = VGroup(
-            *[self.freq_eq1[i] for i in (4, 10, 14, 17, 23, 27)],
-            *[self.freq_eq2[i] for i in (4, 10, 14, 17, 23, 27)],
-            *[self.freq_eq3[i] for i in (3, 7, 13, 16)],
-            *[self.freq_eq4[i] for i in (4, 10, 13)],
-            self.freq_eq5[0]
-        )
-        unit_texs.set_color(self.unit_color)
-
-        brace = Brace(self.freq_eqs, direction=LEFT)
-        eqs_group = VGroup(
-            brace,
-            self.freq_eqs
+        self.play(
+            ShowCreation(dividing_line)
         )
 
-        return eqs_group
-
-    def get_diff_eqs(self):
-        diff_eq1 = TexMobject(
-            "0 = ",
-            "{1", "\\over", "150}", "v_0", " + ",
-            "\\Bigg(-", "{1", "\\over", "150}", "-", "{1", "\\over", "100}", "\\Bigg)", "v_1", "+"
-            "{1", "\\over", "100}", "v_2", "-",
-            "0.003", "{d", "v_1", "\\over", "dt}", "+",
-            "0.001", "{d", "v_3", "\\over", "dt}",
-        )
-        diff_eq2 = TexMobject(
-            "0 = ",
-            "-{1", "\\over", "100}", "{d", "v_1", "\\over", "dt}", "+",
-            "\\Bigg(", "{1", "\\over", "200}", "+", "{1", "\\over", "100}", "\\Bigg)", "{d", "v_2", "\\over", "dt}",
-            "-",
-            "{1", "\\over", "200}", "{d", "v_3", "\\over", "dt}", "+",
-            "{1", "\\over", "5}", "v_2", "-",
-            "{1", "\\over", "5}", "v_4",
-        )
-        diff_eq3 = TexMobject(
-            "0 = ",
-            "{1", "\\over", "200}", "v_2", "-",
-            "{1", "\\over", "200}", "v_3", "-",
-            "0.001", "{d", "v_3", "\\over", "dt}", "-",
-            "0.001", "{d", "v_1", "\\over", "dt}",
-        )
-        diff_eq4 = TexMobject(
-            "0 = "
-            "{1", "\\over", "5}", "v_2", "-",
-            "{1", "\\over", "5}", "v_4", "+",
-            "{1", "\\over", "100}", "{d", "v_4", "\\over", "dt}",
-        )
-        diff_eq5 = TexMobject(
-            "20", "cos(", "4", "t - ", "15^{\\circ}", ")", "=", "v_0"
+        # my video title
+        my_video = TextMobject("\\underline{This Video}")
+        my_video.move_to(FRAME_WIDTH*0.25*LEFT + FRAME_HEIGHT*0.5*UP + my_video.get_height()*0.5*DOWN + 0.2*DOWN)
+        self.play(
+            Write(my_video)
         )
 
-        # coloring
-        self.V_texs = VGroup(
-            VGroup(diff_eq1[4], diff_eq5[-1]),
-            VGroup(diff_eq1[15], diff_eq2[5], diff_eq1[-9], diff_eq3[-3]),
-            VGroup(diff_eq1[19], diff_eq2[-6], diff_eq2[-21], diff_eq3[4], diff_eq4[3]),
-            VGroup(diff_eq1[-3], diff_eq2[-13], diff_eq3[-9], diff_eq3[-13]),
-            VGroup(diff_eq2[-1], diff_eq4[-3], diff_eq4[-9])
-        )
-        for i in range(5):
-            self.V_texs[i].set_color(self.voltage_colors[i])
-
-        self.dt_texs = VGroup(
-            *[diff_eq1[i] for i in (-1, -2, -4, -7, -8, -10)],
-            *[diff_eq2[i] for i in (4, 6, 7, 18, 20, 21, 26, 28, 29)],
-            *[diff_eq3[i] for i in (12, 14, 15, 18, 20, 21)],
-            *[diff_eq4[i] for i in (-1, -2, -4)],
-        )
-        self.dt_texs.set_color(self.dt_color)
-        unit_texs = VGroup(
-            *[diff_eq1[i] for i in (3, 9, 13, 18, 21, 27)],
-            *[diff_eq2[i] for i in (3, 12, 16, 25, 33, 38)],
-            *[diff_eq3[i] for i in (3, 8, 11, 17)],
-            *[diff_eq4[i] for i in (2, 7, 12)],
-            *[diff_eq5[i] for i in (0, 2, 4)],
-        )
-        unit_texs.set_color(self.unit_color)
-        # voltage_texs = VGroup(
-        #     *[diff_eq1[i] for i in (4, 15, 19, 23, 29)],
-        #     *[diff_eq2[i] for i in (5, 19, 27, 34, 39)],
-        #     *[diff_eq3[i] for i in (4, 9, 13, 19)],
-        #     *[diff_eq4[i] for i in (3, 8, 14)],
-        #     diff_eq5[-1]
-        # )
-        # voltage_texs.set_color(self.voltage_color)
-        diff_eqs = VGroup(diff_eq1, diff_eq2, diff_eq3, diff_eq4, diff_eq5) \
-            .arrange(DOWN, aligned_edge=LEFT, buff=0.5)
-        diff_eqs_brace = Brace(diff_eqs, direction=LEFT)
-        diff_eqs_group = VGroup(
-            diff_eqs_brace,
-            diff_eqs
+        # add animations later
+        todo = TextMobject("Insert\\\\Visuals\\\\Later")\
+            .move_to(FRAME_WIDTH*0.25*LEFT)
+        self.add(
+            todo, SurroundingRectangle(todo, buff=2)
         )
 
-        return diff_eqs_group
+        # add college classroom title
+        classroom = TextMobject("\\underline{Circuits Class}")
+        classroom.move_to(
+            FRAME_WIDTH * 0.25 * RIGHT + FRAME_HEIGHT * 0.5 * UP + classroom.get_height() * 0.5 * DOWN + 0.2 * DOWN)
+        self.play(
+            Write(classroom)
+        )
+
+        # add math
+        # kw = {
+        #     "substrings_to_isolate": ["v"]
+        # }
+        kw ={}
+        eqs = VGroup(
+            TexMobject("v", " = V_M cos(\\omega t + \\varphi)", **kw),
+            TexMobject("{d", "v", "\\over", "dt}", " = -V_M \\omega sin(\\omega t + \\varphi)", **kw),
+            TexMobject("{d", "v", "\\over dt} = V_M \\omega cos(\\omega t + \\varphi + 90^\\circ)", **kw),
+            TexMobject("{d", "v", "\\over dt} = \\Re(\\omega V_M e^{j \\omega t} e^{j \\varphi} e^{j 90^\\circ})", **kw),
+            TexMobject("{d", "v", "\\over dt} = \\Re(j \\omega V_M e^{j \\omega t} e^{j \\varphi})", **kw),
+        ) \
+            .arrange(DOWN, aligned_edge=LEFT) \
+            .move_to(FRAME_WIDTH*0.25*RIGHT)
+        self.play(
+            Write(eqs)
+        )
+
+        self.wait(4.17)
+
+class NoPrerequisites(Scene):
+    def construct(self):
+        # show list
+        list = BulletedList(
+            "Calculus",
+            "Physics",
+            "Circuits I"
+        )\
+            .scale(1.25)
+        preq_title = TextMobject("\\underline{Background Knowledge}")\
+            .next_to(list, direction=UP, buff=0.5) \
+            .scale(1.5)
+        self.play(
+            Write(preq_title)
+        )
+        self.wait(2.67)
+        self.play(
+            AnimationGroup(
+                *[
+                    Write(item)
+                    for item in list
+                ],
+                lag_ratio=1
+            )
+        )
+
+        # cross out
+        list_group = VGroup(preq_title, list)
+        x_height = max(list_group.get_width(), list_group.get_height()) + 0.1
+        x_center = list_group.get_center()
+        x = VGroup(
+            Line(
+                start=x_center+UR*0.5*x_height,
+                end=x_center+DL*0.5*x_height,
+                stroke_width=30,
+                color=RED
+            ),
+            Line(
+                start=x_center + UL * 0.5 * x_height,
+                end=x_center + DR * 0.5 * x_height,
+                stroke_width=30,
+                color=RED
+            )
+        )
+        self.play(
+            Write(x)
+        )
+        self.wait(1.6)
