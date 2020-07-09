@@ -308,7 +308,7 @@ class EEApplication(Scene):
             run_time=0.95
         )
 
-        self.wait()
+        self.wait(3.27)
 
 class ComplexQuantitiesPaper(Scene):
     def construct(self):
@@ -447,7 +447,7 @@ class PoleZeroPlot(Scene):
             system_diagram
         )
 
-        run_time = 0.055
+        run_time = 0.06
         for s, w, z in vals:
             # print(f"({s}, {w}, {z})")
             self.play(
@@ -601,9 +601,11 @@ class CompareToClassroom(Scene):
         # add animations later
         todo = TextMobject("Insert\\\\Visuals\\\\Later")\
             .move_to(FRAME_WIDTH*0.25*LEFT)
-        self.add(
-            todo, SurroundingRectangle(todo, buff=2)
+        self.play(
+            Write(todo),
+            Write(SurroundingRectangle(todo, buff=2))
         )
+        self.wait(2.4)
 
         # add college classroom title
         classroom = TextMobject("\\underline{Circuits Class}")
@@ -631,7 +633,7 @@ class CompareToClassroom(Scene):
             Write(eqs)
         )
 
-        self.wait(4.17)
+        self.wait(1.53)
 
 class NoPrerequisites(Scene):
     def construct(self):

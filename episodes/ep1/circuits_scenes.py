@@ -1,7 +1,21 @@
 from manimlib.imports import *
-from accalib.electrical_circuits import BatteryLampCircuit
+from accalib.electrical_circuits import *
 from accalib.circuit_comps import *
 
+class WhatIsCircuit(Scene):
+    def construct(self):
+        section_label = TextMobject(
+            "Part 1: \\\\",
+            "What Really is an Electric Circuit?"
+        ).scale(1.5)
+        self.play(
+            Write(section_label[0]),
+        )
+        self.wait()
+        self.play(
+            Write(section_label[1])
+        )
+        self.wait()
 
 class IntroduceCircuit(Scene):
     CONFIG={
@@ -21,7 +35,7 @@ class IntroduceCircuit(Scene):
                 direction=UP
             )
         )
-        self.wait(3.57)
+        self.wait(0.506)
 
         # expand ACCA
         self.play(
@@ -34,7 +48,7 @@ class IntroduceCircuit(Scene):
                 2 * RIGHT
             ),
         )
-        self.wait(1.1)
+        self.wait(0.506)
 
         # indicate Circuit
         brace_Circuit = Brace(acca_text[1], color=self.circuit_color)
@@ -50,7 +64,7 @@ class IntroduceCircuit(Scene):
                 self.circuit_color
             )
         )
-        self.wait(1.67)
+        self.wait(0.506)
 
         # move to title
         self.play(
@@ -71,6 +85,7 @@ class IntroduceCircuit(Scene):
                 direction=DOWN
             )
         )
+        self.wait(0.506)
 
         # underline Circuit
         underline = Line(LEFT, RIGHT, color=self.circuit_color)
@@ -82,8 +97,7 @@ class IntroduceCircuit(Scene):
                 underline
             )
         )
-
-        self.wait(0.87)
+        self.wait(2.57)
 
         # add phone
         phone = ImageMobject("images/ep1/IntroduceCircuit/iphone-circuit-board.jpg")\
@@ -241,7 +255,7 @@ class CircuitDefinition(Scene):
                 run_time=1.77
             )
         )
-        self.wait(0.13)
+        self.wait(2.23)
 
         # add rectangles around electrical elements
         elements_label = VGroup()
@@ -258,10 +272,10 @@ class CircuitDefinition(Scene):
             )
         )
         self.play(
-            Write(elements_label[0])
+            Write(elements_label[0], run_time=0.77)
         )
         self.play(
-            Write(elements_label[1])
+            Write(elements_label[1], run_time=0.77)
         )
 
         kw = {'color': YELLOW}
@@ -506,7 +520,7 @@ class CompsDisplay(Scene):
             .next_to(comps_box, direction=UP, buff=0.2)
         comps_group.add(ee_text)
         self.play(
-            get_comps_anim(run_time=10.2),
+            get_comps_anim(run_time=14.93),
             Write(ee_text)
         )
 
@@ -554,7 +568,7 @@ class CompsDisplay(Scene):
         )
         self.play(
             get_comps_anim(
-                run_time=5.46
+                run_time=6.693
             )
         )
 
@@ -567,7 +581,7 @@ class CompsDisplay(Scene):
         )\
             .scale(1.2)
         con_text = TextMobject(
-            "use to build a deeper understanding",
+            "build a deeper understanding",
             color=BLUE_C
         )\
             .next_to(con_arrow, direction=RIGHT)
@@ -576,13 +590,13 @@ class CompsDisplay(Scene):
         self.play(
             AnimationGroup(
                 ShowCreation(con_arrow),
-                ShowCreation(con_text),
+                Write(con_text),
                 lag_ratio=0.1
             ),
-            get_comps_anim(7),
+            get_comps_anim(13.2),
         )
 
-    def create_comp_box(self,comp):
+    def create_comp_box(self, comp):
         width = 2.7
         rect = Rectangle(
             stroke_opacity=0,
@@ -611,7 +625,7 @@ class ComplexCircuitOverview(Scene):
             .next_to(definition[4], DOWN, SMALL_BUFF)
         self.add(
             definition,
-        ),
+        )
 
         # needed for positioning boxes
         scale_factor = 1.5
@@ -624,7 +638,7 @@ class ComplexCircuitOverview(Scene):
                 run_time=2
             )
         )
-        self.wait(5.83)
+        self.wait(3.4)
 
         electrical_elem_label = TextMobject("\\underline{44 Electrical Elements}", color=YELLOW) \
             .scale(1.5) \
@@ -636,7 +650,7 @@ class ComplexCircuitOverview(Scene):
                 # FadeInFrom, FadeInFromLarge
                 SpinInFromNothing,
                 electrical_elem_rects,
-                run_time=4.5,
+                run_time=7.5,
                 lag_ratio=0.25
             ),
             LaggedStart(
@@ -644,7 +658,7 @@ class ComplexCircuitOverview(Scene):
                     FadeInFrom(
                         electrical_elem_label,
                         direction=UP,
-                        run_time=2
+                        run_time=0.5
                     ),
                     AnimationGroup(
                         ApplyMethod(
@@ -674,7 +688,7 @@ class ComplexCircuitOverview(Scene):
                 )
             )
         )
-        self.wait(4)
+        self.wait(0.8)
 
     def get_elec_element_rects(self, scale_factor=2.):
         stroke_mult = 2/(1+np.exp(1*(-scale_factor+1)))
@@ -774,3 +788,145 @@ class ComplexCircuitOverview(Scene):
             )
         rects.sort(point_to_num_func=lambda x: x[0])
         return rects
+
+class Summary(Scene):
+    def construct(self):
+        # add definition
+        definition = TextMobject(
+            "electrical circuit ", "-", " interconnection ", "of", " electrical elements",
+            arg_separator=" ",
+            color=YELLOW) \
+            .scale(1.4) \
+            .to_corner(DOWN)
+        underline1 = Line(LEFT, RIGHT, color=BLUE_C) \
+            .match_width(definition[2]) \
+            .scale(1) \
+            .next_to(definition[2], DOWN, SMALL_BUFF)
+        underline2 = Line(LEFT, RIGHT, color=BLUE_C) \
+            .match_width(definition[4]) \
+            .scale(1) \
+            .next_to(definition[4], DOWN, SMALL_BUFF)
+        self.add(
+            definition,
+        )
+
+        self.wait(3.37)
+        self.play(
+            AnimationGroup(
+                AnimationGroup(
+                    ApplyMethod(
+                        definition[4].set_color,
+                        BLUE_C,
+                        run_time=0.53
+                    ),
+                    ShowCreation(
+                        underline2,
+                        run_time=0.53
+                    ),
+                    lag_ratio=0.01
+                ),
+                AnimationGroup(
+                    ApplyMethod(
+                        definition[2].set_color,
+                        BLUE_C,
+                        run_time=0.53
+                    ),
+                    ShowCreation(
+                        underline1,
+                        run_time=0.53
+                    ),
+                    lag_ratio=0.01
+                ),
+                lag_ratio=1
+            )
+        )
+        self.wait(0.77)
+
+        home_circuit = ImageMobject(
+            "images\ep1\Summary\home_circuit.jpg"
+        )\
+            .move_to(FRAME_WIDTH*0.25*LEFT)\
+            .scale(2.25)
+        home_rect = SurroundingRectangle(home_circuit, color=YELLOW, buff=0.05)
+        self.play(
+            AnimationGroup(
+                FadeIn(home_circuit),
+                Write(home_rect),
+                lag_ratio=0.1,
+            )
+        )
+        self.wait(1.96)
+
+        circuit_board = ImageMobject(
+            "images\ep1\Summary\circuit-board.jpg"
+        ) \
+            .move_to(FRAME_WIDTH * 0.25 * RIGHT) \
+            .scale(2.25)
+        circuit_rect = SurroundingRectangle(circuit_board, color=YELLOW, buff=0.05)
+        self.play(
+            AnimationGroup(
+                FadeIn(circuit_board),
+                Write(circuit_rect),
+                lag_ratio=0.1,
+            )
+        )
+        self.wait(1.33)
+
+class HowDoesThisRelateToComplexNumbers(Scene):
+    def construct(self):
+        question = TextMobject(
+            "How does this relate to complex numbers?"
+        ).scale(1.5)
+
+        self.play(Write(question))
+
+        self.wait()
+
+class UnclearConnection(Scene):
+    def construct(self):
+        # fade in circuit
+        circuit = BatteryLampCircuit()
+        self.add(circuit)
+        self.wait()
+
+        # move circuit left
+        self.play(
+            ApplyMethod(circuit.scale, 0.75)
+        )
+        self.play(
+            ApplyMethod(circuit.move_to, LEFT * 0.25 * FRAME_WIDTH),
+        )
+
+        # add i
+        i_text = TexMobject(
+            "i", "&=\\sqrt{-1}",
+            substrings_to_isolate=["$i$"]
+        ) \
+            .scale(1.4) \
+            .shift(0.35 * RIGHT * FRAME_WIDTH)
+        i_text.get_part_by_tex("i").set_color(YELLOW)
+        i_rect = SurroundingRectangle(
+            i_text,
+            buff=0.5,
+            color=PURPLE
+        )
+        self.play(
+            Write(i_text),
+            Write(i_rect),
+        )
+
+        # question mark / line
+        arrow = DoubleArrow(
+            start=circuit.get_right(),
+            end=i_rect.get_left(),
+            color=YELLOW
+        )
+        qm = TextMobject("???", color=YELLOW)\
+            .scale(2) \
+            .next_to(arrow, direction=UP)
+        self.play(
+            ShowCreation(arrow),
+            Write(qm)
+        )
+
+        self.wait()
