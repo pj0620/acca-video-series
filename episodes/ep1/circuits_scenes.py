@@ -142,7 +142,7 @@ class IntroduceCircuit(Scene):
         )
 
         # shift up and ask "What really is an electrical circuit?"
-        question = TextMobject("What really is an electrical circuit?", color=BLUE) \
+        question = TextMobject("What really is an electrical circuit?", color=self.circuit_color) \
             .scale(1.5) \
             .to_corner(DOWN)
         phone_group = Group(phone,phone_rect)
@@ -871,62 +871,3 @@ class Summary(Scene):
             )
         )
         self.wait(1.33)
-
-class HowDoesThisRelateToComplexNumbers(Scene):
-    def construct(self):
-        question = TextMobject(
-            "How does this relate to complex numbers?"
-        ).scale(1.5)
-
-        self.play(Write(question))
-
-        self.wait()
-
-class UnclearConnection(Scene):
-    def construct(self):
-        # fade in circuit
-        circuit = BatteryLampCircuit()
-        self.add(circuit)
-        self.wait()
-
-        # move circuit left
-        self.play(
-            ApplyMethod(circuit.scale, 0.75)
-        )
-        self.play(
-            ApplyMethod(circuit.move_to, LEFT * 0.25 * FRAME_WIDTH),
-        )
-
-        # add i
-        i_text = TexMobject(
-            "i", "&=\\sqrt{-1}",
-            substrings_to_isolate=["$i$"]
-        ) \
-            .scale(1.4) \
-            .shift(0.35 * RIGHT * FRAME_WIDTH)
-        i_text.get_part_by_tex("i").set_color(YELLOW)
-        i_rect = SurroundingRectangle(
-            i_text,
-            buff=0.5,
-            color=PURPLE
-        )
-        self.play(
-            Write(i_text),
-            Write(i_rect),
-        )
-
-        # question mark / line
-        arrow = DoubleArrow(
-            start=circuit.get_right(),
-            end=i_rect.get_left(),
-            color=YELLOW
-        )
-        qm = TextMobject("???", color=YELLOW)\
-            .scale(2) \
-            .next_to(arrow, direction=UP)
-        self.play(
-            ShowCreation(arrow),
-            Write(qm)
-        )
-
-        self.wait()

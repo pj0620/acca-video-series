@@ -5,13 +5,15 @@ from accalib.particles import Electron
 import random
 from accalib.utils import VectorInterpolator
 from functools import partial
+from accalib.rate_functions import accelerated
 
 class BatteryLampCircuit(SVGMobject):
     CONFIG={
         "battery_orange": "#f99420",
         "num_of_electrons": 10,
         # "num_of_electrons": 1,
-        "bezier_approx_samples": 50
+        "bezier_approx_samples": 50,
+        "electron_freq": 0.11
     }
 
     def __init__(self, mode="plain", **kwargs):
@@ -19,6 +21,15 @@ class BatteryLampCircuit(SVGMobject):
         svg_file="images/svgs/battery_lamp_circuit.svg"
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
         self.scale(3.5)
+        self.battery = VGroup(
+            self.top_rect,
+            self.bot_rect,
+            self.outer_rect,
+            self.plus_sign,
+            self.minus_sign,
+            self.horz_line,
+            self.lightning_bolt,
+        )
 
     def name_parts(self):
         self.outer_rect = self.submobjects[0]
@@ -98,7 +109,7 @@ class BatteryLampCircuit(SVGMobject):
 
         return self
 
-    def setup_electrons(self):
+    def setup_electrons(self, add_electrons=True):
         bezier_func_bot=bezier(self.wire_bot.get_points())
         bezier_func_top=bezier(self.wire_top.get_points())
         points=[]
@@ -114,11 +125,13 @@ class BatteryLampCircuit(SVGMobject):
         self.electrons=[]
         self.electron_loc=ValueTracker(0)
         for i in range(self.num_of_electrons):
-            self.electrons+=[Electron()]
+            self.electrons+=[Electron().scale(0.2)]
             self.electrons[-1].add_updater(
                 partial(self.electron_updater, i=i),
                 call_updater=True
             )
+        if not add_electrons:
+            return
         self.add(
             *self.electrons,
             self.top_rect,
@@ -131,6 +144,24 @@ class BatteryLampCircuit(SVGMobject):
             self.block_rect,
             self.base_big,
             self.base_small
+        )
+
+    def get_electron_acceleration_anim(self, new_freq, run_time=1):
+        acc_anim = ApplyMethod(
+            self.electron_loc.increment_value,
+            ((self.electron_freq + new_freq) / 2) * run_time,
+            run_time=run_time,
+            rate_func=partial(accelerated, f0=self.electron_freq, f1=new_freq)
+        )
+        self.electron_freq = new_freq
+        return acc_anim
+
+    def get_electron_anim(self, run_time=1):
+        return ApplyMethod(
+            self.electron_loc.increment_value,
+            run_time * self.electron_freq,
+            run_time=run_time,
+            rate_func=linear
         )
 
     def remove_electrons(self):
@@ -156,7 +187,7 @@ class BatteryLampCircuit(SVGMobject):
             return
 
         # change due to random motion
-        diff=(2 * random.random() - 1) * 0.01
+        diff=(2 * random.random() - 1) * 0.005
 
         # down move if inside voltage source
         if 0.755 < (cur + diff) % 1 < 1:

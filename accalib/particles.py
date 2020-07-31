@@ -2,15 +2,10 @@ from manimlib.imports import *
 from accalib.constants import *
 
 class Electron(SVGMobject):
-    CONFIG={
-        "stroke_width": DEFAULT_WIRE_THICKNESS
-    }
-
     def __init__(self, mode="plain", include_sign=True, **kwargs):
         self.parts_named=False
         svg_file="images/svgs/electron.svg"
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
-        self.scale(0.17)
         if not include_sign:
             self.remove(self.minus)
         # ignore if not free electron
@@ -29,7 +24,7 @@ class Electron(SVGMobject):
         if not self.parts_named:
             self.name_parts()
 
-        self.circle.set_fill("#3fb5de", opacity=1)
+        self.circle.set_fill(RED, opacity=1)
         self.circle.set_stroke(WHITE, opacity=0)
         self.minus.set_fill(WHITE, opacity=1)
         self.minus.set_stroke(WHITE, opacity=0)
@@ -39,6 +34,51 @@ class Electron(SVGMobject):
         #     mob.set_fill(BLACK, opacity=0)
 
         return self
+
+class Proton(SVGMobject):
+    def __init__(self, mode="plain", include_sign=True, **kwargs):
+        self.parts_named = False
+        svg_file = "images/svgs/proton.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+        if not include_sign:
+            self.remove(self.minus)
+        # ignore if not free electron
+        self.next_center = None
+        self.current_center = None
+        self.wait_theta = None
+        self.total_theta = 0
+
+    def name_parts(self):
+        self.circle = self.submobjects[0]
+        self.plus = VGroup(*self.submobjects[1:3])
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        self.circle.set_fill("#3fb5de", opacity=1)
+        self.circle.set_stroke(WHITE, opacity=0)
+        self.plus.set_fill(WHITE, opacity=1)
+        self.plus.set_stroke(WHITE, opacity=0)
+
+        # for mob in self.submobjects:
+        #     mob.set_stroke(BLACK, self.get_stroke_width())
+        #     mob.set_fill(BLACK, opacity=0)
+
+        return self
+
+class Neutron(Circle):
+    CONFIG = {
+        # "radius": DEFAULT_DOT_RADIUS,
+        "stroke_width": 0,
+        "fill_opacity": 1.0,
+        "color": GREY
+    }
+
+    def __init__(self, **kwargs):
+        Circle.__init__(self, **kwargs)
 
 class CopperAtom(SVGMobject):
     def __init__(self, include_valence=True, electron_color="#3fb5de",mode="plain", **kwargs):
