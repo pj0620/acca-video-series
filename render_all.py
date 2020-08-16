@@ -5,26 +5,39 @@ import os
 scenes_dir = "episodes/ep1/"
 scenes_map = {
     "hook.py":
-        ["ComplexNumbersTitle",
-         "ApplicationsOfComplexNumbers",
-         "EEApplication",
-         "ComplexQuantitiesPaper",
-         "PoleZeroPlot",
-         "CompareToClassroom",
-         "NoPrerequisites"],
+        [
+            "ComplexNumbersTitle",
+            "ApplicationsOfComplexNumbers",
+            "EEApplication",
+            "ComplexQuantitiesPaper",
+            "PoleZeroPlot",
+            "CompareToClassroom",
+            "NoPrerequisites"
+        ],
     "circuits_scenes.py":
-        ["WhatIsCircuit",
-         "IntroduceCircuit",
-         "CircuitDefinition",
-         "CompsDisplay",
-         "ComplexCircuitOverview"],
+        [
+            "WhatIsCircuit",
+            "IntroduceCircuit",
+            "CircuitDefinition",
+            "CompsDisplay",
+            "ComplexCircuitOverview"
+        ],
     "current_scenes.py":
-        ["IntroCurrentPart",
-         "IntroduceACDC",
-         "IntroCharge",
-         "ElementaryCharge",
-         "SimpleCircuit",
-         "Amperes"]
+        [
+            "IntroCurrentPart",
+            "IntroduceACDC",
+            "IntroCharge",
+            "ElementaryCharge",
+            "SimpleCircuit",
+            "Amperes",
+            "BackToSimpleCircuit"
+        ],
+    "ohms_law.py":
+        [
+            "IntroOhmsLawPart",
+            "OhmsLawIntro",
+            "CurrentCalculation"
+        ]
 }
 
 def get_commands(quality_arg, quality_ending):
@@ -62,6 +75,7 @@ def main(argv):
         quality_ending = "480"
 
     for command in get_commands(quality_arg, quality_ending):
+        print("executing: " + command)
         os.system(command)
 
 

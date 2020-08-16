@@ -1006,8 +1006,8 @@ class Amperes(Scene):
         )
 
         self.play(
-            self.get_electron_wire_anim(15),
-            self.get_electron_pos_wire_anim(15),
+            self.get_electron_wire_anim(7.33),
+            self.get_electron_pos_wire_anim(7.33),
         )
 
     def get_electron_pos_wire_anim(self, run_time=1.):
@@ -1056,7 +1056,7 @@ class BackToSimpleCircuit(Scene):
         self.add(*self.circuit.electrons)
         self.add(self.circuit.battery, self.circuit.block_rect, self.circuit.base_big, self.circuit.base_small)
         self.play(
-            self.get_electron_anim(run_time=4.17)
+            self.get_electron_anim(run_time=3.07)
         )
 
         # fade in current label
@@ -1093,7 +1093,7 @@ class BackToSimpleCircuit(Scene):
                 FadeIn(mob)
                 for mob in (current_arrow, current_text, current_value)
             ],
-            self.get_electron_anim(2.93)
+            self.get_electron_anim(4.42)
         )
 
         # label equivalent electrons per second
@@ -1129,7 +1129,7 @@ class BackToSimpleCircuit(Scene):
                 elec_per_sec_unit,
                 direction=DOWN
             ),
-            self.get_electron_anim(5.33)
+            self.get_electron_anim(8.8)
         )
 
         self.circuit.electrons_flowing = False
@@ -1161,7 +1161,7 @@ class BackToSimpleCircuit(Scene):
             ),
             self.get_electron_anim(
                 freq=0,
-                run_time=16.17
+                run_time=24.2
             )
         )
 
@@ -1203,7 +1203,7 @@ class BackToSimpleCircuit(Scene):
                 run_time=1
             ),
             self.get_electron_anim(
-                run_time=4.07
+                run_time=5
             )
         )
 
@@ -1261,7 +1261,7 @@ class BackToSimpleCircuit(Scene):
             )
         )
         self.play(
-            self.get_electron_anim(3.13, self.electron_freq_1 / 2)
+            self.get_electron_anim(7.43, self.electron_freq_1 / 2)
         )
 
         question = TextMobject(
@@ -1283,7 +1283,7 @@ class BackToSimpleCircuit(Scene):
         )
 
         self.play(
-            self.get_electron_anim(3.33, self.electron_freq_1/2)
+            self.get_electron_anim(5.02, self.electron_freq_1/2)
         )
 
     def get_electron_anim(self, run_time=1., freq=0.11):

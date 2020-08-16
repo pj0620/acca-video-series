@@ -3,88 +3,88 @@ from accalib.constants import *
 import time
 
 class PressureGauge(SVGMobject):
-        CONFIG={
-            "max_pressure": 52,
-            "min_pressure": 25,
-            "initial_pressure": 0,
-            "text_color": WHITE,
-            "text_direction": RIGHT,
-            "text_buff": 0.2,
-            "unknown": True
-        }
+    CONFIG={
+        "max_pressure": 30,
+        "min_pressure": 0,
+        "initial_pressure": 0,
+        "text_color": WHITE,
+        "text_direction": RIGHT,
+        "text_buff": 0.2,
+        "unknown": False
+    }
 
-        def __init__(self, mode="plain", **kwargs):
-            self.parts_named=False
-            svg_file="images/svgs/pressure_gauge.svg"
-            SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file="images/svgs/pressure_gauge.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
 
-            self.angle = 0
+        self.angle = 0
 
-            self.pressure = ValueTracker(self.initial_pressure)
+        self.pressure = ValueTracker(self.initial_pressure)
 
-            self.needle.rotate(180 * DEG_TO_RAD, about_point=self.rings.get_center())
-            self.add_updater(lambda x: x.set_pressure(self.pressure.get_value()))
+        self.needle.rotate(180 * DEG_TO_RAD, about_point=self.rings.get_center())
+        self.add_updater(lambda x: x.set_pressure(self.pressure.get_value()))
 
-            self.text_num=DecimalNumber(self.initial_pressure,
-                                        unit="Pa",
-                                        num_decimal_places=1,
-                                        color=self.text_color,
-                                        edge_to_fix=RIGHT).scale(1.9)
-            self.text_unk=TextMobject("???",
-                                      color=self.text_color).scale(1.9)
-            if self.unknown:
-                self.text = self.text_unk
-            else:
-                self.text = self.text_num
-
-            self.add_updater(lambda x: x.text.next_to(self.rings,
-                                                      direction=self.text_direction,
-                                                      buff=self.text_buff),
-                             call_updater=True)
-            self.submobjects.append(self.text)
-            self.add_updater(lambda x: x.text_num.set_value(self.pressure.get_value()))
-
-        def set_value_known(self):
+        self.text_num=DecimalNumber(self.initial_pressure,
+                                    unit="Pa",
+                                    num_decimal_places=1,
+                                    color=self.text_color,
+                                    edge_to_fix=RIGHT).scale(1.9)
+        self.text_unk=TextMobject("???",
+                                  color=self.text_color).scale(1.9)
+        if self.unknown:
+            self.text = self.text_unk
+        else:
             self.text = self.text_num
 
-        def get_pressure(self):
-            return self.pressure
+        self.add_updater(lambda x: x.text.next_to(self.rings,
+                                                  direction=self.text_direction,
+                                                  buff=self.text_buff),
+                         call_updater=True)
+        self.submobjects.append(self.text)
+        self.add_updater(lambda x: x.text_num.set_value(self.pressure.get_value()))
 
-        def set_pressure(self,new_pressure):
-            new_angle=interpolate(0,
-                                  270,
-                                  (self.pressure.get_value() - self.min_pressure) / (self.max_pressure - self.min_pressure)
-                                  )
-            del_angle=new_angle - self.angle
-            self.angle = new_angle
+    def set_value_known(self):
+        self.text = self.text_num
 
-            self.needle.rotate(
-                -1 * DEG_TO_RAD * del_angle,
-                about_point=self.rings.get_center()
-            )
+    def get_pressure(self):
+        return self.pressure
 
-        def name_parts(self):
-            self.rings = self.submobjects[0]
-            self.readings = self.submobjects[1]
-            self.needle = self.submobjects[2]
-            self.pipe = self.submobjects[3:5]
+    def set_pressure(self,new_pressure):
+        new_angle=interpolate(0,
+                              270,
+                              (self.pressure.get_value() - self.min_pressure) / (self.max_pressure - self.min_pressure)
+                              )
+        del_angle=new_angle - self.angle
+        self.angle = new_angle
 
-        def init_colors(self):
-            SVGMobject.init_colors(self)
+        self.needle.rotate(
+            -1 * DEG_TO_RAD * del_angle,
+            about_point=self.rings.get_center()
+        )
 
-            if not self.parts_named:
-                self.name_parts()
+    def name_parts(self):
+        self.rings = self.submobjects[0]
+        self.readings = self.submobjects[1]
+        self.needle = self.submobjects[2]
+        self.pipe = self.submobjects[3:5]
 
-            self.rings.set_fill(self.get_color(),opacity=1)
-            self.rings.set_stroke(self.get_color(), 3)
-            self.readings.set_fill(self.get_color(), opacity=1)
-            self.readings.set_stroke(self.get_color(), 1)
-            self.needle.set_fill(self.get_color(), opacity=1)
-            self.needle.set_stroke(self.get_color(), 2)
-            for mob in self.pipe:
-                mob.set_stroke(self.get_color(),5)
+    def init_colors(self):
+        SVGMobject.init_colors(self)
 
-            return self
+        if not self.parts_named:
+            self.name_parts()
+
+        self.rings.set_fill(self.get_color(),opacity=1)
+        self.rings.set_stroke(self.get_color(), 3)
+        self.readings.set_fill(self.get_color(), opacity=1)
+        self.readings.set_stroke(self.get_color(), 1)
+        self.needle.set_fill(self.get_color(), opacity=1)
+        self.needle.set_stroke(self.get_color(), 2)
+        for mob in self.pipe:
+            mob.set_stroke(self.get_color(),5)
+
+        return self
 
 class PumpBody(SVGMobject):
     CONFIG={
@@ -160,12 +160,13 @@ class Fins(SVGMobject):
 
 class HydraulicCircuit(Mobject):
     CONFIG={
-        "max_pressure": 52,
-        "min_pressure": 25,
-        "initial_pressure": 25,
+        "max_pressure": 40,
+        "min_pressure": 0,
+        "initial_pressure": 0,
         "start_color": 	(0.110, 0.639, 0.925),
         "end_color": (0.039, 0.267, 0.434),
-        "include_water_source": False
+        "include_water_source": True,
+        "ang_freq": PI
     }
 
     def __init__(self,**kwargs):
@@ -198,6 +199,13 @@ class HydraulicCircuit(Mobject):
         )
 
         self.submobjects.extend([*self.rects_top,*self.rects_bot,self.pump_circle,self.body,self.small_rect,self.fins])
+
+    def get_rotate_anim(self, run_time=1):
+        return Rotating(
+            self.fins,
+            radians=-run_time * self.ang_freq,
+            run_time=run_time
+        )
 
     def initialize_water(self):
         self.pump_circle=Circle(color=self.get_pressure_color(self.initial_pressure),
@@ -307,14 +315,6 @@ class HydraulicCircuit(Mobject):
             self.start_color[2] + (self.end_color[2]-self.start_color[2])*alpha,
         )
         return rgb_to_color(color_rgb)
-
-    def set_angle(self, new_angle):
-        del_angle=new_angle - self.angle.get_value()
-        self.angle.set_value(new_angle)
-
-        self.fins.rotate_in_place(
-            -1 * DEG_TO_RAD * del_angle
-        )
 
     def get_small_tube_radius(self):
         return (self.body.small_tube[0].get_center()[0] -
