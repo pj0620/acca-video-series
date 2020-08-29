@@ -24,18 +24,21 @@ class IntroduceCircuit(Scene):
     def construct(self):
         # show ACCA
         acca_text = TextMobject(
-            "AC", "Circuit", "Analysis",
+            "AC", "Circuit", "s",
             arg_separator=" ",
         )\
             .scale(2.5)\
-            .to_edge(UP,buff=3)
+            .to_edge(UP, buff=3)
+        acca_text[1].center()
+        acca_text[0].next_to(acca_text[1], direction=LEFT, buff=0.75)
+        acca_text[2].next_to(acca_text[1], direction=RIGHT, buff=0.13, aligned_edge=DOWN)
         self.play(
             FadeInFrom(
                 acca_text,
                 direction=UP
             )
         )
-        self.wait(0.506)
+        self.wait(5.2)
 
         # expand ACCA
         self.play(
@@ -197,7 +200,7 @@ class CircuitDefinition(Scene):
                 run_time=2
             )
         )
-        self.wait(6.59)
+        self.wait(7.56)
 
         brace_ee = Brace(definition[4], color=YELLOW, direction=UP)
         text_ee = brace_ee.get_text("???").set_color(YELLOW)
@@ -208,7 +211,7 @@ class CircuitDefinition(Scene):
                 lag_ratio=0.05
             )
         )
-        self.wait(0.57)
+        self.wait(0.77)
 
         brace_inter = Brace(definition[2], color=YELLOW, direction=UP)
         text_inter = brace_inter.get_text("???").set_color(YELLOW)
@@ -242,7 +245,7 @@ class CircuitDefinition(Scene):
                 )
             )
         )
-        self.wait(4.63)
+        self.wait(4.7)
 
         # add Electrical Element label
         elements_text = TextMobject("2 electrical elements", color=YELLOW)\
@@ -255,7 +258,7 @@ class CircuitDefinition(Scene):
                 run_time=1.77
             )
         )
-        self.wait(2.23)
+        self.wait(1.93)
 
         # add rectangles around electrical elements
         elements_label = VGroup()
@@ -295,7 +298,7 @@ class CircuitDefinition(Scene):
         )
         self.wait(0.57)
 
-        underline1 = Line(LEFT, RIGHT, color=BLUE_C) \
+        underline1 = Line(LEFT, RIGHT, color=RED_C) \
             .match_width(definition[2]) \
             .scale(1) \
             .next_to(definition[2], DOWN, SMALL_BUFF)
@@ -305,31 +308,37 @@ class CircuitDefinition(Scene):
             .next_to(definition[4], DOWN, SMALL_BUFF)
         self.play(
             AnimationGroup(
-                AnimationGroup(
-                    ApplyMethod(
-                        definition[4].set_color,
-                        BLUE_C,
-                        run_time=0.8
-                    ),
-                    ShowCreation(
-                        underline2,
-                        run_time=0.8
-                    ),
-                    lag_ratio=0.01
+                ApplyMethod(
+                    definition[4].set_color,
+                    BLUE_C,
+                    run_time=0.8
                 ),
-                AnimationGroup(
-                    ApplyMethod(
-                        definition[2].set_color,
-                        BLUE_C,
-                        run_time=0.8
-                    ),
-                    ShowCreation(
-                        underline1,
-                        run_time=0.8
-                    ),
-                    lag_ratio=0.01
+                ShowCreation(
+                    underline2,
+                    run_time=0.8
                 ),
-                lag_ratio=1
+                lag_ratio=0.01
+            ),
+        )
+        self.play(
+            AnimationGroup(
+                ApplyMethod(
+                    definition[2].set_color,
+                    RED_C,
+                    run_time=0.8
+                ),
+                ShowCreation(
+                    underline1,
+                    run_time=0.8
+                ),
+                lag_ratio=0.01
+            ),
+            ApplyMethod(
+                VGroup(
+                    self.lamp_circuit.wire_bot,
+                    self.lamp_circuit.wire_top
+                ).set_color,
+                RED_C
             )
         )
 

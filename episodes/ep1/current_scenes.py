@@ -36,7 +36,7 @@ class IntroduceACDC(Scene):
         self.play(
             ShowCreation(dividing_line)
         )
-        self.wait(1.83)
+        self.wait(1.56)
 
         # dc title
         dc_title = TextMobject("Direct Current", "(DC)")\
@@ -190,24 +190,49 @@ class IntroCharge(Scene):
             SpinInFromNothing(neutron),
             Write(n_title)
         )
+        self.wait(0.33)
 
         # expand each particle
         part_scale_factor = 1.5
-        for part in (electron, proton, neutron):
-            self.play(
-                ApplyMethod(
-                    part.scale,
-                    part_scale_factor
-                )
+        self.play(
+            ApplyMethod(
+                electron.scale,
+                part_scale_factor
             )
-            self.play(
-                ApplyMethod(
-                    part.scale,
-                    1/part_scale_factor
-                )
+        )
+        self.play(
+            ApplyMethod(
+                electron.scale,
+                1/part_scale_factor
             )
-        self.wait(6.66)
-
+        )
+        self.wait(0.33)
+        self.play(
+            ApplyMethod(
+                proton.scale,
+                part_scale_factor
+            )
+        )
+        self.play(
+            ApplyMethod(
+                proton.scale,
+                1 / part_scale_factor
+            )
+        )
+        self.wait(0.47)
+        self.play(
+            ApplyMethod(
+                neutron.scale,
+                part_scale_factor
+            )
+        )
+        self.play(
+            ApplyMethod(
+                neutron.scale,
+                1 / part_scale_factor
+            )
+        )
+        self.wait(5.93)
 
         # tiny particle params
         tiny_scale = 0.4
@@ -348,7 +373,7 @@ class ElementaryCharge(Scene):
                 eq_mid, VGroup(eq2[2:4])
             )
         )
-        self.wait(3.7)
+        self.wait(3.9)
 
         # elementary charge label
         ec_text = TexMobject(
@@ -470,7 +495,7 @@ class SimpleCircuit(Scene):
             )
         )
 
-        self.wait(3.27)
+        self.wait(4.54)
         self.play(
             AnimationGroup(
                 *[
@@ -530,7 +555,7 @@ class SimpleCircuit(Scene):
             )
         )
         self.play(
-            self.get_electron_anim(4.83)
+            self.get_electron_anim(2.3)
         )
 
         # add current label
@@ -569,14 +594,14 @@ class SimpleCircuit(Scene):
             self.get_electron_anim()
         )
         self.play(
-            self.get_electron_anim(run_time=1.87)
+            self.get_electron_anim(run_time=1.44)
         )
         self.play(
             FadeInFrom(current_value, direction=UP),
             self.get_electron_anim()
         )
         self.play(
-            self.get_electron_anim(run_time=2.64)
+            self.get_electron_anim(run_time=2.91)
         )
 
         self.circuit.electrons_flowing = False
@@ -604,7 +629,27 @@ class SimpleCircuit(Scene):
         self.play(
             self.get_electron_anim(
                 freq=0,
-                run_time=26.5
+                run_time=13.7
+            )
+        )
+
+        # label no constant flow
+        no_flow_text = TextMobject(
+            "No Constant Flow"
+        )\
+            .scale(1.5)\
+            .to_edge(DOWN, buff=1)
+        self.play(
+            Write(no_flow_text),
+            self.get_electron_anim(
+                freq=0,
+            )
+        )
+
+        self.play(
+            self.get_electron_anim(
+                freq=0,
+                run_time=9.07
             )
         )
 
@@ -614,7 +659,8 @@ class SimpleCircuit(Scene):
             cur = (self.circuit.electron_loc.get_value() + i / self.circuit.num_of_electrons +
                    self.circuit.electron_disps[i]) % 1
             if 0.755 < cur < 1:
-                self.circuit.electrons[i].set_opacity(0)
+                self.circuit.electrons[i].set_opacity(1)
+                self.circuit.electrons[i].set_stroke(BLUE, opacity=0)
         self.play(
             ApplyMethod(
                 current_tracker.set_value, 2,
@@ -625,8 +671,9 @@ class SimpleCircuit(Scene):
                 direction=LEFT,
                 run_time=1
             ),
+            FadeOut(no_flow_text),
             self.get_electron_anim(
-                run_time=16.06
+                run_time=15.36
             )
         )
 
@@ -663,7 +710,7 @@ class SimpleCircuit(Scene):
                 FadeInFrom(charge, direction=UP),
                 lag_ratio=0.1
             ),
-            self.get_electron_anim(7.5)
+            self.get_electron_anim(7.27)
         )
 
         not_eps = TextMobject(

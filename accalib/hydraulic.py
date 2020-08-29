@@ -4,9 +4,9 @@ import time
 
 class PressureGauge(SVGMobject):
     CONFIG={
-        "max_pressure": 30,
-        "min_pressure": 0,
-        "initial_pressure": 0,
+        "max_pressure": 300,
+        "min_pressure": 100,
+        "initial_pressure": 100,
         "text_color": WHITE,
         "text_direction": RIGHT,
         "text_buff": 0.2,
@@ -26,7 +26,7 @@ class PressureGauge(SVGMobject):
         self.add_updater(lambda x: x.set_pressure(self.pressure.get_value()))
 
         self.text_num=DecimalNumber(self.initial_pressure,
-                                    unit="Pa",
+                                    unit="kPa",
                                     num_decimal_places=1,
                                     color=self.text_color,
                                     edge_to_fix=RIGHT).scale(1.9)
@@ -160,9 +160,9 @@ class Fins(SVGMobject):
 
 class HydraulicCircuit(Mobject):
     CONFIG={
-        "max_pressure": 40,
-        "min_pressure": 0,
-        "initial_pressure": 0,
+        "max_pressure": 300,
+        "min_pressure": 100,
+        "initial_pressure": 100,
         "start_color": 	(0.110, 0.639, 0.925),
         "end_color": (0.039, 0.267, 0.434),
         "include_water_source": True,

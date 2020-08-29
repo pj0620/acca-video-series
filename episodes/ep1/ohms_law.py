@@ -3,6 +3,7 @@ from accalib.electrical_circuits import BatteryLampCircuit
 from accalib.hydraulic import HydraulicCircuit, PressureGauge
 from accalib.rate_functions import accelerated
 import progressbar
+from accalib.tools import rule_of_thirds_guide
 
 class IntroOhmsLawPart(Scene):
     def construct(self):
@@ -116,7 +117,7 @@ class OhmsLawIntro(Scene):
             Write(r_rect),
             FadeInFrom(r_text, direction=DOWN)
         )
-        self.wait(5.69)
+        self.wait(2.89)
 
         # add circuit
         self.circuit = BatteryLampCircuit()\
@@ -692,7 +693,7 @@ class CurrentCalculation(Scene):
                 current_final, i_label[1]
             ),
             FadeOut(question_marks),
-            circuit.get_electron_anim(5)
+            circuit.get_electron_anim(7.9)
         )
 
     def get_label(self, text, initial_value, unit, **kwargs):
@@ -713,14 +714,108 @@ class CurrentCalculation(Scene):
         return VGroup(lhs, decimal_num), value
 
 
-class HydraulicAnalogy(Scene):
+class VoltageResistanceQuestion(Scene):
+    CONFIG = {
+        "current_color": GREEN_D,  # GREEN_C
+        "voltage_color": RED_D,  # RED_A,RED_B,
+        "resistance_color": ORANGE,
+    }
+    def construct(self):
+        self.add(
+            Rectangle(
+                width=FRAME_WIDTH,
+                height=FRAME_HEIGHT
+            ),
+            # rule_of_thirds_guide()
+        )
+
+        ohms_law = TexMobject(
+            "I", "={", "V", "\\over", "R", "}",
+            tex_to_color_map={
+                "V": self.voltage_color,
+                "I": self.current_color,
+                "R": self.resistance_color
+            }
+        )\
+            .scale(4)\
+            .to_edge(LEFT, buff=1)
+        self.play(
+            FadeInFrom(ohms_law, direction=LEFT)
+        )
+        self.wait(2.4)
+
+        current = TextMobject(
+            "Current",
+            color=self.current_color
+        )\
+            .scale(3)\
+            .to_corner(DL)\
+            .shift(1.5*RIGHT + 0.2*UP)
+        carrow = CurvedArrow(
+            start_point=current.get_corner(UL)+0.2*UL,
+            end_point=ohms_law.get_part_by_tex("I").get_corner(DL)+0.2*DOWN+0.1*RIGHT,
+            color=self.current_color,
+            angle=-PI * 0.4
+        )
+        self.play(
+            Write(current),
+            ShowCreation(carrow)
+        )
+        self.wait(0.63)
+
+        voltage = TextMobject(
+            "Voltage", "?",
+            color=self.voltage_color
+        )\
+            .scale(3) \
+            .next_to(ohms_law.get_part_by_tex("V"), direction=RIGHT, buff=3)
+        varrow = CurvedArrow(
+            start_point=voltage.get_left() + 0.2*LEFT,
+            end_point=ohms_law.get_part_by_tex("V").get_right() + 0.2*UR,
+            color=self.voltage_color,
+            angle=PI*0.4
+        )
+        self.play(
+            Write(voltage[0]),
+            ShowCreation(varrow)
+        )
+
+        resistance = TextMobject(
+            "Resistance", "?",
+            color=self.resistance_color
+        ) \
+            .scale(3) \
+            .next_to(ohms_law.get_part_by_tex("R"), direction=RIGHT, buff=3)
+        rarrow = CurvedArrow(
+            start_point=resistance.get_left() + 0.2 * LEFT,
+            end_point=ohms_law.get_part_by_tex("R").get_right() + 0.2 * DR,
+            color=self.resistance_color,
+            angle=-PI * 0.4
+        )
+        self.play(
+            Write(resistance[0]),
+            ShowCreation(rarrow)
+        )
+        self.wait(0.8)
+
+        self.play(
+            Write(voltage[1])
+        )
+        self.wait(0.43)
+        self.play(
+            Write(resistance[1]),
+        )
+
+        self.wait(11.7)
+
+class HydraulicCircuitOverview(Scene):
     CONFIG = {
         "current_color": GREEN_D,  # GREEN_C
         "voltage_color": RED_D,  # RED_A,RED_B,
         "resistance_color": ORANGE,
         "pump_ang_freq": np.pi,
         "add_vector_fields": True,
-        "A": 5e-4  # (r^4)(\\Delta P)/Q , from Hagen–Poiseuille equation
+        "A": 3.125  # (r^4)(\\Delta P)/Q [m^4 kPa s / L] from Hagen–Poiseuille equation
     }
 
     def construct(self):
@@ -729,7 +824,7 @@ class HydraulicAnalogy(Scene):
                 width=FRAME_WIDTH,
                 height=FRAME_HEIGHT,
                 color=YELLOW
-            )
+            ),
         )
 
         # setup electric circuit
@@ -748,22 +843,22 @@ class HydraulicAnalogy(Scene):
         ) \
             .scale(2.5) \
             .move_to(point1 + 0.05 * UR)
-        i_label, i_value = self.get_label("I=", 0, "A", color=self.current_color)
+        i_label, i_value = self.get_label("I", 0, "A", color=self.current_color)
         i_label.next_to(current_arrow, direction=UR, buff=0) \
             .shift(0 * RIGHT)
 
         # write voltage of circuit
-        v_label, self.v_value = self.get_label("V=", 0, "V", color=self.voltage_color)
+        v_label, self.v_value = self.get_label("V", 0, "V", color=self.voltage_color)
         v_label.next_to(electric_circuit.battery, direction=UL, buff=0)\
             .shift(0.25 * UP + 0.4 * RIGHT)
 
         # write resistance of circuit
-        r_label, r_value = self.get_label("R=", 6, "\\Omega", color=self.resistance_color)
+        r_label, r_value = self.get_label("R", 6, "\\Omega", color=self.resistance_color)
         r_label.next_to(electric_circuit.light_bulb, direction=DOWN, buff=0.2)\
             .shift(0 * RIGHT)
 
         # setup hydraulic circuit
-        self.hydraulic_circuit = HydraulicCircuit(initial_pressure=0)\
+        self.hydraulic_circuit = HydraulicCircuit()\
             .scale(0.8)\
             .to_edge(LEFT)\
             .shift(0.5*DOWN)
@@ -772,6 +867,7 @@ class HydraulicAnalogy(Scene):
             x.top_pressure.set_value(self.voltage_to_pressure(self.v_value.get_value()))
         )
         self.add(self.hydraulic_circuit)
+        self.wait(3.57)
 
         # indicate pump
         self.play(
@@ -779,7 +875,8 @@ class HydraulicAnalogy(Scene):
                 VGroup(
                     self.hydraulic_circuit.body.circle,
                     self.hydraulic_circuit.fins
-                )
+                ),
+                run_time=1.25
             )
         )
 
@@ -787,22 +884,38 @@ class HydraulicAnalogy(Scene):
         self.play(
             Indicate(
                 VGroup(*self.hydraulic_circuit.body.large_tube),
-                scale_factor=1.08
+                scale_factor=1.08,
+                run_time=1.25
             )
         )
+        self.wait(3.53)
 
         # indicate small tubes
+        small_tube_cp = VGroup(*self.hydraulic_circuit.body.small_tube).copy()
+        VGroup(*self.hydraulic_circuit.body.small_tube).set_color(YELLOW)
         self.play(
-            Indicate(
+            WiggleOutThenIn(
                 VGroup(*self.hydraulic_circuit.body.small_tube),
+                scale_factor=1.7,
+                n_wiggles=6,
+                rotation_angle=0.06*TAU,
+                run_time=2
+            ),
+            Flash(
+                small_tube_cp,
+                flash_radius=2,
+                line_length=0.8,
+                run_time=2
             )
         )
+        VGroup(*self.hydraulic_circuit.body.small_tube).set_color(WHITE)
+        self.wait(3.93)
 
         # fade in pressure gauges
-        bot_gauge = PressureGauge(initial_pressure=0, text_color=self.voltage_color)\
+        bot_gauge = PressureGauge(initial_pressure=100, text_color=self.voltage_color)\
             .scale(0.6)\
             .next_to(self.hydraulic_circuit.rects_bot[1], direction=UP, buff=0)
-        top_gauge = PressureGauge(initial_pressure=0, text_color=self.voltage_color) \
+        top_gauge = PressureGauge(initial_pressure=100, text_color=self.voltage_color) \
             .scale(0.6) \
             .next_to(self.hydraulic_circuit.rects_top[1], direction=UP, buff=0)\
             .shift(0.5*RIGHT)
@@ -814,6 +927,7 @@ class HydraulicAnalogy(Scene):
             FadeIn(bot_gauge),
             FadeIn(top_gauge)
         )
+        self.wait(3)
 
         # indicate water source
         self.play(
@@ -825,6 +939,7 @@ class HydraulicAnalogy(Scene):
                 )
             )
         )
+        self.wait(6.64)
 
         self.play(
             self.get_rot_anim(1),
@@ -836,16 +951,30 @@ class HydraulicAnalogy(Scene):
         if self.add_vector_fields:
             self.setup_vector_fields()
 
+        self.play(self.get_rot_anim(6.77))
+
+        # indicate vector field in small tube
+        if self.add_vector_fields:
+            self.play(
+                ShowPassingFlash(
+                    self.stream_lines_yellow,
+                    time_width=0.4,
+                    run_time=4
+                ),
+                self.get_rot_anim(4)
+            )
+        else:
+            self.wait(4)
         self.play(
-            self.get_rot_anim()
+            self.get_rot_anim(1.27)
         )
 
         # setup hydraulic circuit labels
-        radius_label, radius_value = self.get_label("r = ", 0.1, "m", color=self.resistance_color)
+        radius_label, radius_value = self.get_label("r ", 0.5, "m", color=self.resistance_color)
         radius_label.next_to(self.hydraulic_circuit.rects_bot[2], direction=RIGHT) \
             .shift(0.5 * UP)
 
-        del_p_label, del_p_value = self.get_label("$\\Delta P = $", 10, "Pa", color=self.voltage_color)
+        del_p_label, del_p_value = self.get_label("$\\Delta P$ ", 100, "kPa", color=self.voltage_color)
         del_p_label\
             .next_to(self.hydraulic_circuit, direction=UR)\
             .shift(1*LEFT+0*UP)
@@ -865,7 +994,7 @@ class HydraulicAnalogy(Scene):
         )\
             .next_to(flow_line, direction=RIGHT, buff=0.1)
         flow_var_label = TexMobject(
-            "Q =",
+            "Q", "=",
             color=self.current_color
         )\
             .scale(1.25)\
@@ -879,7 +1008,7 @@ class HydraulicAnalogy(Scene):
             .next_to(flow_var_label, direction=RIGHT, buff=0.2)
         flow_label.add_updater(
             lambda x:
-            x.set_value(((radius_value.get_value()**4) * self.voltage_to_pressure(self.v_value.get_value()))/self.A)
+            x.set_value(((radius_value.get_value()**4) * (self.voltage_to_pressure(self.v_value.get_value())-100))/self.A)
         )
         flow_unit = TexMobject(
             "{L", "\\over", "s}",
@@ -894,22 +1023,88 @@ class HydraulicAnalogy(Scene):
                 FadeIn(mob)
                 for mob in (flow_line, flow_arrow, flow_label, flow_unit, flow_var_label)
             ],
-            self.get_rot_anim(2)
-        )
-        self.play(
-            FadeIn(del_p_label),
-            self.get_rot_anim(2)
+            self.get_rot_anim(3.2)
         )
 
+        # add description of Q
+        flow_desc = TextMobject(
+            "Volumetric Flow Rate",
+            color=self.current_color
+        ) \
+            .scale(1.2) \
+            .next_to(flow_unit, direction=UR, buff=0.5) \
+            .shift(0.2*LEFT)
+        flow_desc_arrow = CurvedArrow(
+            start_point=flow_desc.get_left()+0.2*LEFT,
+            end_point=flow_unit.get_corner(UL)+0.3*LEFT,
+            color=self.current_color
+        )
+        self.play(
+            Write(flow_desc),
+            ShowCreation(flow_desc_arrow),
+            self.get_rot_anim(1)
+        )
+
+        # highlight Q
+        Q_rect = SurroundingRectangle(flow_var_label[0])
+        self.play(
+            ShowCreationThenFadeOut(Q_rect, run_time=4),
+            self.get_rot_anim(19.03)
+        )
+
+        # show delta P
+        self.play(
+            Write(del_p_label[0].get_part_by_tex("$\\Delta P$")),
+            self.get_rot_anim(3.9)
+        )
+
+        # show radius label
         self.play(
             FadeIn(radius_label),
-            self.get_rot_anim()
+            self.get_rot_anim(4.6)
         )
+
+        # show del P calculation
+        del_p_calc = TexMobject(
+             "200 kPa", "-", "100 kPa",
+            color=self.voltage_color
+        )\
+            .scale(1.2)\
+            .next_to(del_p_label[0], direction=RIGHT)
+        self.play(
+            Write(del_p_label[0].get_part_by_tex("=")),
+            self.get_rot_anim(2.3)
+        )
+        self.play(
+            TransformFromCopy(top_gauge.text, del_p_calc[0]),
+            self.get_rot_anim(1.83)
+        )
+        self.play(
+            Write(del_p_calc[1]),
+            self.get_rot_anim(2.4)
+        )
+        self.play(
+            TransformFromCopy(bot_gauge.text, del_p_calc[2]),
+            self.get_rot_anim(6.8)
+        )
+        # trick to transform del_p_label even though mobs with updaters cannot be transformed
+        del_p_label_cp = del_p_label[1].copy()
+        del_p_label_cp.clear_updaters()
+        self.play(
+            ReplacementTransform(del_p_calc, del_p_label_cp),
+            self.get_rot_anim(2)
+        )
+        self.add(del_p_label[1])
+        self.remove(del_p_label_cp)
 
         self.play(
-            self.get_rot_anim(3)
+            self.get_rot_anim(3.2)
         )
 
+        qrects = [
+            SurroundingRectangle(mob)
+            for mob in (del_p_label[0][0], flow_var_label[0], radius_label[0][0])
+        ]
         hagen_poiseuille_title = TextMobject(
             "\\underline{Hagen–Poiseuille Equation}"
         )\
@@ -928,25 +1123,58 @@ class HydraulicAnalogy(Scene):
             .scale(1.4)\
             .next_to(hagen_poiseuille_title, direction=DOWN, buff=0.3)
         self.play(
-            AnimationGroup(
-                Write(hagen_poiseuille_title),
-                FadeInFrom(hagen_poiseuille_equation, direction=DOWN)
-            ),
-            self.get_rot_anim(5)
+            ShowCreation(qrects[0]),
+            self.get_rot_anim()
+        )
+        self.play(
+            ShowCreation(qrects[1]),
+            self.get_rot_anim(2.93)
+        )
+        self.play(
+            ShowCreation(qrects[2]),
+            self.get_rot_anim(4.16)
+        )
+        self.play(
+            Write(hagen_poiseuille_title),
+            FadeInFrom(hagen_poiseuille_equation, direction=DOWN),
+            self.get_rot_anim()
+        )
+        self.play(
+            *[
+                FadeOut(rect)
+                for rect in qrects
+            ],
+            self.get_rot_anim(3.33)
         )
 
         # double pressure
+        p_rect = SurroundingRectangle(del_p_label[1])
+        q_rect = SurroundingRectangle(flow_label)
         self.play(
             ApplyMethod(
-                self.v_value.set_value, 10
+                self.v_value.set_value, 10,
+                run_time=3
             ),
             ApplyMethod(
-                del_p_value.set_value, 20
+                del_p_value.set_value, self.voltage_to_pressure(10)-100,
+                run_time=3
             ),
-            self.get_rot_anim(5, ang_freq=1.5*np.pi)
+            self.get_rot_anim(4.83, ang_freq=1.5*np.pi)
+        )
+        self.play(
+            ShowCreation(
+                p_rect
+            ),
+            self.get_rot_anim(ang_freq=1.5*np.pi, run_time=8.73)
+        )
+        self.play(
+            ShowCreation(
+                q_rect
+            ),
+            self.get_rot_anim(ang_freq=1.5 * np.pi, run_time=6)
         )
 
-    def get_rot_anim(self, run_time=1, ang_freq=np.pi):
+    def get_rot_anim(self, run_time=1., ang_freq=np.pi):
         return Rotating(
             self.hydraulic_circuit.fins,
             radians=-run_time * ang_freq,
@@ -954,10 +1182,10 @@ class HydraulicAnalogy(Scene):
         )
 
     def voltage_to_pressure(self, voltage):
-        return 2 * voltage
+        return 100 + 20 * voltage
 
     def get_label(self, text, initial_value, unit, **kwargs):
-        lhs = TextMobject(text, **kwargs)\
+        lhs = TextMobject(text, "=", **kwargs)\
             .scale(1.25)
         decimal_num = DecimalNumber(
             initial_value,
@@ -977,7 +1205,7 @@ class HydraulicAnalogy(Scene):
         viscosity = 8.90E-4
         R = abs(self.vf_x_max - self.vf_x_min) / 2.
         r = p[0] - (self.vf_x_min + self.vf_x_max) / 2.
-        scale_factor = 0.6E-1
+        scale_factor = 0.6E-2
         dPdx = self.voltage_to_pressure(self.v_value.get_value()) / (self.hydraulic_circuit.body.small_tube[0].get_height())
 
         # in small tube
@@ -993,7 +1221,9 @@ class HydraulicAnalogy(Scene):
         large_tube = self.hydraulic_circuit.body.large_tube
         small_tube = self.hydraulic_circuit.body.small_tube
         PUM_circle = self.hydraulic_circuit.pump_circle
-        mag = self.voltage_to_pressure(self.v_value.get_value())/10
+
+        # return 1 for any non-zero pressure
+        mag = int(bool(self.voltage_to_pressure(self.v_value.get_value())))
 
         # in pump
         if np.linalg.norm(p - self.hydraulic_circuit.body.circle.get_center()) < \
@@ -1135,3 +1365,120 @@ class HydraulicAnalogy(Scene):
             # line_anim_class=ShowPassingFlashWithThinningStrokeWidth,
         )
         self.add(self.animated_stream_lines)
+
+class HaganPouiseuilleOhmsLaw(Scene):
+    CONFIG = {
+        "current_color": GREEN_D,  # GREEN_C
+        "voltage_color": RED_D,  # RED_A,RED_B,
+        "resistance_color": ORANGE,
+        "text_scale_factor": 2.7
+    }
+    def construct(self):
+        self.add(
+            Rectangle(
+                width=FRAME_WIDTH,
+                height=FRAME_HEIGHT,
+                color=YELLOW
+            )
+        )
+
+        self.add(
+            Title("Hagan-Pouiseuille Equation", scale_factor=1.5)
+        )
+
+        # Write HP equation
+        hagen_poiseuille_equation = TexMobject(
+            "\\Delta P", "=",
+            "{8", "\\mu", "L", "Q", "\\over", "\\pi", "r^4}",
+            tex_to_color_map={
+                "Q": self.current_color,
+                "r^": self.resistance_color,
+                "\\Delta P": self.voltage_color
+            }
+        )\
+            .scale(self.text_scale_factor)\
+            .shift(1.65*UP)
+        self.play(
+            FadeInFrom(hagen_poiseuille_equation,direction=UP)
+        )
+
+        # factor out Q
+        new_rhs = TexMobject(
+            "Q", "{8", "\\mu", "L", "\\over", "\\pi", "r^4}",
+            tex_to_color_map={
+                "Q": self.current_color,
+                "r^": self.resistance_color,
+                "\\Delta P": self.voltage_color
+            }
+        )\
+            .scale(self.text_scale_factor)\
+            .move_to(VGroup(*hagen_poiseuille_equation[2:]).get_center())
+        VGroup(*new_rhs[1:]).shift(0.5*RIGHT)
+        self.play(
+            Transform(hagen_poiseuille_equation[5], new_rhs[0]),
+            Transform(
+                VGroup(*hagen_poiseuille_equation[2:5], *hagen_poiseuille_equation[6:]),
+                VGroup(*new_rhs[1:])
+            )
+        )
+
+        # add ohm's law
+        ohms_law = TexMobject(
+            "V", "=", "I", "R",
+            tex_to_color_map={
+                "I": self.current_color,
+                "R": self.resistance_color,
+                "V": self.voltage_color
+            }
+        )\
+            .scale(self.text_scale_factor)\
+            .next_to(hagen_poiseuille_equation, direction=DOWN, buff=3)
+        ohms_law[0].shift(1.2*LEFT)
+        ohms_law[1].shift(0.6*LEFT)
+        ohms_law[2].shift(0.5*LEFT)
+        ohms_law[3].shift(1.0*RIGHT)
+        self.play(
+            FadeInFrom(ohms_law, direction=DOWN)
+        )
+
+        # compare voltage pressure
+        varrow = DoubleArrow(
+            start=hagen_poiseuille_equation[0].get_bottom()+0.2*DOWN,
+            end=hagen_poiseuille_equation[0].get_bottom()+3.7*DOWN,
+            color=self.voltage_color,
+            stroke_width=7
+        )
+        varrow.tip.scale(1.5)
+        varrow.start_tip.scale(1.5)
+        self.play(
+            Write(varrow)
+        )
+
+        # compare current flow rate
+        carrow = DoubleArrow(
+            start=new_rhs[0].get_bottom() + 0.0 * DOWN,
+            end=new_rhs[0].get_bottom() + 3.5 * DOWN,
+            color=self.current_color,
+            stroke_width=7
+        )
+        carrow.tip.scale(1.5)
+        carrow.start_tip.scale(1.5)
+        self.play(
+            Write(carrow)
+        )
+
+        # compare resistance
+        rarrow = DoubleArrow(
+            start=VGroup(new_rhs[1:]).get_bottom() + 0.2 * DOWN,
+            end=VGroup(new_rhs[1:]).get_bottom() + 2.7 * DOWN,
+            color=self.resistance_color,
+            stroke_width=7
+        )
+        rarrow.tip.scale(1.5)
+        rarrow.start_tip.scale(1.5)
+        self.play(
+            Write(rarrow)
+        )
+
+        self.wait(3)
+

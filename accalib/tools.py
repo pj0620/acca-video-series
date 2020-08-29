@@ -2,6 +2,21 @@ import sys
 import math
 from manimlib.imports import *
 
+def rule_of_thirds_guide():
+    kw={
+        "color": YELLOW
+    }
+    return VGroup(
+        Line(start=(1/6) * FRAME_WIDTH * RIGHT + (FRAME_HEIGHT / 2) * DOWN,
+             end=(1/6) * FRAME_WIDTH * RIGHT + (FRAME_HEIGHT / 2) * UP, **kw),
+        Line(start=(1/6) * FRAME_WIDTH * LEFT + (FRAME_HEIGHT / 2) * DOWN,
+             end=(1/6) * FRAME_WIDTH * LEFT + (FRAME_HEIGHT / 2) * UP, **kw),
+        Line(start=(1/6) * FRAME_HEIGHT * UP + (FRAME_WIDTH / 2) * LEFT,
+             end=(1/6) * FRAME_HEIGHT * UP + (FRAME_WIDTH / 2) * RIGHT, **kw),
+        Line(start=(1 / 6) * FRAME_HEIGHT * DOWN + (FRAME_WIDTH / 2) * LEFT,
+             end=(1 / 6) * FRAME_HEIGHT * DOWN + (FRAME_WIDTH / 2) * RIGHT, **kw)
+    )
+
 def add_vguide(scene, x, **kwargs):
     guide=Line(**kwargs,start=x*RIGHT+(FRAME_HEIGHT/2)*DOWN,
                           end=x*RIGHT+(FRAME_HEIGHT/2)*UP)

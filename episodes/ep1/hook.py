@@ -26,6 +26,7 @@ class ComplexNumbersTitle(Scene):
         )
         self.wait()
 
+
 class ApplicationsOfComplexNumbers(Scene):
     def construct(self):
         title = Title(
@@ -53,7 +54,7 @@ class ApplicationsOfComplexNumbers(Scene):
             Write(i_text),
             Write(i_rect)
         )
-        self.wait(2.73)
+        self.wait(2.5)
 
         qm_text = TextMobject(
             "Quantum Mechanics:"
@@ -77,7 +78,6 @@ class ApplicationsOfComplexNumbers(Scene):
             .shift(2*LEFT)
         schrodinger_eq.get_part_by_tex("i").set_color(YELLOW)
         self.play(Write(schrodinger_eq))
-        self.wait(0.57)
 
         ft_text = TextMobject(
             "Fourier Analysis:"
@@ -87,10 +87,9 @@ class ApplicationsOfComplexNumbers(Scene):
         self.play(
             Write(
                 ft_text,
-                run_time=0.75
+                run_time=1
             )
         )
-
         ft_equation = TexMobject(
             "G(f) = ",
             "\\int_{-\\infty}^{\\infty} g(t)",
@@ -115,7 +114,8 @@ class ApplicationsOfComplexNumbers(Scene):
             .next_to(ft_text, direction=DOWN, aligned_edge=LEFT, buff=2.5)
         self.play(Write(many_more))
 
-        self.wait(5.6)
+        self.wait(7.6)
+
 
 class EEApplication(Scene):
     CONFIG = {
@@ -308,7 +308,7 @@ class EEApplication(Scene):
             run_time=0.95
         )
 
-        self.wait(3.27)
+        self.wait(4.87)
 
 class ComplexQuantitiesPaper(Scene):
     def construct(self):
@@ -340,17 +340,20 @@ class ComplexQuantitiesPaper(Scene):
             .move_to(rect.get_center())\
             .shift(1*DOWN)
         self.play(
-            ApplyMethod(
-               pages.shift, 40 * UP,
-               run_time=12.37,
-               rate_func=linear,
-            ),
-            FadeIn(
-                rect
-            ),
-            Write(
-                title_text
-            ),
+            AnimationGroup(
+                ApplyMethod(
+                   pages.shift, 40 * UP,
+                   run_time=12.37,
+                   rate_func=linear,
+                ),
+                FadeIn(
+                    rect
+                ),
+                Write(
+                    title_text
+                ),
+                lag_ratio=0.01
+            )
         )
 
 
