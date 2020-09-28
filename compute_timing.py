@@ -3,6 +3,8 @@
 import sys
 import datetime
 
+FRAME_RATE=23
+
 def print_usage():
     print(f"Usage: {sys.argv[0]} timing_file [-h help]")
 
@@ -11,7 +13,7 @@ def time_dif(start,end):
 
 def convert_time(time_str):
     time_split = time_str.split(':')
-    subseconds = (1./30.)*int(time_split[-1])
+    subseconds = (1./FRAME_RATE)*int(time_split[-1])
     seconds = 0
     minutes = 0
     if len(time_split) > 1:

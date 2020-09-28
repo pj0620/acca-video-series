@@ -1,6 +1,7 @@
 from manimlib.imports import *
 from accalib.electrical_circuits import *
 from accalib.circuit_comps import *
+from accalib.tools import rule_of_thirds_guide
 
 class WhatIsCircuit(Scene):
     def construct(self):
@@ -798,8 +799,17 @@ class ComplexCircuitOverview(Scene):
         rects.sort(point_to_num_func=lambda x: x[0])
         return rects
 
-class Summary(Scene):
+class CircuitSummary(Scene):
     def construct(self):
+        self.add(
+            Rectangle(
+                width=FRAME_WIDTH,
+                height=FRAME_HEIGHT,
+                color=YELLOW
+            ),
+            # rule_of_thirds_guide()
+        )
+
         # add definition
         definition = TextMobject(
             "electrical circuit ", "-", " interconnection ", "of", " electrical elements",
@@ -852,31 +862,32 @@ class Summary(Scene):
         self.wait(0.77)
 
         home_circuit = ImageMobject(
-            "images\ep1\Summary\home_circuit.jpg"
+            "images\ep1\CircuitSummary\home_circuit.jpg"
         )\
-            .move_to(FRAME_WIDTH*0.25*LEFT)\
-            .scale(2.25)
-        home_rect = SurroundingRectangle(home_circuit, color=YELLOW, buff=0.05)
+            .scale(2.25)\
+            .to_corner(UL, buff=0)\
+            .shift(0.1*RIGHT)
         self.play(
-            AnimationGroup(
-                FadeIn(home_circuit),
-                Write(home_rect),
-                lag_ratio=0.1,
-            )
+            FadeIn(home_circuit),
         )
         self.wait(1.96)
 
         circuit_board = ImageMobject(
-            "images\ep1\Summary\circuit-board.jpg"
+            "images\ep1\CircuitSummary\circuit-board.jpg"
         ) \
-            .move_to(FRAME_WIDTH * 0.25 * RIGHT) \
-            .scale(2.25)
-        circuit_rect = SurroundingRectangle(circuit_board, color=YELLOW, buff=0.05)
+            .scale(2.2)\
+            .to_corner(UR, buff=0)
         self.play(
-            AnimationGroup(
-                FadeIn(circuit_board),
-                Write(circuit_rect),
-                lag_ratio=0.1,
-            )
+            FadeIn(circuit_board),
+        )
+
+        raspberry_pi = ImageMobject(
+            "images\\ep1\\CircuitSummary\\raspberrypi.jpg"
+        ) \
+            .scale(2) \
+            .next_to(definition, direction=UP, buff=0.1)\
+            .shift(0.75*LEFT)
+        self.play(
+            FadeIn(raspberry_pi)
         )
         self.wait(1.33)

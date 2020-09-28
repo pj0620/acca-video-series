@@ -109,6 +109,9 @@ class BatteryLampCircuit(SVGMobject):
 
         return self
 
+    def set_electron_freq(self, new_freq):
+        self.electron_freq = new_freq
+
     def setup_electrons(self, add_electrons=True):
         bezier_func_bot=bezier(self.wire_bot.get_points())
         bezier_func_top=bezier(self.wire_top.get_points())
@@ -178,6 +181,163 @@ class BatteryLampCircuit(SVGMobject):
 
     def electron_updater(self, x, i):
         cur=(self.electron_loc.get_value() + i / self.num_of_electrons + self.electron_disps[i]) % 1
+
+        # always move if electrons are flowing
+        if self.electrons_flowing:
+            x.move_to(
+                self.electron_vect_inter.interpolate(cur)
+            )
+            return
+
+        # change due to random motion
+        diff=(2 * random.random() - 1) * 0.005
+
+        # down move if inside voltage source
+        if 0.755 < (cur + diff) % 1 < 1:
+            return
+
+        x.move_to(
+            self.electron_vect_inter.interpolate(
+                (cur + diff) % 1
+            )
+        )
+        self.electron_disps[i]+=diff
+
+class BatteryLampCircuitAC(SVGMobject):
+    CONFIG={
+        "battery_orange": "#f99420",
+        "num_of_electrons": 10,
+        # "num_of_electrons": 1,
+        "bezier_approx_samples": 50,
+        "electron_freq": 3.5,
+        "electron_amplitude": 0.08
+    }
+
+    def __init__(self, mode="plain", **kwargs):
+        self.parts_named=False
+        svg_file="images/svgs/battery_lamp_circuit_ac.svg"
+        SVGMobject.__init__(self, file_name=svg_file, **kwargs)
+        self.scale(3.5)
+
+    def name_parts(self):
+        self.outer_rect = self.submobjects[0]
+        self.circle = self.submobjects[1]
+        self.light_bulb = self.submobjects[2]
+        self.base_big = self.submobjects[3]
+        self.base_small = self.submobjects[4]
+        self.wire_bot = self.submobjects[5]
+        self.wire_top = self.submobjects[6]
+        self.filament = VGroup(*self.submobjects[7:10])
+        self.sine_wave = self.submobjects[10]
+
+    def init_colors(self):
+        SVGMobject.init_colors(self)
+
+        # set opacity of every submobject to 0
+        for mob in self.submobjects:
+            mob.set_stroke(RED,10,opacity=0)
+            mob.set_fill(RED,opacity=0)
+
+        if not self.parts_named:
+            self.name_parts()
+
+        self.outer_rect.set_stroke(WHITE, 3, opacity=1)
+        self.light_bulb.set_stroke(WHITE,5,opacity=1)
+        self.light_bulb.set_fill(YELLOW,opacity=0.9)
+        self.base_big.set_fill(DARK_GREY,opacity=1)
+        self.base_big.set_stroke(DARK_GREY,5,opacity=1)
+        self.base_small.set_fill(DARK_GREY, opacity=1)
+        self.base_small.set_stroke(DARK_GREY, 5, opacity=1)
+        self.filament.set_stroke(BLACK,1,opacity=1)
+        self.wire_bot.set_stroke(WHITE,5,opacity=1)
+        self.wire_top.set_stroke(WHITE,5,opacity=1)
+        self.sine_wave.set_stroke(BLUE_C, 5, opacity=1).scale(0.9)
+        self.circle.set_stroke(RED_C, 3, opacity=1)
+
+        self.battery_rect = Rectangle(
+            width=self.outer_rect.get_width(),
+            height=self.outer_rect.get_height(),
+            stroke_opacity=0
+        )\
+            .move_to(self.outer_rect.get_center())\
+            .set_fill(BLACK,1)
+        self.block_rect=self.base_big.copy().set_color(BLACK)
+        self.block_rect.set_width(self.base_big.get_width()+1.5, stretch=True)
+        self.block_rect.shift(1.5*LEFT)
+
+        self.add(
+            self.battery_rect,
+            self.block_rect,
+            self.outer_rect,
+            self.base_big,
+            self.base_small,
+            self.sine_wave,
+            self.circle
+        )
+
+        return self
+
+    def set_electron_freq(self, new_freq):
+        self.electron_freq = new_freq
+
+    def setup_electrons(self, add_electrons=True):
+        bezier_func_bot=bezier(self.wire_bot.get_points())
+        bezier_func_top=bezier(self.wire_top.get_points())
+        points=[]
+        for i in range(self.bezier_approx_samples):
+            points+=[bezier_func_bot(float(i)/ float(self.bezier_approx_samples))]
+        for i in range(self.bezier_approx_samples):
+            points+=[bezier_func_top(1.-(float(i)/float(self.bezier_approx_samples)))]
+
+        self.electron_vect_inter=VectorInterpolator(points)
+
+        self.electrons_flowing=True
+        self.electron_disps=[0] * self.num_of_electrons
+        self.electrons=[]
+        self.electron_loc=ValueTracker(0)
+        for i in range(self.num_of_electrons):
+            self.electrons+=[Electron().scale(0.2)]
+            self.electrons[-1].add_updater(
+                partial(self.electron_updater, i=i),
+                call_updater=True
+            )
+        if add_electrons:
+            self.add(
+                *self.electrons,
+                self.battery_rect,
+                self.outer_rect,
+                self.block_rect,
+                self.base_big,
+                self.base_small,
+                self.sine_wave,
+                self.circle
+            )
+
+        self.electron_phase = -np.pi/2 # radians
+
+    def get_electron_anim(self, run_time=1):
+        return ApplyMethod(
+            self.electron_loc.increment_value,
+            run_time*self.electron_freq,
+            run_time=run_time,
+            rate_func=linear
+        )
+
+    def remove_electrons(self):
+        for electron in self.electrons:
+            electron.clear_updaters()
+            self.remove(electron)
+
+    # turn on/off light bulb
+    def set_light_bulb_state(self,new_state):
+        if new_state:
+            self.light_bulb.set_fill(YELLOW)
+        else:
+            self.light_bulb.set_fill(BLACK)
+
+    def electron_updater(self, x, i):
+        loc = self.electron_amplitude*(1+np.sin(self.electron_loc.get_value()))
+        cur= (loc + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
         # always move if electrons are flowing
         if self.electrons_flowing:

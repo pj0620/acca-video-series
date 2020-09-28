@@ -24,25 +24,63 @@ scenes_map = {
             "IntroduceCircuit",
             "CircuitDefinition",
             "CompsDisplay",
-            "ComplexCircuitOverview"
+            "ComplexCircuitOverview",
+            "CircuitSummary"
         ],
-    "current_scenes.py":
-        [
-            "IntroCurrentPart",
-            "IntroduceACDC",
-            "IntroCharge",
-            "ElementaryCharge",
-            "SimpleCircuit",
-            "Amperes",
-            "BackToSimpleCircuit"
-        ],
+    # "current_scenes.py":
+    #     [
+    #         "IntroCurrentPart",
+    #         "IntroduceACDC",
+    #         "IntroCharge",
+    #         "ElementaryCharge",
+    #         "SimpleCircuit",
+    #         "Amperes",
+    #         "BackToSimpleCircuit"
+    #     ],
+    "current_scenes_new.py":
+            [
+                "IntroCurrentPart",
+                "IntroduceACDC",
+                "SimpleCircuit",
+                "ACvsDC"
+            ],
     "ohms_law.py":
         [
             "IntroOhmsLawPart",
             "OhmsLawIntro",
-            "CurrentCalculation"
+            "CurrentCalculation",
+            "VoltageResistanceQuestion",
+            "HydraulicCircuitOverview",
+            "HaganPouiseuilleOhmsLaw"
         ]
 }
+
+# # maximal square
+# scenes_dir = "leetcode/maximal_square/"
+# output_dir = "media/videos/"
+# # quality_arg = "--high_quality"
+# # quality_ending = "1080p60"
+# quality_arg = "-l"
+# quality_ending = "480p15"
+# scenes_map = {
+#     "maximal_square_setup.py":
+#         [
+#             "ProblemSetup",
+#             "SolutionTimeComplexity",
+#             "AnotherExample"
+#         ],
+#     "brute_force.py":
+#         [
+#             "BruteForceExample",
+#             "NotBestSolution"
+#         ],
+#     "dynamic_programming.py":
+#         [
+#             "TimeComplexityComparison",
+#             "SimpleExample",
+#             "ThreeSquareProof"
+#         ]
+# }
 
 
 def get_random_string(length):
@@ -54,15 +92,16 @@ def get_random_string(length):
 # find file containing scene, and render
 scene_to_render = sys.argv[2]
 selected_file = None
-rand_string = get_random_string(5)
+rand_string = get_random_string(8)
 for file, scenes in scenes_map.items():
     if scene_to_render in scenes:
+        if selected_file is not None:
+            raise Exception("selected scene " + scene_to_render + " found in two files " + selected_file + " and " + file)
         selected_file = file
         cmd = "python manim.py " + scenes_dir + file + " " + scene_to_render + " " + quality_arg + " -o " + \
               scene_to_render + quality_ending + "_" + rand_string + " -p"
         print("executing: " + cmd)
         os.system(cmd)
-        break
 
 if selected_file is None:
     raise Exception("selected scene " + scene_to_render + " not found in " + scenes_dir)
