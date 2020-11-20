@@ -165,6 +165,7 @@ class SimpleCircuit(Scene):
         )\
             .shift(UP)
         self.add(circuit)
+        self.wait(2.98)
 
         # label elements
         elements_label = VGroup()
@@ -180,8 +181,6 @@ class SimpleCircuit(Scene):
                 )
             )
         )
-
-        self.wait(3.19)
         self.play(
             AnimationGroup(
                 *[
@@ -194,7 +193,7 @@ class SimpleCircuit(Scene):
         self.play(
             FadeOut(elements_label, run_time=0.91),
         )
-        self.wait(0.37)
+        self.wait(0.24)
 
         # remove battery
         circuit.set_light_bulb_state(False)
@@ -222,7 +221,7 @@ class SimpleCircuit(Scene):
         self.add(*circuit.electrons)
         self.add(circuit.battery, circuit.block_rect, circuit.base_big, circuit.base_small)
         self.play(
-            circuit.get_electron_anim(run_time=3.94)
+            circuit.get_electron_anim(run_time=4.02)
         )
 
         arrow = CurvedArrow(
@@ -239,7 +238,7 @@ class SimpleCircuit(Scene):
             circuit.get_electron_anim(4.83)
         )
         self.play(
-            circuit.get_electron_anim(2.73)
+            circuit.get_electron_anim(2.43)
         )
 
         # fade in current label
@@ -277,14 +276,28 @@ class SimpleCircuit(Scene):
             circuit.get_electron_anim()
         )
         self.play(
-            circuit.get_electron_anim(run_time=1.14)
+            circuit.get_electron_anim(run_time=1.01)
         )
+
+        # show definition
+        definition = TextMobject(
+            "current - measure of ", "electrons", " per second passing through a circuit",
+            color=YELLOW
+        ) \
+            .scale(1) \
+            .to_corner(DOWN)
+        self.play(
+            Write(
+                definition,
+                run_time=2
+            ),
+            circuit.get_electron_anim(5.91)
+        )
+
+        # add 2 Amps label
         self.play(
             FadeInFrom(current_value, direction=UP),
-            circuit.get_electron_anim()
-        )
-        self.play(
-            circuit.get_electron_anim(8.95)
+            circuit.get_electron_anim(11.57)
         )
 
         # remove battery
@@ -307,26 +320,8 @@ class SimpleCircuit(Scene):
                 run_time=1
             ),
             circuit.get_electron_anim(
-                run_time=3
+                run_time=12.47
             )
-        )
-        self.play(
-            circuit.get_electron_anim(13.35)
-        )
-
-        # label no constant flow
-        no_flow_text = TexMobject(
-            "\\text{No Constant Flow}", "\\Rightarrow", "\\text{No Power Transmitted}"
-        )\
-            .scale(1.5)\
-            .to_edge(DOWN, buff=1)
-        self.play(
-            Write(no_flow_text[0]),
-            circuit.get_electron_anim(4.13)
-        )
-        self.play(
-            Write(VGroup(*no_flow_text[1:])),
-            circuit.get_electron_anim(6.29)
         )
 
         circuit.electrons_flowing = True
@@ -348,23 +343,7 @@ class SimpleCircuit(Scene):
                 direction=LEFT,
                 run_time=1
             ),
-            FadeOut(no_flow_text),
-            circuit.get_electron_anim(15.62)
-        )
-
-        # show definition
-        definition = TextMobject(
-            "current - measure of ", "electrons", " per second passing through a circuit",
-            color=YELLOW
-        ) \
-            .scale(1) \
-            .to_corner(DOWN)
-        self.play(
-            Write(
-                definition,
-                run_time=2
-            ),
-            circuit.get_electron_anim(run_time=6.35)
+            circuit.get_electron_anim(22.21)
         )
 
         # add question mark next to Amp
@@ -404,6 +383,23 @@ class SimpleCircuit(Scene):
         )
         self.play(
             circuit.get_electron_anim(1.13)
+        )
+
+        # increase current to 40 Amps
+        self.play(
+            ApplyMethod(
+                current_tracker.set_value,
+                90,
+                run_time=2,
+                rate_func=linear
+            ),
+            circuit.get_electron_acceleration_anim(
+                self.electron_freq_1*1.8,
+                run_time=2
+            )
+        )
+        self.play(
+            circuit.get_electron_anim()
         )
 
         # fadeout definition
@@ -461,7 +457,7 @@ class SimpleCircuit(Scene):
                 elec_per_sec_unit,
                 direction=DOWN
             ),
-            circuit.get_electron_anim(5.89)
+            circuit.get_electron_anim(7.2)
         )
 
         # increase to 2 amps
@@ -486,7 +482,7 @@ class SimpleCircuit(Scene):
             )
         )
         self.play(
-            circuit.get_electron_anim(10.16)
+            circuit.get_electron_anim(9.38)
         )
 
         # increase to 40 amps
@@ -509,7 +505,7 @@ class SimpleCircuit(Scene):
             )
         )
         self.play(
-            circuit.get_electron_anim(10.17)
+            circuit.get_electron_anim(10.16)
         )
 
         # remove battery

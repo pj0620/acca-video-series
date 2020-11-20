@@ -7,6 +7,8 @@ scenes_dir = "episodes/ep1/"
 output_dir = "media/videos/"
 quality_arg = "-l"
 quality_ending = "480p15"
+# quality_arg = "--high_quality"
+# quality_ending = "1080p60"
 scenes_map = {
     "hook.py":
         [
@@ -37,22 +39,42 @@ scenes_map = {
     #         "Amperes",
     #         "BackToSimpleCircuit"
     #     ],
-    "current_scenes_new.py":
-            [
-                "IntroCurrentPart",
-                "IntroduceACDC",
-                "SimpleCircuit",
-                "ACvsDC"
-            ],
-    "ohms_law.py":
+    # "current_scenes_new.py":
+    #         [
+    #             "IntroCurrentPart",
+    #             "IntroduceACDC",
+    #             "SimpleCircuit",
+    #             "ACvsDC"
+    #         ],
+    "current_scenes_final.py":
+        [
+            "IntroCurrentPart",
+            "CurrentOverview"
+        ],
+    "ohms_law_final.py":
         [
             "IntroOhmsLawPart",
             "OhmsLawIntro",
             "CurrentCalculation",
-            "VoltageResistanceQuestion",
-            "HydraulicCircuitOverview",
-            "HaganPouiseuilleOhmsLaw"
+            "CircuitsTable"
+        ],
+    "phasors.py":
+        [
+            "IntroPhasorsPart",
+            "ImaginaryVoltageCircuit",
+            "ACvsDC",
+            "ACDCApplications",
+            "SineWaveCharacteristics"
         ]
+    # "ohms_law.py":
+    #     [
+    #         "IntroOhmsLawPart",
+    #         "OhmsLawIntro",
+    #         "CurrentCalculation",
+    #         "VoltageResistanceQuestion",
+    #         "HydraulicCircuitOverview",
+    #         "HaganPouiseuilleOhmsLaw"
+    #     ]
 }
 
 # # maximal square
@@ -78,7 +100,11 @@ scenes_map = {
 #         [
 #             "TimeComplexityComparison",
 #             "SimpleExample",
-#             "ThreeSquareProof"
+#             "ThreeSquareProof",
+#             "ThreeSquareProof2",
+#             "FinalFormulaForDP",
+#             "NotCorrectFormulaForDP",
+#             "ComputingDP"
 #         ]
 # }
 
@@ -88,6 +114,8 @@ def get_random_string(length):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
 
+# kill all vlc sessions
+os.system("TASKKILL /IM vlc.exe /F")
 
 # find file containing scene, and render
 scene_to_render = sys.argv[2]

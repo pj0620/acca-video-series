@@ -166,7 +166,8 @@ class HydraulicCircuit(Mobject):
         "start_color": 	(0.110, 0.639, 0.925),
         "end_color": (0.039, 0.267, 0.434),
         "include_water_source": True,
-        "ang_freq": PI
+        "ang_freq": PI,
+        "small_tube_radius": 0.25
     }
 
     def __init__(self,**kwargs):
@@ -186,17 +187,18 @@ class HydraulicCircuit(Mobject):
             self.body.water_source_text.set_opacity(0)
 
         self.angle = ValueTracker(0)
-        self.radius = ValueTracker(self.get_small_tube_radius())
+        # self.radius = ValueTracker(self.get_small_tube_radius())
 
         self.bot_pressure = ValueTracker(self.initial_pressure)
         self.top_pressure = ValueTracker(self.initial_pressure)
 
         self.initialize_water()
 
-        self.add_updater(
-            lambda x:
-            x.set_small_tube_radius(self.radius.get_value())
-        )
+        self.set_small_tube_radius(self.small_tube_radius)
+        # self.add_updater(
+        #     lambda x:
+        #     x.set_small_tube_radius(self.radius.get_value())
+        # )
 
         self.submobjects.extend([*self.rects_top,*self.rects_bot,self.pump_circle,self.body,self.small_rect,self.fins])
 
@@ -326,6 +328,29 @@ class HydraulicCircuit(Mobject):
         self.body.small_tube[0].shift(del_radius*RIGHT)
         self.body.small_tube[1].shift(del_radius*LEFT)
         self.small_rect.set_width(2*radius - 0.07, stretch=True)
+
+    # def get_small_tube_radius_anim(self, radius, *args, **kwargs):
+    #     cur_radius = self.get_small_tube_radius()
+    #     del_radius = radius - cur_radius
+    #     self.body.small_tube[0].shift(del_radius*RIGHT)
+    #     self.body.small_tube[1].shift(del_radius*LEFT)
+    #     self.small_rect.set_width(2*radius - 0.07, stretch=True)
+    #
+    #     return AnimationGroup(
+    #         ApplyMethod(
+    #             self.small_rect.set_width, 2*radius - 0.07,
+    #             stretch=True,
+    #             *args, **kwargs
+    #         ),
+    #         ApplyMethod(
+    #             self.body.small_tube[0].shift, del_radius * RIGHT,
+    #             *args, **kwargs
+    #         ),
+    #         ApplyMethod(
+    #             self.body.small_tube[1].shift, del_radius * LEFT,
+    #             *args, **kwargs
+    #         )
+    #     )
 
 class SealedBox(Mobject):
     def __init__(self, **kwargs):

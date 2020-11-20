@@ -13,7 +13,7 @@ class BatteryLampCircuit(SVGMobject):
         "num_of_electrons": 10,
         # "num_of_electrons": 1,
         "bezier_approx_samples": 50,
-        "electron_freq": 0.11
+        "electron_freq": 0.11,
     }
 
     def __init__(self, mode="plain", **kwargs):
@@ -210,7 +210,7 @@ class BatteryLampCircuitAC(SVGMobject):
         # "num_of_electrons": 1,
         "bezier_approx_samples": 50,
         "electron_freq": 3.5,
-        "electron_amplitude": 0.08
+        "electron_amplitude": 0.15
     }
 
     def __init__(self, mode="plain", **kwargs):
@@ -277,6 +277,9 @@ class BatteryLampCircuitAC(SVGMobject):
 
         return self
 
+    def set_electron_amplitude(self, new_amplitude):
+        self.electron_amplitude = new_amplitude
+
     def set_electron_freq(self, new_freq):
         self.electron_freq = new_freq
 
@@ -336,7 +339,7 @@ class BatteryLampCircuitAC(SVGMobject):
             self.light_bulb.set_fill(BLACK)
 
     def electron_updater(self, x, i):
-        loc = self.electron_amplitude*(1+np.sin(self.electron_loc.get_value()))
+        loc = self.electron_amplitude*(1+np.cos(self.electron_loc.get_value()))
         cur= (loc + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
         # always move if electrons are flowing
