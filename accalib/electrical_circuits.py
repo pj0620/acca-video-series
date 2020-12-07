@@ -6,6 +6,7 @@ import random
 from accalib.utils import VectorInterpolator
 from functools import partial
 from accalib.rate_functions import accelerated
+import numpy.polynomial.polynomial as poly
 
 class BatteryLampCircuit(SVGMobject):
     CONFIG={
@@ -219,6 +220,18 @@ class BatteryLampCircuitAC(SVGMobject):
         SVGMobject.__init__(self, file_name=svg_file, **kwargs)
         self.scale(3.5)
 
+        # used to animate changing electron amplitude
+        self.changing_elec_amplitude = False
+        self.new_amplitude = None
+        self.start_amplitude = None
+
+        # used to animate changing electron frequency
+        self.changing_elec_freq = False
+        self.new_freq = None
+        self.inter_coefs = None
+        self.start_time = None
+        self.change_duration = None
+
     def name_parts(self):
         self.outer_rect = self.submobjects[0]
         self.circle = self.submobjects[1]
@@ -277,8 +290,52 @@ class BatteryLampCircuitAC(SVGMobject):
 
         return self
 
-    def set_electron_amplitude(self, new_amplitude):
-        self.electron_amplitude = new_amplitude
+    def set_electron_freq_anim(self, new_freq, run_time=1):
+        if self.changing_elec_freq:
+            raise Exception(f"cannot change freq of sine wave to {new_freq} while "
+                            f"still changing amplitude to {self.electron_freq}")
+
+        self.changing_elec_freq = True
+        self.new_freq = new_freq
+        self.start_time = self.electron_time.get_value()
+        self.change_duration = run_time
+
+        # find fit points
+        fit_points = []
+        N_approx = 3
+        T1 = 0.5*((2*PI)/self.electron_freq)
+        T2 = 0.5*((2*PI)/self.new_freq)
+        for i in range(N_approx):
+            # left approx point
+            t1 = self.start_time - (T1/N_approx)*i
+            y1 = self.electron_amplitude*(1-np.cos(self.electron_freq*t1))
+            fit_points.append((t1, y1))
+
+            # right approx point
+            t2 = self.start_time + run_time + (T2 / N_approx) * i
+            y2 = self.electron_amplitude * (1 - np.cos(self.new_freq * t2))
+            fit_points.append((t2, y2))
+
+        # sort by time
+        fit_points = sorted(fit_points, key=lambda x: x[0])
+
+        # convert to numpy arrays
+        x = np.array([point[0] for point in fit_points])
+        y = np.array([point[1] for point in fit_points])
+
+        # polynomial fit
+        self.inter_coefs = poly.polyfit(x, y, 2*N_approx)
+
+    def set_electron_amplitude_anim(self, new_amplitude, run_time=1):
+        if self.changing_elec_amplitude:
+            raise Exception(f"cannot change amplitude of sine wave to {new_amplitude} while "
+                            f"still changing amplitude to {self.new_amplitude}")
+
+        self.changing_elec_amplitude = True
+        self.new_amplitude = new_amplitude
+        self.start_amplitude = self.electron_amplitude
+        self.start_time = self.electron_time.get_value()
+        self.change_duration = run_time
 
     def set_electron_freq(self, new_freq):
         self.electron_freq = new_freq
@@ -297,7 +354,7 @@ class BatteryLampCircuitAC(SVGMobject):
         self.electrons_flowing=True
         self.electron_disps=[0] * self.num_of_electrons
         self.electrons=[]
-        self.electron_loc=ValueTracker(0)
+        self.electron_time=ValueTracker(0)
         for i in range(self.num_of_electrons):
             self.electrons+=[Electron().scale(0.2)]
             self.electrons[-1].add_updater(
@@ -318,10 +375,13 @@ class BatteryLampCircuitAC(SVGMobject):
 
         self.electron_phase = -np.pi/2 # radians
 
+    def get_instantaneous_current(self):
+        return self.electron_amplitude*np.sin(self.electron_time.get_value()*self.electron_freq)
+
     def get_electron_anim(self, run_time=1):
         return ApplyMethod(
-            self.electron_loc.increment_value,
-            run_time*self.electron_freq,
+            self.electron_time.increment_value,
+            run_time,
             run_time=run_time,
             rate_func=linear
         )
@@ -339,7 +399,52 @@ class BatteryLampCircuitAC(SVGMobject):
             self.light_bulb.set_fill(BLACK)
 
     def electron_updater(self, x, i):
-        loc = self.electron_amplitude*(1+np.cos(self.electron_loc.get_value()))
+        #       ##  Changing Amplitude ##
+        #   t  = self.abs_elec_pos.get_value()
+        #   t0 = self.start_argument
+        #   A1 = self.electron_amplitude
+        #   A2 = self.new_amplitude
+        #   wT = self.change_duration_rad
+        #   w  = angular frequency
+        #
+        #   l = (A1 + ((t-t0)/wT)*(A2-A1))(1-cos(t))(1/w)
+        #
+        if self.changing_elec_amplitude:
+            alpha = (self.electron_time.get_value() - self.start_time)/self.change_duration
+            self.electron_amplitude = self.start_amplitude + alpha * (self.new_amplitude - self.start_amplitude)
+
+            # stop changing amplitude if we are finished
+            if alpha >= 1:
+                self.electron_amplitude = self.new_amplitude
+
+                self.changing_elec_amplitude = False
+                self.new_amplitude = None
+                self.start_amplitude = None
+                self.start_time = None
+                self.change_duration = None
+            loc = self.electron_amplitude * (1 - np.cos(self.electron_time.get_value() * self.electron_freq))
+
+        # changing frequency
+        elif self.changing_elec_freq:
+            alpha = (self.electron_time.get_value() - self.start_time) / self.change_duration
+            if alpha >= 1:
+                # set to new frequency
+                self.electron_freq = self.new_freq
+
+                self.changing_elec_freq = False
+                self.new_freq = None
+                self.inter_coefs = None
+                self.start_time = None
+                self.change_duration = None
+
+                loc = self.electron_amplitude * (1 - np.cos(self.electron_time.get_value() * self.electron_freq))
+            else:
+                loc = poly.polyval(self.electron_time.get_value(), self.inter_coefs)
+
+        # nothing being changed
+        else:
+            loc = self.electron_amplitude * (1 - np.cos(self.electron_time.get_value() * self.electron_freq))
+
         cur= (loc + i / self.num_of_electrons + self.electron_disps[i]) % 1
 
         # always move if electrons are flowing

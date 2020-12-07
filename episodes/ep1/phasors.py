@@ -709,19 +709,15 @@ class SineWaveCharacteristics(ACvsDC):
 
         # fade in ac circuit
         self.ac_circuit = BatteryLampCircuitAC(
-            electron_freq=1
+            electron_freq=self.base_electron_freq,
+            electron_amplitude=self.base_electron_amplitude
         ) \
             .scale(1.0) \
             .to_edge(LEFT, buff=0.1)
+        self.amplitude_value = ValueTracker(1)
+        self.freq_value = ValueTracker(1)
+        self.phase_value = ValueTracker(0)
         self.ac_circuit.setup_electrons()
-        block_rect_ac = Rectangle(
-            fill_opacity=1,
-            fill_color=BLACK,
-            stroke_opacity=0,
-            width=7.7,
-            height=6
-        ) \
-            .move_to(self.ac_circuit.get_center())
         point1 = self.ac_circuit.electron_vect_inter.interpolate(0.55)
         point2 = self.ac_circuit.electron_vect_inter.interpolate(0.5)
         angle = np.arccos((point2[0] - point1[0]) / np.linalg.norm(point2 - point1))
@@ -745,15 +741,13 @@ class SineWaveCharacteristics(ACvsDC):
         ) \
             .scale(1.5) \
             .next_to(current_text_ac, direction=RIGHT, buff=0.3)
-        self.phase_tracker_ac = ValueTracker(0)
         current_value_ac.add_updater(
             lambda x:
-            x.set_value(np.sin(self.phase_tracker_ac.get_value()))
+            x.set_value((1/self.base_electron_amplitude) * self.ac_circuit.get_instantaneous_current())
         )
-        self.add(self.ac_circuit, current_arrow_ac, current_text_ac, current_value_ac, block_rect_ac)
+        self.add(self.ac_circuit, current_arrow_ac, current_text_ac, current_value_ac)
         self.play(
-            FadeOut(block_rect_ac),
-            self.get_electron_anim(2*PI-1)
+            self.ac_circuit.get_electron_anim(2*PI-1)
         )
 
         # add axis
@@ -768,7 +762,7 @@ class SineWaveCharacteristics(ACvsDC):
             FadeIn(self.time_axes),
             FadeIn(y_label),
             FadeIn(time_label),
-            self.get_electron_anim(1)
+            self.ac_circuit.get_electron_anim(1)
         )
 
         #
@@ -776,27 +770,39 @@ class SineWaveCharacteristics(ACvsDC):
         #
 
         # draw sine wave
-        self.graph = self.time_axes.get_graph(np.sin).set_color(self.current_color)
+        graph_animated = self.time_axes.get_graph(
+            np.sin,
+        ).set_color(self.current_color)
+        self.graph = self.time_axes.get_graph(
+            np.sin,
+            x_max=20
+        ).set_color(self.current_color)
         draw_line = Line(ORIGIN, ORIGIN, color=YELLOW, stroke_width=4)
         draw_dot = Dot(ORIGIN, color=YELLOW)
-        self.phase_tracker_ac.set_value(0)
+        self.ac_circuit.electron_time.set_value(0)
         def line_update(line):
-            start = self.time_axes.center_point + self.phase_tracker_ac.get_value()*RIGHT
-            end = self.time_axes.center_point + np.sin(self.phase_tracker_ac.get_value())*UP + self.phase_tracker_ac.get_value()*RIGHT + 0.00001*UP
+            rvec = self.ac_circuit.electron_time.get_value()*RIGHT
+            uvec = (self.ac_circuit.get_instantaneous_current()/self.base_electron_amplitude)*UP
+            start = self.time_axes.center_point + rvec
+            end = self.time_axes.center_point + uvec + rvec + 0.00001*UP
             line.put_start_and_end_on(start, end)
         def dot_update(dot):
-            loc = self.time_axes.center_point + np.sin(self.phase_tracker_ac.get_value()) * UP + self.phase_tracker_ac.get_value() * RIGHT + 0.00001 * UP
+            rvec = self.ac_circuit.electron_time.get_value() * RIGHT
+            uvec = (self.ac_circuit.get_instantaneous_current() / self.base_electron_amplitude) * UP
+            loc = self.time_axes.center_point + uvec + rvec + 0.00001 * UP
             dot.move_to(loc)
         self.play(
             UpdateFromFunc(draw_line, line_update),
             UpdateFromFunc(draw_dot, dot_update),
             ShowCreation(
-                self.graph,
+                graph_animated,
                 run_time=7,
                 rate_func=linear
             ),
-            self.get_electron_anim(8)
+            self.ac_circuit.get_electron_anim(8)
         )
+        self.remove(graph_animated)
+        self.add(self.graph)
 
         # add sine wave equation
         equation = TexMobject(
@@ -807,7 +813,33 @@ class SineWaveCharacteristics(ACvsDC):
             .to_edge(DOWN, buff=0.1)
         self.play(
             FadeInFrom(equation, direction=DOWN),
-            self.get_electron_anim(2)
+            self.ac_circuit.get_electron_anim(8.48)
+        )
+
+        # show different sine waves
+        self.play(
+            self.get_amplitude_anim(2, 0.5),
+        )
+        self.play(
+            self.get_freq_anim(2, 0.5),
+        )
+        self.play(
+            self.get_amplitude_anim(0.25, 0.5),
+        )
+        self.play(
+            self.get_freq_anim(0.7, 0.5),
+        )
+
+        #set amplitude to 1
+        self.play(
+            self.get_amplitude_anim(1, 0.5),
+        )
+        # set freq to 1
+        self.play(
+            self.get_freq_anim(1, 0.5),
+        )
+        self.play(
+            self.ac_circuit.get_electron_anim(4.47),
         )
 
         # transform to general sine wave formula
@@ -829,11 +861,30 @@ class SineWaveCharacteristics(ACvsDC):
             .to_edge(DOWN, buff=0.1)
         self.play(
             Transform(equation, equation_general),
-            self.get_electron_anim(2)
+            self.ac_circuit.get_electron_anim(2.65)
+        )
+
+        # add rectangles around parameters
+        rects_kw={
+            "buff": 0.15,
+            "color": YELLOW,
+            "stroke_width": 5
+        }
+        params = VGroup(
+            equation_general.get_part_by_tex("A"),
+            equation_general.get_part_by_tex("\\omega"),
+            equation_general.get_part_by_tex("\\phi"),
+        )
+        # rects[-1].shift(0.1*UP)
+        self.play(
+            *[
+                ShowCreationThenDestructionAround(rect)
+                for rect in params
+            ],
+            self.ac_circuit.get_electron_anim(3.39)
         )
 
         # show amplitude braces with definition
-        self.amplitude_value=ValueTracker(1)
         brace_ampl = Brace(
             equation_general.get_part_by_tex("A"),
             direction=UP,
@@ -851,13 +902,13 @@ class SineWaveCharacteristics(ACvsDC):
         self.play(
             ShowCreation(brace_ampl),
             Write(brace_ampl_def),
-            self.get_electron_anim(2)
+            self.ac_circuit.get_electron_anim(6.13)
         )
 
         # convert amplitude to 1
         self.play(
             Transform(brace_ampl_def, brace_ampl_val),
-            self.get_electron_anim(3)
+            self.ac_circuit.get_electron_anim(3)
         )
         brace_ampl_val.add_updater(
             lambda x: x.set_value(self.amplitude_value.get_value())
@@ -871,74 +922,304 @@ class SineWaveCharacteristics(ACvsDC):
             "color": self.amplitude_color,
             "dash_length": 0.05
         }
+
         def up_ampl_updator(line):
             line.put_start_and_end_on(
-                self.time_axes.center_point + UP*self.amplitude_value.get_value(),
-                self.time_axes.center_point + UP*self.amplitude_value.get_value() + 8 * RIGHT
+                self.time_axes.center_point + UP * self.amplitude_value.get_value(),
+                self.time_axes.center_point + UP * self.amplitude_value.get_value() + 8 * RIGHT
             )
+
         def down_ampl_updator(line):
             line.put_start_and_end_on(
-                self.time_axes.center_point + DOWN*self.amplitude_value.get_value(),
-                self.time_axes.center_point + DOWN*self.amplitude_value.get_value() + 8 * RIGHT
+                self.time_axes.center_point + DOWN * self.amplitude_value.get_value(),
+                self.time_axes.center_point + DOWN * self.amplitude_value.get_value() + 8 * RIGHT
             )
+
         ampl_lines = VGroup(
             DashedLine(**ampl_kw).add_updater(up_ampl_updator, call_updater=True),
             DashedLine(**ampl_kw).add_updater(down_ampl_updator, call_updater=True)
         )
+
         def up_ampl_label_updator(label):
             label.next_to(
-                self.time_axes.center_point + UP*self.amplitude_value.get_value(),
+                self.time_axes.center_point + UP * self.amplitude_value.get_value(),
                 direction=LEFT
             )
             label.set_value(self.amplitude_value.get_value())
+
         def down_ampl_label_updator(label):
             label.next_to(
                 self.time_axes.center_point + DOWN * self.amplitude_value.get_value(),
                 direction=LEFT
             )
-            label.set_value(-1*self.amplitude_value.get_value())
-        ampl_labels = VGroup(
+            label.set_value(-1 * self.amplitude_value.get_value())
+
+        self.ampl_labels = VGroup(
             DecimalNumber(**ampl_kw).add_updater(up_ampl_label_updator, call_updater=True),
             DecimalNumber(**ampl_kw).add_updater(down_ampl_label_updator, call_updater=True),
         )
         self.play(
             AnimationGroup(
                 ShowCreation(ampl_lines),
-                FadeInFrom(ampl_labels, direction=LEFT),
+                FadeInFrom(self.ampl_labels, direction=LEFT),
                 lag_ratio=0.8
             ),
-            self.get_electron_anim(2)
+            self.ac_circuit.get_electron_anim(4.52)
         )
 
-        # amplitude animations
-        self.play(self.get_amplitude_anim(2))
-        self.play(self.get_amplitude_anim(0.5))
-        self.play(self.get_amplitude_anim(1))
+        # set amplitude to 2 A
+        self.play(
+            self.get_amplitude_anim(2),
+            self.ac_circuit.get_electron_anim(5)
+        )
+
+        # set amplitude to 0.25 A
+        self.play(
+            self.get_amplitude_anim(0.25),
+            self.ac_circuit.get_electron_anim(3.57)
+        )
+
+        # set amplitude to 1 A
+        self.play(
+            self.get_amplitude_anim(1),
+            self.ac_circuit.get_electron_anim(1.83)
+        )
+
+        # show freq braces with definition
+        brace_freq = Brace(
+            equation_general.get_part_by_tex("\\omega"),
+            direction=UP,
+            color=self.ang_freq_color
+        )
+        brace_freq_def = brace_freq.get_text("Angular Frequency") \
+            .scale(1.5) \
+            .set_color(self.ang_freq_color)
+        brace_freq_val = DecimalNumber(
+            1,
+            color=self.ang_freq_color,
+        ) \
+            .scale(1.5) \
+            .move_to(brace_freq_def.get_center())
+        brace_freq_def.shift(2*RIGHT)
+        self.play(
+            ShowCreation(brace_freq),
+            Write(brace_freq_def),
+            self.ac_circuit.get_electron_anim(8.13)
+        )
+
+        # convert freq to 1
+        self.play(
+            Transform(brace_freq_def, brace_freq_val),
+            self.ac_circuit.get_electron_anim(3)
+        )
+        brace_freq_val.add_updater(
+            lambda x: x.set_value(self.freq_value.get_value())
+        )
+        # second call to add for updater
+        self.remove(brace_freq_def)
+        self.add(brace_freq_val)
+
+        # set freq to 2 A
+        self.play(
+            self.get_freq_anim(2),
+            self.ac_circuit.get_electron_anim(5)
+        )
+
+        # set freq to 0.5 A
+        self.play(
+            self.get_freq_anim(0.5),
+            self.ac_circuit.get_electron_anim(5)
+        )
+
+        # set freq to 1 A
+        self.play(
+            self.get_freq_anim(1),
+            self.ac_circuit.get_electron_anim(8.3)
+        )
+
+        # show phase braces with definition
+        brace_phase = Brace(
+            equation_general.get_part_by_tex("\\phi"),
+            direction=UP,
+            color=self.phase_color
+        )
+        brace_phase_def = brace_phase.get_text("Phase") \
+            .scale(1.5) \
+            .set_color(self.phase_color)
+        brace_phase_val = DecimalNumber(
+            0,
+            color=self.phase_color,
+        ) \
+            .scale(1.5) \
+            .move_to(brace_phase_def.get_center())
+        self.play(
+            ShowCreation(brace_phase),
+            Write(brace_phase_def),
+            self.ac_circuit.get_electron_anim(4.65)
+        )
+
+        # add graph with negative portion so we can slide left and right
+        self.remove(self.graph)
+        self.ampl_labels.clear_updaters()
+        self.graph = self.time_axes.get_graph(
+            np.sin,
+            x_max=20,
+            x_min=-2.4
+        ).set_color(self.current_color)
+        self.block_rect = Rectangle(
+            width=2.5,
+            height=3,
+            stroke_opacity=0,
+            fill_color=BLACK,
+            fill_opacity=1
+        ) \
+            .next_to(self.time_axes.center_point, direction=LEFT, buff=0)
+        self.add(self.graph, self.block_rect, self.time_axes, self.ampl_labels)
+
+        # convert phase to 0
+        self.play(
+            Transform(brace_phase_def, brace_phase_val),
+            self.ac_circuit.get_electron_anim(3)
+        )
+        brace_phase_val.add_updater(
+            lambda x: x.set_value(self.phase_value.get_value())
+        )
+        # second call to add for updater
+        self.remove(brace_phase_def)
+        self.add(brace_phase_val)
+
+        # set phase to different values
+        self.play(
+            self.get_phase_anim(1)
+        )
+        self.play(
+            self.ac_circuit.get_electron_anim(5.52)
+        )
+        self.play(
+            self.get_phase_anim(-1)
+        )
+        self.play(
+            self.ac_circuit.get_electron_anim(1.65)
+        )
+        self.play(
+            self.get_phase_anim(0)
+        )
+        self.play(
+            self.ac_circuit.get_electron_anim(5)
+        )
 
     def get_sin(self, ampl=1, ang_freq=1, phase=0):
         return lambda t: ampl * np.sin(ang_freq*t + phase)
 
-    def get_amplitude_anim(self, new_ampl):
-        self.ac_circuit.set_electron_amplitude(new_ampl)
-        graph_new = self.time_axes.get_graph(self.get_sin(ampl=new_ampl)).set_color(self.current_color)
+    def get_phase_anim(self, new_phase, run_time=1.):
+        del_phase = new_phase - self.phase_value.get_value()
         return AnimationGroup(
-            Transform(
-                self.graph, graph_new
+            ApplyMethod(
+                self.graph.shift, -1*del_phase*RIGHT,
+                run_time=1
             ),
             ApplyMethod(
-                self.amplitude_value.set_value, new_ampl
+                self.phase_value.set_value, new_phase,
+                run_time=1
             ),
-            self.get_electron_anim(2),
+            ApplyMethod(
+                self.block_rect.shift, 0.001*UP,
+                rate_func=there_and_back,
+                run_time=1
+            ),
+            ApplyMethod(
+                self.ampl_labels.shift, 0.001*UP,
+                rate_func=there_and_back,
+                run_time=1
+            ),
+            ApplyMethod(
+                self.time_axes.shift, 0.001 * UP,
+                rate_func=there_and_back,
+                run_time=1
+            ),
+            self.ac_circuit.get_electron_anim(run_time=run_time)
+        )
+
+    def get_freq_anim(self, new_freq, run_time=1.):
+        self.ac_circuit.set_electron_freq_anim(new_freq * self.base_electron_freq, run_time=run_time)
+        cur_freq = self.freq_value.get_value()
+        transform_matrix = np.array(
+            [[cur_freq/new_freq, 0, 0],
+             [0,                 1, 0],
+             [0,                 0, 1]]
+        )
+        offset = np.array(
+            [(1-cur_freq/new_freq)*self.time_axes.center_point[0],
+             0,
+             0]
+        )
+        def fun(p):
+            return offset + transform_matrix.dot(p)
+
+        return AnimationGroup(
+            ApplyPointwiseFunction(
+                fun, self.graph,
+                run_time=run_time
+            ),
+            self.ac_circuit.get_electron_anim(run_time=run_time),
+            ApplyMethod(
+                self.freq_value.set_value, new_freq,
+                run_time=run_time
+            ),
             lag_ratio=0
         )
 
-    def get_electron_anim(self, run_time=1):
-        return AnimationGroup(
-            self.ac_circuit.get_electron_anim(run_time),
-            ApplyMethod(
-                self.phase_tracker_ac.increment_value,
-                self.ac_electron_freq*run_time,
-                run_time=run_time,
-                rate_func=linear
-            ),
+    def get_amplitude_anim(self, new_ampl, run_time=1.):
+        self.ac_circuit.set_electron_amplitude_anim(new_ampl*self.base_electron_amplitude, run_time=run_time)
+        transform_matrix = np.array(
+            [[1, 0, 0],
+             [0, new_ampl/self.amplitude_value.get_value(), 0],
+             [0, 0, 1]]
         )
+
+        def fun(p):
+            return self.time_axes.center_point + transform_matrix.dot(p-self.time_axes.center_point)
+
+        return AnimationGroup(
+            ApplyPointwiseFunction(
+                fun, self.graph,
+                run_time=run_time
+            ),
+            ApplyMethod(
+                self.amplitude_value.set_value, new_ampl,
+                run_time=run_time
+            ),
+            self.ac_circuit.get_electron_anim(run_time),
+            lag_ratio=0)
+
+
+class OutletScene(ACvsDC):
+    CONFIG = {
+        "hot_color": RED_C,
+        "neutral_color": BLUE_A,
+        "ground_color": ORANGE
+    }
+    def construct(self):
+        self.add(
+            Rectangle(
+                width=FRAME_WIDTH,
+                height=FRAME_HEIGHT,
+                color=PURPLE
+            )
+        )
+
+        # add outlet
+        outlet = ImageMobject("images/ep1/CompareACDC/outlet-US.jpg")\
+            .scale(3)\
+            .to_edge(LEFT)
+        self.add(outlet)
+
+        outlet_mid = outlet.get_center()
+        neutral_center = outlet_mid + UP*1.15 + LEFT*0.36
+        hot_center = outlet_mid + UP*1.15 + RIGHT*0.27
+        ground_center = outlet_mid + UP*0.55 + LEFT*0.05
+
+        self.add(Dot(ground_center, color=PURPLE))
+
+        self.wait()
+

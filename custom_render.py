@@ -64,7 +64,8 @@ scenes_map = {
             "ImaginaryVoltageCircuit",
             "ACvsDC",
             "ACDCApplications",
-            "SineWaveCharacteristics"
+            "SineWaveCharacteristics",
+            "OutletScene"
         ]
     # "ohms_law.py":
     #     [
