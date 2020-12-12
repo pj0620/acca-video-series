@@ -1105,7 +1105,7 @@ class SineWaveCharacteristics(ACvsDC):
             self.get_phase_anim(0)
         )
         self.play(
-            self.ac_circuit.get_electron_anim(5)
+            self.ac_circuit.get_electron_anim(15.13)
         )
 
     def get_sin(self, ampl=1, ang_freq=1, phase=0):
@@ -1193,11 +1193,27 @@ class SineWaveCharacteristics(ACvsDC):
             lag_ratio=0)
 
 
-class OutletScene(ACvsDC):
+class OutletScene(SineWaveCharacteristics):
     CONFIG = {
-        "hot_color": RED_C,
-        "neutral_color": BLUE_A,
-        "ground_color": ORANGE
+        "neutral_color": RED,
+        "hot_color": GREEN,
+        "ground_color": PURPLE,
+        "axes_config": {
+            "number_line_config": {
+                "include_tip": False,
+            },
+            "x_axis_config": {
+                "color": BLUE_C,
+            },
+            "y_axis_config": {
+                "color": BLUE_C,
+            },
+            "x_min": 0,
+            "x_max": 7,
+            "y_min": -2.5,
+            "y_max": 2.5,
+            "center_point": RIGHT_SIDE + 7 * LEFT + 1.75 * UP,
+        },
     }
     def construct(self):
         self.add(
@@ -1211,15 +1227,157 @@ class OutletScene(ACvsDC):
         # add outlet
         outlet = ImageMobject("images/ep1/CompareACDC/outlet-US.jpg")\
             .scale(3)\
-            .to_edge(LEFT)
+            .to_edge(LEFT, buff=3.5)\
+            .shift(1.8*UP)
         self.add(outlet)
+        self.wait(12.13)
+
+        # add graph
+        self.time_axes = Axes(**self.axes_config)
+        y_label = self.time_axes.get_y_axis_label("\\text{Voltage}") \
+            .shift(0.5 * UP) \
+            .scale(1.3) \
+            .set_color(WHITE)
+        time_label = self.time_axes.get_x_axis_label("\\text{time}").set_color(BLUE_C)
+        self.add(self.time_axes, time_label, y_label)
+        self.play(
+            FadeIn(self.time_axes),
+            FadeIn(y_label),
+            FadeIn(time_label),
+        )
+
+        # draw sine wave
+        graph_animated = self.time_axes.get_graph(
+            self.get_sin(ampl=1.7),
+            x_max=8
+        ).set_color(self.neutral_color)
+        self.graph = self.time_axes.get_graph(
+            self.get_sin(ampl=1.7),
+            x_max=20
+        ).set_color(self.neutral_color)
+        draw_line = Line(ORIGIN, ORIGIN, color=YELLOW, stroke_width=4)
+        draw_dot = Dot(ORIGIN, color=YELLOW)
+        time_value = ValueTracker(0)
+        def line_update(line):
+            rvec = time_value.get_value() * RIGHT
+            uvec = 1.7 * np.sin(time_value.get_value()) * UP
+            start = self.time_axes.center_point + rvec
+            end = self.time_axes.center_point + uvec + rvec + 0.00001 * UP
+            line.put_start_and_end_on(start, end)
+
+        def dot_update(dot):
+            rvec = time_value.get_value() * RIGHT
+            uvec = 1.7 * np.sin(time_value.get_value()) * UP
+            loc = self.time_axes.center_point + uvec + rvec + 0.00001 * UP
+            dot.move_to(loc)
+
+        self.play(
+            ApplyMethod(
+                time_value.set_value, 8,
+                rate_func=linear,
+                run_time=4,
+            ),
+            UpdateFromFunc(draw_line, line_update),
+            UpdateFromFunc(draw_dot, dot_update),
+            ShowCreation(
+                graph_animated,
+                run_time=4,
+                rate_func=linear
+            ),
+        )
+        self.remove(graph_animated)
+        self.add(self.graph)
+        self.wait(1.91)
 
         outlet_mid = outlet.get_center()
         neutral_center = outlet_mid + UP*1.15 + LEFT*0.36
         hot_center = outlet_mid + UP*1.15 + RIGHT*0.27
         ground_center = outlet_mid + UP*0.55 + LEFT*0.05
 
-        self.add(Dot(ground_center, color=PURPLE))
+        arrow_kw = {
+            "stroke_width": 30,
+            "tip_length": 10,
+            "max_tip_length_to_length_ratio": 0.25
+        }
 
-        self.wait()
+        # neutral label
+        neutral_arrow = Arrow(
+            neutral_center + 2*LEFT,
+            neutral_center,
+            buff=0,
+            color=self.neutral_color,
+            **arrow_kw
+        )
+        neutral_label = TextMobject(
+            "Neutral",
+            color=self.neutral_color
+        )\
+            .scale(1.4)\
+            .next_to(neutral_arrow, direction=LEFT, buff=0.3)
+        self.play(
+            Write(neutral_label),
+            ShowCreation(neutral_arrow)
+        )
+
+        # hot label
+        hot_arrow = Arrow(
+            hot_center + 2 * RIGHT,
+            hot_center,
+            buff=0,
+            color=self.hot_color,
+            **arrow_kw
+        )
+        hot_label = TextMobject(
+            "Hot",
+            color=self.hot_color
+        ) \
+            .scale(1.4) \
+            .next_to(hot_arrow, direction=RIGHT, buff=0.3)
+        self.play(
+            Write(hot_label),
+            ShowCreation(hot_arrow)
+        )
+
+        # ground label
+        ground_arrow = Arrow(
+            ground_center + 2 * RIGHT + 0.5 * DOWN,
+            ground_center,
+            buff=0,
+            color=self.ground_color,
+            **arrow_kw
+        )
+        ground_label = TextMobject(
+            "Ground",
+            color=self.ground_color
+        ) \
+            .scale(1.4) \
+            .next_to(ground_center + 2 * RIGHT + 0.5 * DOWN, direction=RIGHT, buff=0.3)
+        self.play(
+            Write(ground_label),
+            ShowCreation(ground_arrow)
+        )
+        self.wait(3.13)
+
+        # add neutral equation
+        neutral_eq = TexMobject(
+            "V_{\\text{Neutral}}(t) = 170 \\hspace{1mm} sin( \\hspace{1mm} 120\\pi \\hspace{1mm} t )",
+            color=self.neutral_color,
+            tex_to_color_map={
+                "170": self.amplitude_color,
+                "120\\pi": self.ang_freq_color,
+            },
+            substring_to_isolate=[
+                "170",
+                "120\\pi",
+            ]
+        ) \
+            .scale(1.75) \
+            .to_edge(DOWN, buff=0.1)
+        self.play(
+            FadeInFrom(
+                neutral_eq, direction=DOWN
+            )
+        )
+
+        self.wait(5)
 
