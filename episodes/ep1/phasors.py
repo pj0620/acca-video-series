@@ -2,6 +2,9 @@ from manimlib.imports import *
 from accalib.electrical_circuits import BatteryLampCircuit, BatteryLampCircuitAC
 from accalib.particles import Electron
 
+from accalib.lines import DottedLine
+
+from accalib.tools import rule_of_thirds_guide
 
 class IntroPhasorsPart(Scene):
     def construct(self):
@@ -1105,7 +1108,7 @@ class SineWaveCharacteristics(ACvsDC):
             self.get_phase_anim(0)
         )
         self.play(
-            self.ac_circuit.get_electron_anim(15.13)
+            self.ac_circuit.get_electron_anim(50)
         )
 
     def get_sin(self, ampl=1, ang_freq=1, phase=0):
@@ -1193,191 +1196,937 @@ class SineWaveCharacteristics(ACvsDC):
             lag_ratio=0)
 
 
-class OutletScene(SineWaveCharacteristics):
+class EulersFormulaIntro(Scene):
     CONFIG = {
-        "neutral_color": RED,
-        "hot_color": GREEN,
-        "ground_color": PURPLE,
-        "axes_config": {
+        "x_color": GREEN_D,
+        "y_color": RED_D,
+    }
+    def construct(self):
+        # add eulers identity equation
+        eulers_identity = TexMobject(
+            "e^{j \\pi} = -1",
+            tex_to_color_map={
+                "j": PURPLE,
+                "\\pi": YELLOW
+            }
+        )\
+            .scale(4)
+        self.play(Write(eulers_identity))
+        self.wait(14.91)
+
+        # add eulers formula
+        eulers_formula = TexMobject(
+            "Im \\{ e^{j \\theta} \\}", " = ", "cos(", "\\theta", ")", " + j ", "sin(", "\\theta", ")",
+            # tex_to_color_map={
+            #     "j": PURPLE,
+            #     "\\theta": YELLOW
+            # }
+        ) \
+            .scale(2) \
+            .move_to(2.7 * RIGHT + DOWN)
+        eulers_formula[2].set_color(self.x_color)
+        eulers_formula[4].set_color(self.x_color)
+        eulers_formula[6].set_color(self.y_color)
+        eulers_formula[8].set_color(self.y_color)
+        eulers_formula[0][4].set_color(PURPLE)
+        eulers_formula[5][1].set_color(PURPLE)
+        eulers_formula[0][5].set_color(YELLOW)
+        eulers_formula[3].set_color(YELLOW)
+        eulers_formula[-2].set_color(YELLOW)
+        imag_label = VGroup(
+            *eulers_formula[0][:3],
+            eulers_formula[0][-1]
+        )
+        imag_label.set_opacity(0)
+        self.play(
+            Transform(
+                eulers_identity, eulers_formula
+            )
+        )
+
+        self.wait(10)
+
+
+class VideoRecommendEulerIdentity(Scene):
+    def construct(self):
+        height = 7
+        rect = Rectangle(
+            height=height,
+            width=(16/9)*height
+        )\
+            .to_edge(DOWN, buff=1)
+        self.add(rect)
+
+        title = TextMobject("Understanding e to the i pi in 3.14 minutes | DE5 - 3Blue1Brown")\
+            .scale(1.2)\
+            .next_to(rect, direction=UP)
+        self.play(
+            Write(title)
+        )
+
+        self.wait(10)
+
+
+class EulersFormula(SineWaveCharacteristics):
+    CONFIG = {
+        "imag_axes_config": {
             "number_line_config": {
-                "include_tip": False,
+                "include_tip": True,
             },
             "x_axis_config": {
                 "color": BLUE_C,
+                "tick_frequency": 10
             },
             "y_axis_config": {
                 "color": BLUE_C,
+                "tick_frequency": 10
             },
-            "x_min": 0,
-            "x_max": 7,
-            "y_min": -2.5,
-            "y_max": 2.5,
-            "center_point": RIGHT_SIDE + 7 * LEFT + 1.75 * UP,
+            "x_min": -2.1,
+            "x_max": 2.1,
+            "y_min": -2.1,
+            "y_max": 2.1,
+            "center_point": FRAME_WIDTH*0.25*LEFT + FRAME_HEIGHT*0.25*UP + 0.3*UP + 1.7*LEFT,
         },
+        "sin_axes_config": {
+            "number_line_config": {
+                "include_tip": True,
+            },
+            "x_axis_config": {
+                "color": BLUE_C,
+                "tick_frequency": 1
+            },
+            "y_axis_config": {
+                "color": BLUE_C,
+                "tick_frequency": 1
+            },
+            "x_min": -0.2,
+            "x_max": 7,
+            "y_min": -2.1,
+            "y_max": 2.1,
+            "center_point": FRAME_WIDTH * 0.25 * LEFT + FRAME_HEIGHT * 0.25 * UP + 0.3 * UP + 2*RIGHT,
+        },
+        "cos_axes_config": {
+            "number_line_config": {
+                "include_tip": True,
+            },
+            "x_axis_config": {
+                "color": BLUE_C,
+                "tick_frequency": 1
+            },
+            "y_axis_config": {
+                "color": BLUE_C,
+                "tick_frequency": 1
+            },
+            "x_min": -0.2,
+            "x_max": 7,
+            "y_min": -2.1,
+            "y_max": 2.1,
+            "center_point": FRAME_WIDTH * 0.25 * LEFT + FRAME_HEIGHT * 0.25 * UP + 2.2 * DOWN + 1.7*LEFT,
+        },
+        "x_color": GREEN_D,
+        "y_color": RED_D,
+        "show_x_graph": False,
+        "show_y_graph": False,
+        # "amplitude_color": ORANGE,
+        # "ang_freq_color": BLUE_C,
+        # "phase_color": RED_B,
     }
+
     def construct(self):
-        self.add(
-            Rectangle(
-                width=FRAME_WIDTH,
-                height=FRAME_HEIGHT,
-                color=PURPLE
-            )
+        # add eulers formula
+        eulers_formula = TexMobject(
+            "Im \\{ e^{j \\theta} \\}", " = ", "cos(", "\\theta", ")"," + j ", "sin(", "\\theta", ")",
+            # tex_to_color_map={
+            #     "j": PURPLE,
+            #     "\\theta": YELLOW
+            # }
+        ) \
+            .scale(2)\
+            .move_to(2.5*RIGHT + 1*DOWN)
+        eulers_formula[2].set_color(self.x_color)
+        eulers_formula[4].set_color(self.x_color)
+        eulers_formula[6].set_color(self.y_color)
+        eulers_formula[8].set_color(self.y_color)
+        eulers_formula[0][4].set_color(PURPLE)
+        eulers_formula[5][1].set_color(PURPLE)
+        eulers_formula[0][5].set_color(YELLOW)
+        eulers_formula[3].set_color(YELLOW)
+        eulers_formula[-2].set_color(YELLOW)
+        eq_imag_label = VGroup(
+            *eulers_formula[0][:3],
+            eulers_formula[0][-1]
+        )
+        eq_imag_label.set_opacity(0)
+
+        self.add(eulers_formula)
+
+        self.wait(3.48)
+
+        self.create_circle_mobs()
+
+        ejt_rect = SurroundingRectangle(
+            VGroup(*eulers_formula[0][3:6]),
+            fill_color=YELLOW,
+            fill_opacity=0.5
+        )
+        self.play(
+            self.get_drawing_anims(1.65),
+        )
+        self.play(
+            FadeInFrom(ejt_rect, direction=UP),
+            self.get_drawing_anims(2*PI - 1.65),
         )
 
-        # add outlet
-        outlet = ImageMobject("images/ep1/CompareACDC/outlet-US.jpg")\
-            .scale(3)\
-            .to_edge(LEFT, buff=3.5)\
-            .shift(1.8*UP)
-        self.add(outlet)
-        self.wait(12.13)
-
-        # add graph
-        self.time_axes = Axes(**self.axes_config)
-        y_label = self.time_axes.get_y_axis_label("\\text{Voltage}") \
-            .shift(0.5 * UP) \
-            .scale(1.3) \
-            .set_color(WHITE)
-        time_label = self.time_axes.get_x_axis_label("\\text{time}").set_color(BLUE_C)
-        self.add(self.time_axes, time_label, y_label)
+        # phase must be a multiple of 2*PI at this point
+        self.wait(1)
         self.play(
-            FadeIn(self.time_axes),
-            FadeIn(y_label),
-            FadeIn(time_label),
+            FadeOut(ejt_rect)
         )
 
-        # draw sine wave
-        graph_animated = self.time_axes.get_graph(
-            self.get_sin(ampl=1.7),
-            x_max=8
-        ).set_color(self.neutral_color)
-        self.graph = self.time_axes.get_graph(
-            self.get_sin(ampl=1.7),
-            x_max=20
-        ).set_color(self.neutral_color)
-        draw_line = Line(ORIGIN, ORIGIN, color=YELLOW, stroke_width=4)
-        draw_dot = Dot(ORIGIN, color=YELLOW)
-        time_value = ValueTracker(0)
-        def line_update(line):
-            rvec = time_value.get_value() * RIGHT
-            uvec = 1.7 * np.sin(time_value.get_value()) * UP
-            start = self.time_axes.center_point + rvec
-            end = self.time_axes.center_point + uvec + rvec + 0.00001 * UP
-            line.put_start_and_end_on(start, end)
+        self.show_x_graph = True
+        self.show_y_graph = True
 
-        def dot_update(dot):
-            rvec = time_value.get_value() * RIGHT
-            uvec = 1.7 * np.sin(time_value.get_value()) * UP
-            loc = self.time_axes.center_point + uvec + rvec + 0.00001 * UP
-            dot.move_to(loc)
+        self.setup_cos_mobs()
+        self.cos_graph = self.cos_axes.get_graph(
+            np.cos,
+            color=self.x_color,
+            x_min=0,
+            x_max=2 * PI
+        )
 
-        self.play(
-            ApplyMethod(
-                time_value.set_value, 8,
-                rate_func=linear,
-                run_time=4,
+        # add sin axes
+        self.setup_sine_mobs()
+        self.sin_graph = self.sin_axes.get_graph(
+            np.sin,
+            color=self.y_color,
+            x_min=0,
+            x_max=2 * PI
+        )
+        self.add(self.sin_axes)
+
+        cos_rects = VGroup(
+            SurroundingRectangle(
+                VGroup(*eulers_formula[2:5]),
+                color=self.x_color,
+                fill_color=self.x_color,
+                fill_opacity=0.5
             ),
-            UpdateFromFunc(draw_line, line_update),
-            UpdateFromFunc(draw_dot, dot_update),
+            SurroundingRectangle(
+                VGroup(self.cos_label),
+                color=self.x_color,
+                fill_color=self.x_color,
+                fill_opacity=0.5
+            ),
+        )
+
+        sin_rects = VGroup(
+            SurroundingRectangle(
+                VGroup(*eulers_formula[6:]),
+                color=self.y_color,
+                fill_color=self.y_color,
+                fill_opacity=0.5
+            ),
+            SurroundingRectangle(
+                VGroup(self.sin_label),
+                color=self.y_color,
+                fill_color=self.y_color,
+                fill_opacity=0.5
+            ),
+        )
+
+        # draw graphs
+        self.play(
+            self.get_drawing_anims(3 * PI),
             ShowCreation(
-                graph_animated,
-                run_time=4,
+                self.cos_graph,
+                run_time=2*PI,
                 rate_func=linear
             ),
+            ShowCreation(
+                self.sin_graph,
+                run_time=2 * PI,
+                rate_func=linear
+            ),
+            AnimationGroup(
+                FadeIn(Dot().shift(100 * UR), run_time=1.26),
+                FadeIn(cos_rects),
+                FadeIn(Dot().shift(100*UR), run_time=3),
+                FadeIn(sin_rects),
+                lag_ratio=1
+            )
         )
-        self.remove(graph_animated)
-        self.add(self.graph)
-        self.wait(1.91)
-
-        outlet_mid = outlet.get_center()
-        neutral_center = outlet_mid + UP*1.15 + LEFT*0.36
-        hot_center = outlet_mid + UP*1.15 + RIGHT*0.27
-        ground_center = outlet_mid + UP*0.55 + LEFT*0.05
-
-        arrow_kw = {
-            "stroke_width": 30,
-            "tip_length": 10,
-            "max_tip_length_to_length_ratio": 0.25
-        }
-
-        # neutral label
-        neutral_arrow = Arrow(
-            neutral_center + 2*LEFT,
-            neutral_center,
-            buff=0,
-            color=self.neutral_color,
-            **arrow_kw
-        )
-        neutral_label = TextMobject(
-            "Neutral",
-            color=self.neutral_color
-        )\
-            .scale(1.4)\
-            .next_to(neutral_arrow, direction=LEFT, buff=0.3)
         self.play(
-            Write(neutral_label),
-            ShowCreation(neutral_arrow)
+            FadeOut(VGroup(sin_rects, cos_rects)),
+            self.get_drawing_anims(5.91),
         )
 
-        # hot label
-        hot_arrow = Arrow(
-            hot_center + 2 * RIGHT,
-            hot_center,
-            buff=0,
-            color=self.hot_color,
-            **arrow_kw
+        # only show imaginary part
+        self.show_x_graph = False
+        self.play(
+            AnimationGroup(
+                AnimationGroup(
+                    FadeOut(VGroup(*eulers_formula[2:6])),
+                    ApplyMethod(eq_imag_label.set_opacity, 1),
+                    lag_ratio=0
+                ),
+                AnimationGroup(
+                    # ApplyMethod(VGroup(*eulers_formula[:2]).shift, 2 * RIGHT),
+                    ApplyMethod(VGroup(*eulers_formula[6:]).shift, 4 * LEFT),
+                    lag_ratio=0
+                ),
+                lag_ratio=1
+            ),
+            FadeOut(self.cos_axes),
+            FadeOut(self.time_label2),
+            FadeOut(self.cos_label),
+            FadeOut(self.cos_dot),
+            FadeOut(self.x_draw_line),
+            FadeOut(self.cos_graph),
+            self.get_drawing_anims(2)
         )
-        hot_label = TextMobject(
-            "Hot",
-            color=self.hot_color
+
+        self.play(
+            self.get_drawing_anims(13.17),
+        )
+
+        cur_eulers_formula = VGroup(
+            *eulers_formula[:2],
+            *eulers_formula[6:]
+        )
+        general_eulers_formula = TexMobject(
+            "Im \\{ A e^{j (\\omega t + \\phi)} \\}", " = ", "A", "sin(", "\\omega", "t", "+", "\\phi", ")",
         ) \
-            .scale(1.4) \
-            .next_to(hot_arrow, direction=RIGHT, buff=0.3)
-        self.play(
-            Write(hot_label),
-            ShowCreation(hot_arrow)
-        )
-
-        # ground label
-        ground_arrow = Arrow(
-            ground_center + 2 * RIGHT + 0.5 * DOWN,
-            ground_center,
-            buff=0,
-            color=self.ground_color,
-            **arrow_kw
-        )
-        ground_label = TextMobject(
-            "Ground",
-            color=self.ground_color
-        ) \
-            .scale(1.4) \
-            .next_to(ground_center + 2 * RIGHT + 0.5 * DOWN, direction=RIGHT, buff=0.3)
-        self.play(
-            Write(ground_label),
-            ShowCreation(ground_arrow)
-        )
-        self.wait(3.13)
-
-        # add neutral equation
-        neutral_eq = TexMobject(
-            "V_{\\text{Neutral}}(t) = 170 \\hspace{1mm} sin( \\hspace{1mm} 120\\pi \\hspace{1mm} t )",
-            color=self.neutral_color,
+            .scale(2)\
+            .next_to(cur_eulers_formula, direction=DOWN, buff=0.3)
+        VGroup(
+            general_eulers_formula[0][3],
+            general_eulers_formula[2]
+        ).set_color(self.amplitude_color)
+        VGroup(
+            general_eulers_formula[0][7],
+            general_eulers_formula[4]
+        ).set_color(self.ang_freq_color)
+        VGroup(
+            general_eulers_formula[0][10],
+            general_eulers_formula[7]
+        ).set_color(self.phase_color)
+        general_eulers_formula[0][5].set_color(PURPLE)
+        VGroup(
+            general_eulers_formula[3],
+            general_eulers_formula[8]
+        ).set_color(self.y_color)
+        new_sin_label = TexMobject(
+            "A", "sin(", "\\omega", "t", "+", "\\phi", ")",
             tex_to_color_map={
-                "170": self.amplitude_color,
-                "120\\pi": self.ang_freq_color,
-            },
-            substring_to_isolate=[
-                "170",
-                "120\\pi",
-            ]
+                "A": self.amplitude_color,
+                "sin(": self.y_color,
+                "\\omega": self.ang_freq_color,
+                "\\phi": self.phase_color,
+                ")": self.y_color
+            }
         ) \
-            .scale(1.75) \
-            .to_edge(DOWN, buff=0.1)
+            .next_to(self.sin_axes.y_axis.get_top() + 0.4 * DOWN, direction=RIGHT)
+        self.time_label_t = TexMobject("time(t)", color=WHITE) \
+            .next_to(self.sin_axes.x_axis.get_right(), direction=RIGHT)
         self.play(
-            FadeInFrom(
-                neutral_eq, direction=DOWN
+            TransformFromCopy(
+                cur_eulers_formula, general_eulers_formula
+            ),
+            Transform(
+                self.sin_label, new_sin_label
+            ),
+            Transform(
+                self.time_label1, self.time_label_t
+            ),
+            self.get_drawing_anims(4.96)
+        )
+
+        # indicate time axis label
+        kw_arg = {
+            "fill_color": YELLOW,
+            "fill_opacity": 0.5
+        }
+        kw_theta_arg = {
+            "fill_color": GREEN_D,
+            "fill_opacity": 0.5,
+            "stroke_color": GREEN_D
+        }
+        t_ax_rect = SurroundingRectangle(self.time_label_t, **kw_arg)
+        t_gen_rects = VGroup(
+            SurroundingRectangle(general_eulers_formula[0][8], **kw_arg),
+            SurroundingRectangle(general_eulers_formula[-4], **kw_arg),
+        )
+        theta_rects = VGroup(
+            SurroundingRectangle(eulers_formula[0][5], **kw_theta_arg),
+            SurroundingRectangle(eulers_formula[-2], **kw_theta_arg),
+        )
+        self.play(
+            ShowCreation(t_ax_rect),
+            self.get_drawing_anims(2.35)
+        )
+        self.play(
+            TransformFromCopy(
+                t_ax_rect, t_gen_rects
+            ),
+            self.get_drawing_anims(1.43)
+        )
+        self.play(
+            FadeIn(
+                theta_rects
+            ),
+            self.get_drawing_anims(2)
+        )
+        self.play(
+            FadeOut(t_ax_rect),
+            FadeOut(t_gen_rects),
+            FadeOut(theta_rects),
+            self.get_drawing_anims(9.86)
+        )
+
+        # show rectangles around arguments
+        arg_rects = VGroup(
+            SurroundingRectangle(VGroup(*general_eulers_formula[0][7:11]), **kw_arg),
+            SurroundingRectangle(VGroup(*general_eulers_formula[4:8]), **kw_arg),
+            SurroundingRectangle(VGroup(*eulers_formula[0][5]), **kw_arg),
+            SurroundingRectangle(eulers_formula[-2], **kw_arg),
+        )
+        self.play(
+            FadeIn(arg_rects),
+            self.get_drawing_anims(4.7)
+        )
+
+        # show argument formula
+        argument_formula = TexMobject(
+            "\"Argument\" = \\theta = \\omega", " t + \\phi",
+            tex_to_color_map={
+                "\"Argument\"": YELLOW,
+                "\\theta": YELLOW,
+                "\\omega": self.ang_freq_color,
+                "\\phi": self.phase_color
+            }
+        )\
+            .scale(2)\
+            .next_to(general_eulers_formula, direction=DOWN, buff=0.3)\
+            .shift(1.8*LEFT)
+        theta_rect = SurroundingRectangle(
+            VGroup(self.theta_value, self.theta_label),
+            **kw_arg
+        )
+        self.play(
+            Write(argument_formula),
+            self.get_drawing_anims(3.22)
+        )
+        self.play(
+            TransformFromCopy(arg_rects, theta_rect),
+            self.get_drawing_anims(2)
+        )
+
+        # set angle to a multiple of 2*PI
+        #   ** will not work when ang_freq != 1
+        cur_ang = self.get_ang()
+        del_ang = 2*PI*math.ceil(cur_ang/(2*PI))-cur_ang
+        self.play(
+            self.get_drawing_anims(del_ang+0.00001)
+        )
+        self.time_value.set_value(0)
+
+        # remove argument rectangles
+        self.play(
+            FadeOut(arg_rects),
+            FadeOut(theta_rect)
+        )
+
+        # focus on argument
+        self.play(
+            FadeOutAndShift(
+                cur_eulers_formula, direction=UP
+            ),
+            ApplyMethod(
+                general_eulers_formula.shift, 2*UP
+            ),
+            FadeOutAndShift(
+                VGroup(*argument_formula[:2]), direction=UL
+            ),
+            ApplyMethod(
+                VGroup(*argument_formula[2:]).shift, 2*LEFT + 2*UP
+            ),
+        )
+        self.wait(2.61)
+
+        # remove phase
+        phase_mobs = VGroup(
+            argument_formula[-1],
+            argument_formula[-2][1],
+            *general_eulers_formula[0][9:11],
+            *general_eulers_formula[6:8]
+        )
+        self.play(
+            ApplyMethod(
+                phase_mobs.set_opacity, 0.15
             )
         )
 
-        self.wait(5)
+        # add brace for time
+        time_brace = Brace(
+            argument_formula[5][0],
+            direction=DOWN,
+            buff=0.1
+        )
+        time_brace_width = time_brace.get_width()
+        time_brace.set_width(1.1 * time_brace_width, stretch=True)
+        time_text = time_brace.get_text("0") \
+            .scale(1.75) \
+            .shift(0.0 * DOWN)
+        self.play(
+            ShowCreation(time_brace),
+        )
+        self.wait(1.48)
+        self.play(
+            FadeInFrom(time_text, direction=DOWN),
+        )
 
+        # note that theta is equal to zero
+        new_equals = TexMobject("=", color=YELLOW)\
+            .scale(2) \
+            .next_to(argument_formula[2], direction=LEFT, buff=0.3)
+        theta_label2 = DecimalNumber(
+            0,
+            num_decimal_places=1,
+            unit="\\pi",
+            edge_to_fix=RIGHT,
+            color=YELLOW
+        )\
+            .scale(2)\
+            .next_to(new_equals, direction=LEFT, buff=0.3)
+        self.play(
+            FadeIn(theta_label2),
+            FadeIn(new_equals),
+        )
+        self.wait(2.61)
+
+        # label complete rotations
+        multiples_two_pi = TexMobject(
+            "\\text{cycle starts at} \\hspace{1.5mm} \\theta = ",
+            *[str(2*i) + "\\pi " for i in range(10)],
+            color=YELLOW,
+        )
+        multiples_two_pi.scale(2)
+        multiples_two_pi.arrange(RIGHT, buff=1)\
+            .to_edge(LEFT)\
+            .shift(3.7*DOWN + 0.5*LEFT)
+        self.play(
+            FadeIn(multiples_two_pi[0])
+        )
+        self.play(
+            TransformFromCopy(
+                theta_label2, multiples_two_pi[1]
+            )
+        )
+
+        # add updayer for second theta label
+        theta_label2.add_updater(
+            lambda x: x.set_value(self.get_ang() / PI)
+        )
+
+        self.play(
+            FadeOut(time_brace),
+            FadeOut(time_text),
+        )
+
+        # complete one rotation
+        self.play(
+            self.get_drawing_anims(2*PI)
+        )
+        self.wait(2.22)
+
+        # copy 2 pi
+        self.play(
+            Transform(
+                theta_label2.copy().clear_updaters(), multiples_two_pi[2]
+            )
+        )
+
+        self.wait()
+
+        for i in range(3, 5):
+            # complete one rotation
+            self.play(
+                self.get_drawing_anims(2 * PI)
+            )
+
+            # copy 2*i*pi
+            self.play(
+                Transform(
+                    theta_label2.copy().clear_updaters(), multiples_two_pi[i]
+                )
+            )
+
+        # change frequency of wave
+        self.play(
+            self.get_freq_anim(2)
+        )
+
+        # # add T line
+        # period_line = DashedLine(
+        #     self.sin_axes.center_point + 2*PI*RIGHT + 1.2*UP,
+        #     self.sin_axes.center_point + 2*PI*RIGHT + 1.2*DOWN,
+        #     color=YELLOW
+        # )
+        # period_lhs = TexMobject(
+        #     "T = ",
+        #     color=YELLOW
+        # )\
+        #     .move_to(self.sin_axes.center_point + 2*PI*RIGHT + 0.65*RIGHT + 0.75*UP)
+        # period_label = DecimalNumber(
+        #     2*PI,
+        #     color=YELLOW
+        # )\
+        #     .next_to(period_lhs, direction=RIGHT)
+        # self.add(
+        #     period_label,
+        #     period_lhs,
+        #     period_line
+        # )
+        # period_label.add_updater(
+        #     lambda x: x.set_value((2*PI)/self.freq_value.get_value())
+        # )
+        #
+        # self.play(
+        #     self.get_drawing_anims(2*PI)
+        # )
+
+        self.wait()
+
+
+    def get_drawing_anims(self, run_time=1.):
+        anims = [
+            ApplyMethod(
+                self.time_value.increment_value, run_time*self.freq_value.get_value(),
+                rate_func=linear,
+                run_time=run_time
+            ),
+            UpdateFromFunc(
+                self.dot, self.dot_update,
+                rate_func=linear,
+                run_time=run_time
+            ),
+            UpdateFromFunc(
+                self.ang_line, self.ang_line_update,
+                rate_func=linear,
+                run_time=run_time
+            ),
+        ]
+
+        if self.show_y_graph:
+            anims += [
+                UpdateFromFunc(
+                    self.y_draw_line, self.y_draw_line_update,
+                    rate_func=linear,
+                    run_time=run_time
+                ),
+                UpdateFromFunc(
+                    self.sin_dot, self.sin_dot_update,
+                    rate_func=linear,
+                    run_time=run_time
+                )
+            ]
+
+        if self.show_x_graph:
+            anims += [
+                UpdateFromFunc(
+                    self.x_draw_line, self.x_draw_line_update,
+                    rate_func=linear,
+                    run_time=run_time
+                ),
+                UpdateFromFunc(
+                    self.cos_dot, self.cos_dot_update,
+                    rate_func=linear,
+                    run_time=run_time
+                )
+            ]
+
+        return AnimationGroup(*anims)
+
+
+    def ang_line_update(self, l):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        l.put_start_and_end_on(
+            self.real_imag_axes.center_point,
+            self.real_imag_axes.center_point + x * RIGHT + y * UP
+        )
+
+    def y_draw_line_update(self, l):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        l.put_start_and_end_on(
+            self.real_imag_axes.center_point + x * RIGHT + y * UP,
+            self.sin_axes.center_point + (self.time_value.get_value() % (2*PI))*RIGHT + y*UP
+        )
+
+    def x_draw_line_update(self, l):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        l.put_start_and_end_on(
+            self.real_imag_axes.center_point + x * RIGHT + y * UP,
+            self.cos_axes.center_point + (self.time_value.get_value() % (2*PI))*DOWN + x*RIGHT
+        )
+
+    def x_line_update(self, l):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        l.put_start_and_end_on(
+            self.real_imag_axes.center_point + y * UP,
+            self.real_imag_axes.center_point + x * RIGHT + y * UP
+        )
+
+    def y_line_update(self, l):
+        x = self.ampl_value.get_value()*np.cos(self.get_ang())
+        y = self.ampl_value.get_value()*np.sin(self.get_ang()) + 0.0000001
+        l.put_start_and_end_on(
+            self.real_imag_axes.center_point + x*RIGHT,
+            self.real_imag_axes.center_point + x*RIGHT + y*UP
+        )
+
+    def dot_update(self, d):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        d.move_to(self.real_imag_axes.center_point +
+                  x*RIGHT + y*UP )
+
+    def sin_dot_update(self, d):
+        y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
+        d.move_to(self.sin_axes.center_point + (self.time_value.get_value() % (2*PI))*RIGHT + y*UP)
+
+    def cos_dot_update(self, d):
+        x = self.ampl_value.get_value() * np.cos(self.get_ang())
+        d.move_to(self.cos_axes.center_point + (self.time_value.get_value() % (2*PI))*DOWN + x*RIGHT)
+
+    def get_ang(self):
+        return self.phase_value.get_value() + self.time_value.get_value() * self.freq_value.get_value()
+
+    def create_circle_mobs(self):
+        self.phase_value = ValueTracker(0)
+        self.freq_value = ValueTracker(1)
+        self.ampl_value = ValueTracker(1)
+        self.time_value = ValueTracker(0)
+
+        # add real - imag axes
+        self.real_imag_axes = Axes(**self.imag_axes_config)
+        # manually adding tips to left and bottom
+        self.real_imag_axes.x_axis.add_tip(at_start=True)
+        self.real_imag_axes.y_axis.add_tip(at_start=True)
+        # manually remove tick marks
+        self.real_imag_axes.x_axis.big_tick_marks.set_opacity(0)
+        self.real_imag_axes.y_axis.big_tick_marks.set_opacity(0)
+
+        self.dot = Dot(color=YELLOW) \
+            .move_to(self.real_imag_axes.center_point + RIGHT)
+        # self.y_line = Line(color=self.y_color)
+        # self.x_line = Line(color=self.x_color)
+
+        self.circle = Circle(
+            width=2,
+            color=PINK,
+            stroke_opacity=0.5
+        )\
+            .move_to(self.real_imag_axes.center_point)
+
+        self.ang_line = Line(
+            self.real_imag_axes.center_point,
+            self.real_imag_axes.center_point + RIGHT,
+            color=YELLOW
+        )
+        self.ang_arc = Arc(
+            arc_center=self.real_imag_axes.center_point,
+            radius=0.3,
+            color=YELLOW
+        )
+        self.ang_arc.add_updater(
+            lambda m: m.become(
+                Arc(
+                    radius=0.3,
+                    start_angle=0,
+                    arc_center=self.real_imag_axes.center_point,
+                    angle=self.get_ang() % (2*PI),
+                    color=YELLOW
+                )
+            )
+        )
+
+        imag_label = TexMobject(
+            "Imag",
+            color=self.y_color
+        )\
+            .scale(0.8)\
+            .next_to(self.real_imag_axes.y_axis.get_top()+0.3*DOWN, direction=RIGHT)
+        self.add(imag_label)
+
+        real_label = TexMobject(
+            "Real",
+            color=self.x_color
+        ) \
+            .scale(0.8) \
+            .next_to(self.real_imag_axes.x_axis.get_right(), direction=UP)\
+            .shift(0.5*RIGHT)
+
+        self.theta_label = TexMobject("\\theta = ", color=YELLOW) \
+            .scale(0.9) \
+            .move_to(self.real_imag_axes.center_point + 0.5*UP + 0.5*RIGHT)
+
+        self.theta_value = DecimalNumber(
+            0,
+            num_decimal_places=1,
+            unit="\\pi",
+            edge_to_fix=LEFT,
+            color=YELLOW
+        )\
+            .scale(0.9)\
+            .next_to(self.theta_label, direction=RIGHT, buff=0.1)
+
+        self.play(
+            FadeIn(self.real_imag_axes),
+            FadeIn(self.dot),
+            FadeIn(self.circle),
+            FadeIn(self.ang_line),
+            FadeIn(self.ang_arc),
+            FadeIn(imag_label),
+            FadeIn(real_label),
+            FadeIn(self.theta_label),
+            FadeIn(self.theta_value)
+        )
+        self.theta_value.add_updater(
+            lambda x: x.set_value((self.get_ang()/PI)%2)
+        )
+
+    def setup_cos_mobs(self):
+        # add cos axes
+        self.cos_axes = Axes(**self.cos_axes_config)
+        self.cos_axes.y_axis.add_tip(at_start=True)
+        self.cos_axes.y_axis.big_tick_marks.set_opacity(0)
+        self.cos_axes.y_axis.tick_marks.set_opacity(0)
+        self.cos_axes.rotate(-PI / 2, about_point=self.cos_axes.center_point)
+
+        self.time_label2 = TexMobject("\\theta", color=YELLOW) \
+            .next_to(self.cos_axes.x_axis.get_bottom() + 2.25 * UP, direction=LEFT)
+        self.add()
+
+        self.cos_label = TexMobject(
+            "cos(", "\\theta", ")",
+            color=self.x_color,
+            tex_to_color_map={
+                "\\theta": YELLOW
+            }
+        ) \
+            .next_to(self.cos_axes.y_axis.get_right(), direction=DOWN, buff=0.2)
+
+        self.cos_dot = Dot(color=YELLOW)\
+            .move_to(self.cos_axes.center_point + RIGHT)
+
+        self.x_draw_line = DashedLine(
+            self.real_imag_axes.center_point + RIGHT,
+            self.cos_axes.center_point + RIGHT,
+            color=self.x_color,
+            stroke_opacity=0.6
+        )
+
+        self.play(
+            FadeIn(self.cos_axes),
+            FadeIn(self.time_label2),
+            FadeIn(self.cos_label),
+            FadeIn(self.cos_dot),
+            FadeIn(self.x_draw_line)
+        )
+
+    def setup_sine_mobs(self):
+        self.sin_axes = Axes(**self.sin_axes_config)
+        self.sin_axes.y_axis.add_tip(at_start=True)
+        self.sin_axes.y_axis.big_tick_marks.set_opacity(0)
+        self.sin_axes.y_axis.tick_marks.set_opacity(0)
+
+        self.sin_label = TexMobject(
+            "sin(", "\\theta", ")",
+            color=self.y_color,
+            tex_to_color_map={
+                "\\theta": YELLOW
+            }
+        ) \
+            .next_to(self.sin_axes.y_axis.get_top() + 0.4 * DOWN, direction=RIGHT)
+
+        self.time_label1 = TexMobject("\\theta", color=YELLOW) \
+            .next_to(self.sin_axes.x_axis.get_right(), direction=RIGHT)
+
+        self.sin_dot = Dot(color=YELLOW)\
+            .move_to(self.sin_axes.center_point)
+
+        self.y_draw_line = DashedLine(
+            self.real_imag_axes.center_point + RIGHT,
+            self.sin_axes.center_point,
+            color=self.y_color,
+            stroke_opacity=0.6
+        )
+
+        self.play(
+            FadeIn(self.sin_axes),
+            FadeIn(self.sin_label),
+            FadeIn(self.time_label1),
+            FadeIn(self.sin_dot),
+            FadeIn(self.y_draw_line)
+        )
+
+    def get_freq_anim(self, new_freq, run_time=1.):
+        cur_freq = self.freq_value.get_value()
+        # transform_matrix = np.array(
+        #     [[cur_freq/new_freq, 0, 0],
+        #      [0,                 1, 0],
+        #      [0,                 0, 1]]
+        # )
+        # offset = np.array(
+        #     [(1-cur_freq/new_freq)*self.sin_axes.center_point[0],
+        #      0,
+        #      0]
+        # )
+        # def fun(p):
+        #     return offset + transform_matrix.dot(p)
+
+        new_graph = self.sin_axes.get_graph(
+            lambda x: self.ampl_value.get_value()*np.sin(x*self.freq_value.get_value()+self.phase_value.get_value()),
+            color=self.y_color,
+            x_min=0,
+            x_max=2 * PI
+        )
+
+        return AnimationGroup(
+            Transform(
+                self.sin_graph, new_graph,
+                run_time=run_time
+            ),
+            ApplyMethod(
+                self.freq_value.set_value, new_freq,
+                run_time=run_time
+            ),
+            lag_ratio=0
+        )
+
+    def get_amplitude_anim(self, new_ampl, run_time=1.):
+        self.ac_circuit.set_electron_amplitude_anim(new_ampl*self.base_electron_amplitude, run_time=run_time)
+        transform_matrix = np.array(
+            [[1, 0, 0],
+             [0, new_ampl/self.amplitude_value.get_value(), 0],
+             [0, 0, 1]]
+        )
+
+        def fun(p):
+            return self.time_axes.center_point + transform_matrix.dot(p-self.time_axes.center_point)
+
+        return AnimationGroup(
+            ApplyPointwiseFunction(
+                fun, self.graph,
+                run_time=run_time
+            ),
+            ApplyMethod(
+                self.amplitude_value.set_value, new_ampl,
+                run_time=run_time
+            ),
+            self.ac_circuit.get_electron_anim(run_time),
+            lag_ratio=0)

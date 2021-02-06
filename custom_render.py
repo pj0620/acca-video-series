@@ -65,7 +65,9 @@ scenes_map = {
             "ACvsDC",
             "ACDCApplications",
             "SineWaveCharacteristics",
-            "OutletScene"
+            "EulersFormulaIntro",
+            "VideoRecommendEulerIdentity",
+            "EulersFormula"
         ]
     # "ohms_law.py":
     #     [
@@ -138,7 +140,7 @@ if selected_file is None:
 # delete old scene file
 video_dir = output_dir + selected_file.replace(".py", "") + "/" + quality_ending
 for filename in os.listdir(video_dir):
-    if filename.startswith(scene_to_render) and (rand_string not in filename):
+    if filename.startswith(scene_to_render + quality_ending) and (rand_string not in filename):
         cmd = "del /f " + (video_dir + "/" + filename).replace("/", "\\")
         print("executing " + cmd)
         os.system(cmd)
