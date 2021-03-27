@@ -5,10 +5,10 @@ import string
 
 scenes_dir = "episodes/ep1/"
 output_dir = "media/videos/"
-quality_arg = "-l"
-quality_ending = "480p15"
-# quality_arg = "--high_quality"
-# quality_ending = "1080p60"
+# quality_arg = "-l"
+# quality_ending = "480p15"
+quality_arg = "--high_quality"
+quality_ending = "1080p60"
 scenes_map = {
     "hook.py":
         [
