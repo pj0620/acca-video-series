@@ -129,7 +129,7 @@ for file, scenes in scenes_map.items():
         if selected_file is not None:
             raise Exception("selected scene " + scene_to_render + " found in two files " + selected_file + " and " + file)
         selected_file = file
-        cmd = "python manim.py " + scenes_dir + file + " " + scene_to_render + " " + quality_arg + " -o " + \
+        cmd = "manim " + scenes_dir + file + " " + scene_to_render + " " + quality_arg + " -o " + \
               scene_to_render + quality_ending + "_" + rand_string + " -p"
         print("executing: " + cmd)
         os.system(cmd)

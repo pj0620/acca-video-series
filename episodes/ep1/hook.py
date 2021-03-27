@@ -1,12 +1,12 @@
-from manimlib.imports import *
+from manim import *
 from accalib.animations import EllipsesFlash
 from accalib.electrical_circuits import SimpleCircuitFreqDomain
 
 class ComplexNumbersTitle(Scene):
     def construct(self):
-        complex_number = TextMobject(
+        complex_number = Text(
             "Complex Numbers",
-            color=WHITE
+            font="Open Sans"
         )\
             .scale(2.5)
 
@@ -393,7 +393,7 @@ class PoleZeroPlot(Scene):
             "x_max": 7,
             "y_min": -2.5,
             "y_max": 2.5,
-            "center_point": RIGHT_SIDE+7*LEFT+0.5*UP,
+            "center_point": config.frame_width*0.5*RIGHT+7*LEFT+0.5*UP,
         },
         "pole_zero_axes_config": {
             "number_line_config": {
@@ -409,7 +409,7 @@ class PoleZeroPlot(Scene):
             "x_max": 3,
             "y_min": -3,
             "y_max": 3,
-            "center_point": LEFT_SIDE+5*RIGHT+0.5*UP,
+            "center_point": config.frame_width*0.5*LEFT+5*RIGHT+0.5*UP,
         }
     }
     def construct(self):

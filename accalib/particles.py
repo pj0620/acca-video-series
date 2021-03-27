@@ -1,4 +1,4 @@
-from manimlib.imports import *
+from manim import *
 from accalib.constants import *
 
 class Electron(SVGMobject):

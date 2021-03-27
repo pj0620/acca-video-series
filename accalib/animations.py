@@ -1,20 +1,24 @@
-from manimlib.imports import *
-from manimlib.constants import *
+from manim import *
 
 class EllipsesFlash(AnimationGroup):
-    CONFIG = {
-        "line_length": 0.2,
-        "num_lines": 12,
-        "flash_radius_x": 0.3,
-        "flash_radius_y": 0.3,
-        "line_stroke_width": 3,
-        "run_time": 1,
-    }
-
-    def __init__(self, point, color="#FFFF00", **kwargs):
+    def __init__(self,
+                 point,
+                 color="#FFFF00",
+                 line_length=0.2,
+                 num_lines=12,
+                 flash_radius_x=0.3,
+                 flash_radius_y=0.3,
+                 line_stroke_width=3,
+                 run_time=1,
+                 **kwargs):
         self.point = point
         self.color = color
-        digest_config(self, kwargs)
+        self.line_length = line_length
+        self.num_lines = num_lines
+        self.flash_radius_x = flash_radius_x
+        self.flash_radius_y = flash_radius_y
+        self.line_stroke_width = line_stroke_width
+        self.run_time = run_time
         self.lines = self.create_lines()
         animations = self.create_line_anims()
         super().__init__(

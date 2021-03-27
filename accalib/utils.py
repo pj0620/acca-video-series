@@ -1,5 +1,4 @@
-from manimlib.imports import *
-from manimlib.utils import bezier
+from manim import *
 import numpy as np
 
 class VectorInterpolator:

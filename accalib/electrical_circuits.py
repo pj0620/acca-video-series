@@ -1,5 +1,4 @@
-from manimlib.imports import *
-from manimlib.constants import *
+from manim import *
 from accalib.constants import *
 from accalib.particles import Electron
 import random
