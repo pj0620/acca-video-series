@@ -121,7 +121,7 @@ def get_random_string(length):
 os.system("TASKKILL /IM vlc.exe /F")
 
 # find file containing scene, and render
-scene_to_render = sys.argv[2]
+scene_to_render = sys.argv[1]
 selected_file = None
 rand_string = get_random_string(8)
 for file, scenes in scenes_map.items():

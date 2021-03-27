@@ -1269,6 +1269,8 @@ class VideoRecommendEulerIdentity(Scene):
 
 class EulersFormula(SineWaveCharacteristics):
     CONFIG = {
+        "y_draw_length": 4*PI,
+        "num_period_labels": 4,
         "imag_axes_config": {
             "number_line_config": {
                 "include_tip": True,
@@ -1300,7 +1302,7 @@ class EulersFormula(SineWaveCharacteristics):
                 "tick_frequency": 1
             },
             "x_min": -0.2,
-            "x_max": 7,
+            "x_max": 10,
             "y_min": -2.1,
             "y_max": 2.1,
             "center_point": FRAME_WIDTH * 0.25 * LEFT + FRAME_HEIGHT * 0.25 * UP + 0.3 * UP + 2*RIGHT,
@@ -1378,6 +1380,7 @@ class EulersFormula(SineWaveCharacteristics):
         )
 
         # phase must be a multiple of 2*PI at this point
+        self.time_value.set_value(0)
         self.wait(1)
         self.play(
             FadeOut(ejt_rect)
@@ -1391,7 +1394,7 @@ class EulersFormula(SineWaveCharacteristics):
             np.cos,
             color=self.x_color,
             x_min=0,
-            x_max=2 * PI
+            x_max=self.y_draw_length
         )
 
         # add sin axes
@@ -1400,7 +1403,7 @@ class EulersFormula(SineWaveCharacteristics):
             np.sin,
             color=self.y_color,
             x_min=0,
-            x_max=2 * PI
+            x_max=4*PI
         )
         self.add(self.sin_axes)
 
@@ -1436,15 +1439,15 @@ class EulersFormula(SineWaveCharacteristics):
 
         # draw graphs
         self.play(
-            self.get_drawing_anims(3 * PI),
+            self.get_drawing_anims(self.y_draw_length),
             ShowCreation(
                 self.cos_graph,
-                run_time=2*PI,
+                run_time=self.y_draw_length,
                 rate_func=linear
             ),
             ShowCreation(
                 self.sin_graph,
-                run_time=2 * PI,
+                run_time=self.y_draw_length,
                 rate_func=linear
             ),
             AnimationGroup(
@@ -1459,6 +1462,16 @@ class EulersFormula(SineWaveCharacteristics):
             FadeOut(VGroup(sin_rects, cos_rects)),
             self.get_drawing_anims(5.91),
         )
+
+        # replace with extended sine wave
+        self.remove(self.sin_graph)
+        self.sin_graph = self.sin_axes.get_graph(
+            np.sin,
+            color=self.y_color,
+            x_min=0,
+            x_max=30
+        )
+        self.add(self.sin_graph)
 
         # only show imaginary part
         self.show_x_graph = False
@@ -1526,8 +1539,9 @@ class EulersFormula(SineWaveCharacteristics):
             }
         ) \
             .next_to(self.sin_axes.y_axis.get_top() + 0.4 * DOWN, direction=RIGHT)
-        self.time_label_t = TexMobject("time(t)", color=WHITE) \
-            .next_to(self.sin_axes.x_axis.get_right(), direction=RIGHT)
+        self.time_label_t = TexMobject("time(t)", color=WHITE)  \
+            .next_to(self.sin_axes.x_axis.get_right(), direction=DOWN) \
+            .shift(0.2*LEFT)
         self.play(
             TransformFromCopy(
                 cur_eulers_formula, general_eulers_formula
@@ -1674,9 +1688,8 @@ class EulersFormula(SineWaveCharacteristics):
         )
         time_brace_width = time_brace.get_width()
         time_brace.set_width(1.1 * time_brace_width, stretch=True)
-        time_text = time_brace.get_text("0") \
-            .scale(1.75) \
-            .shift(0.0 * DOWN)
+        time_text = time_brace.get_tex("0")\
+            .scale(1.75)
         self.play(
             ShowCreation(time_brace),
         )
@@ -1723,7 +1736,7 @@ class EulersFormula(SineWaveCharacteristics):
             )
         )
 
-        # add updayer for second theta label
+        # add updater for second theta label
         theta_label2.add_updater(
             lambda x: x.set_value(self.get_ang() / PI)
         )
@@ -1761,39 +1774,27 @@ class EulersFormula(SineWaveCharacteristics):
                 )
             )
 
-        # change frequency of wave
+        # add period labels
+        self.period_lines, self.period_labels = self.get_period_labels()
         self.play(
-            self.get_freq_anim(2)
+            FadeIn(
+                self.period_labels,
+                self.period_lines
+            )
         )
-
-        # # add T line
-        # period_line = DashedLine(
-        #     self.sin_axes.center_point + 2*PI*RIGHT + 1.2*UP,
-        #     self.sin_axes.center_point + 2*PI*RIGHT + 1.2*DOWN,
-        #     color=YELLOW
-        # )
-        # period_lhs = TexMobject(
-        #     "T = ",
-        #     color=YELLOW
-        # )\
-        #     .move_to(self.sin_axes.center_point + 2*PI*RIGHT + 0.65*RIGHT + 0.75*UP)
-        # period_label = DecimalNumber(
-        #     2*PI,
-        #     color=YELLOW
-        # )\
-        #     .next_to(period_lhs, direction=RIGHT)
-        # self.add(
-        #     period_label,
-        #     period_lhs,
-        #     period_line
-        # )
         # period_label.add_updater(
         #     lambda x: x.set_value((2*PI)/self.freq_value.get_value())
         # )
-        #
-        # self.play(
-        #     self.get_drawing_anims(2*PI)
-        # )
+
+        self.time_value.set_value(0)
+        # change frequency of wave
+        self.play(
+            self.get_freq_anim(new_freq=2,run_time=2),
+        )
+
+        self.play(
+            self.get_drawing_anims(2*PI)
+        )
 
         self.wait()
 
@@ -1847,6 +1848,28 @@ class EulersFormula(SineWaveCharacteristics):
 
         return AnimationGroup(*anims)
 
+    def get_period_labels(self):
+        period_lines = VGroup()
+        period_labels = VGroup()
+        for k in range(1,self.num_period_labels+1):
+            num = ""
+            if k != 1:
+                num = str(k)
+            period_lines.add(
+                DashedLine(
+                    self.sin_axes.center_point + 2 * PI * k * RIGHT + 1.2 * UP,
+                    self.sin_axes.center_point + 2 * PI * k *RIGHT + 1.2 * DOWN,
+                    color=YELLOW
+                )
+            )
+            period_labels.add(
+                TexMobject(
+                    num + "T",
+                    color=YELLOW
+                )
+                .next_to(period_lines[k-1].get_top(), direction=RIGHT)
+            )
+        return period_lines, period_labels
 
     def ang_line_update(self, l):
         x = self.ampl_value.get_value() * np.cos(self.get_ang())
@@ -1861,7 +1884,7 @@ class EulersFormula(SineWaveCharacteristics):
         y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
         l.put_start_and_end_on(
             self.real_imag_axes.center_point + x * RIGHT + y * UP,
-            self.sin_axes.center_point + (self.time_value.get_value() % (2*PI))*RIGHT + y*UP
+            self.sin_axes.center_point + (self.time_value.get_value() % self.y_draw_length)*RIGHT + y*UP
         )
 
     def x_draw_line_update(self, l):
@@ -1896,7 +1919,7 @@ class EulersFormula(SineWaveCharacteristics):
 
     def sin_dot_update(self, d):
         y = self.ampl_value.get_value() * np.sin(self.get_ang()) + 0.0000001
-        d.move_to(self.sin_axes.center_point + (self.time_value.get_value() % (2*PI))*RIGHT + y*UP)
+        d.move_to(self.sin_axes.center_point + (self.time_value.get_value() % self.y_draw_length)*RIGHT + y*UP)
 
     def cos_dot_update(self, d):
         x = self.ampl_value.get_value() * np.cos(self.get_ang())
@@ -2054,7 +2077,8 @@ class EulersFormula(SineWaveCharacteristics):
             .next_to(self.sin_axes.y_axis.get_top() + 0.4 * DOWN, direction=RIGHT)
 
         self.time_label1 = TexMobject("\\theta", color=YELLOW) \
-            .next_to(self.sin_axes.x_axis.get_right(), direction=RIGHT)
+            .next_to(self.sin_axes.x_axis.get_right(), direction=DOWN) \
+            .shift(0.2*LEFT)
 
         self.sin_dot = Dot(color=YELLOW)\
             .move_to(self.sin_axes.center_point)
@@ -2075,38 +2099,44 @@ class EulersFormula(SineWaveCharacteristics):
         )
 
     def get_freq_anim(self, new_freq, run_time=1.):
+        anims = []
+
+        # stretch sine wave
         cur_freq = self.freq_value.get_value()
-        # transform_matrix = np.array(
-        #     [[cur_freq/new_freq, 0, 0],
-        #      [0,                 1, 0],
-        #      [0,                 0, 1]]
-        # )
-        # offset = np.array(
-        #     [(1-cur_freq/new_freq)*self.sin_axes.center_point[0],
-        #      0,
-        #      0]
-        # )
-        # def fun(p):
-        #     return offset + transform_matrix.dot(p)
-
-        new_graph = self.sin_axes.get_graph(
-            lambda x: self.ampl_value.get_value()*np.sin(x*self.freq_value.get_value()+self.phase_value.get_value()),
-            color=self.y_color,
-            x_min=0,
-            x_max=2 * PI
+        self.freq_value.set_value(new_freq)
+        transform_matrix = np.array(
+            [[cur_freq/new_freq, 0, 0],
+             [0,                 1, 0],
+             [0,                 0, 1]]
+        )
+        offset = np.array(
+            [(1-cur_freq/new_freq)*self.sin_axes.center_point[0],
+             0,
+             0]
+        )
+        def fun(p):
+            return offset + transform_matrix.dot(p)
+        anims.append(
+            ApplyPointwiseFunction(
+                fun, self.sin_graph,
+                run_time=run_time,
+                rate_func=linear
+            )
         )
 
-        return AnimationGroup(
-            Transform(
-                self.sin_graph, new_graph,
-                run_time=run_time
-            ),
-            ApplyMethod(
-                self.freq_value.set_value, new_freq,
-                run_time=run_time
-            ),
-            lag_ratio=0
-        )
+        # shift all period labels
+        new_period = (2*PI)/new_freq
+        cur_period = (2*PI)/cur_freq
+        for k in range(1,self.num_period_labels + 1):
+            anims.append(
+                ApplyMethod(
+                    VGroup(self.period_labels[k-1],self.period_lines[k-1]).shift, k*(cur_period - new_period)*LEFT,
+                    run_time=run_time,
+                    rate_func=linear
+                )
+            )
+
+        return AnimationGroup(*anims)
 
     def get_amplitude_anim(self, new_ampl, run_time=1.):
         self.ac_circuit.set_electron_amplitude_anim(new_ampl*self.base_electron_amplitude, run_time=run_time)
