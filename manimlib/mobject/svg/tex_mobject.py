@@ -43,7 +43,6 @@ class SingleStringTexMobject(SVGMobject):
             self.get_modified_expression(tex_string),
             self.template_tex_file_body
         )
-        print("file_name = " + file_name)
         SVGMobject.__init__(self, file_name=file_name, **kwargs)
         if self.height is None:
             self.scale(TEX_MOB_SCALE_FACTOR)
