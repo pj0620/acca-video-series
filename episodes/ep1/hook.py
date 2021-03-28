@@ -591,14 +591,14 @@ class CompareToClassroom(Scene):
             dash_length=0.25
         )
         self.play(
-            ShowCreation(dividing_line)
+            ShowCreation(dividing_line,run_time=0.4)
         )
 
         # my video title
         my_video = TextMobject("\\underline{This Video}")
         my_video.move_to(FRAME_WIDTH*0.25*LEFT + FRAME_HEIGHT*0.5*UP + my_video.get_height()*0.5*DOWN + 0.2*DOWN)
         self.play(
-            Write(my_video)
+            Write(my_video,run_time=0.9)
         )
 
         # add animations later
@@ -651,13 +651,12 @@ class NoPrerequisites(Scene):
             .next_to(list, direction=UP, buff=0.5) \
             .scale(1.5)
         self.play(
-            Write(preq_title)
+            Write(preq_title, run_time=1.5)
         )
-        self.wait(2.67)
         self.play(
             AnimationGroup(
                 *[
-                    Write(item)
+                    Write(item,run_time=0.75)
                     for item in list
                 ],
                 lag_ratio=1
