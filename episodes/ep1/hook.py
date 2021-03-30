@@ -77,7 +77,7 @@ class ApplicationsOfComplexNumbers(Scene):
             .next_to(qm_text, direction=DR)\
             .shift(2*LEFT)
         schrodinger_eq.get_part_by_tex("i").set_color(YELLOW)
-        self.play(Write(schrodinger_eq))
+        self.play(Write(schrodinger_eq, run_time=0.9))
 
         ft_text = TextMobject(
             "Fourier Analysis:"
@@ -103,7 +103,7 @@ class ApplicationsOfComplexNumbers(Scene):
         self.play(
             Write(
                 ft_equation,
-                run_time=1
+                run_time=0.9
             )
         )
 
