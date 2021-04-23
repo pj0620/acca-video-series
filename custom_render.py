@@ -111,6 +111,8 @@ scenes_map = {
 #         ]
 # }
 
+# check if old scenes should be deleted
+delete_old_scene = "--no_delete" not in sys.argv
 
 def get_random_string(length):
     letters = string.ascii_lowercase
@@ -138,9 +140,10 @@ if selected_file is None:
     raise Exception("selected scene " + scene_to_render + " not found in " + scenes_dir)
 
 # delete old scene file
-video_dir = output_dir + selected_file.replace(".py", "") + "/" + quality_ending
-for filename in os.listdir(video_dir):
-    if filename.startswith(scene_to_render + quality_ending) and (rand_string not in filename):
-        cmd = "del /f " + (video_dir + "/" + filename).replace("/", "\\")
-        print("executing " + cmd)
-        os.system(cmd)
+if delete_old_scene:
+    video_dir = output_dir + selected_file.replace(".py", "") + "/" + quality_ending
+    for filename in os.listdir(video_dir):
+        if filename.startswith(scene_to_render + quality_ending) and (rand_string not in filename):
+            cmd = "del /f " + (video_dir + "/" + filename).replace("/", "\\")
+            print("executing " + cmd)
+            os.system(cmd)

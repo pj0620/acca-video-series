@@ -150,7 +150,7 @@ class EEApplication(Scene):
             scale_factor=1.25
         )
         self.play(
-            Write(title)
+            Write(title, run_time=1.4)
         )
 
         circuit = SimpleCircuitFreqDomain()\

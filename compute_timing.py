@@ -3,7 +3,7 @@
 import sys
 import datetime
 
-FRAME_RATE=23
+FRAME_RATE=60
 
 def print_usage():
     print(f"Usage: {sys.argv[0]} timing_file [-h help]")
