@@ -339,13 +339,21 @@ class ComplexQuantitiesPaper(Scene):
             .scale(1.3)\
             .move_to(rect.get_center())\
             .shift(1*DOWN)
+        page_speed = 3.2 #Munit/s
         self.play(
+            ApplyMethod(
+                pages.shift, 2.23 * page_speed * UP,
+                run_time=2.23,
+                rate_func=linear,
+            ),
+        )
+        self.play(
+            ApplyMethod(
+                pages.shift, 10 * page_speed * UP,
+                run_time=10,
+                rate_func=linear,
+            ),
             AnimationGroup(
-                ApplyMethod(
-                   pages.shift, 40 * UP,
-                   run_time=12.37,
-                   rate_func=linear,
-                ),
                 FadeIn(
                     rect
                 ),

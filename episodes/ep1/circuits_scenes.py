@@ -39,7 +39,7 @@ class IntroduceCircuit(Scene):
                 direction=UP
             )
         )
-        self.wait(5.2)
+        self.wait(3.7)
 
         # expand ACCA
         self.play(
@@ -101,7 +101,7 @@ class IntroduceCircuit(Scene):
                 underline
             )
         )
-        self.wait(2.57)
+        self.wait(0.73)
 
         # add phone
         phone = ImageMobject("images/ep1/IntroduceCircuit/iphone-circuit-board.jpg")\
@@ -113,7 +113,7 @@ class IntroduceCircuit(Scene):
                 FadeIn(phone),
                 Write(phone_rect),
                 lag_ratio=0.1,
-                run_time=1.97
+                run_time=1.52
             )
         )
 
@@ -141,7 +141,7 @@ class IntroduceCircuit(Scene):
                 FadeIn(home_circuit),
                 Write(home_circuit_rect),
                 lag_ratio=0.11,
-                run_time=3.6
+                run_time=3.2
             )
         )
 
@@ -186,7 +186,7 @@ class CircuitDefinition(Scene):
         self.play(
             FadeIn(textbook)
         )
-        self.wait(3.34)
+        self.wait(2.57)
 
         # show definition of circuit
         definition = TextMobject(
@@ -201,29 +201,29 @@ class CircuitDefinition(Scene):
                 run_time=2
             )
         )
-        self.wait(7.56)
+        self.wait(1.8)
 
-        brace_ee = Brace(definition[4], color=YELLOW, direction=UP)
-        text_ee = brace_ee.get_text("???").set_color(YELLOW)
-        self.play(
-            AnimationGroup(
-                FadeIn(brace_ee),
-                FadeIn(text_ee),
-                lag_ratio=0.05
-            )
-        )
-        self.wait(0.77)
-
-        brace_inter = Brace(definition[2], color=YELLOW, direction=UP)
-        text_inter = brace_inter.get_text("???").set_color(YELLOW)
-        self.play(
-            AnimationGroup(
-                FadeIn(brace_inter),
-                FadeIn(text_inter),
-                lag_ratio=0.05
-            )
-        )
-        self.wait(3.8)
+        # brace_ee = Brace(definition[4], color=YELLOW, direction=UP)
+        # text_ee = brace_ee.get_text("???").set_color(YELLOW)
+        # self.play(
+        #     AnimationGroup(
+        #         FadeIn(brace_ee),
+        #         FadeIn(text_ee),
+        #         lag_ratio=0.05
+        #     )
+        # )
+        # self.wait(0.77)
+        #
+        # brace_inter = Brace(definition[2], color=YELLOW, direction=UP)
+        # text_inter = brace_inter.get_text("???").set_color(YELLOW)
+        # self.play(
+        #     AnimationGroup(
+        #         FadeIn(brace_inter),
+        #         FadeIn(text_inter),
+        #         lag_ratio=0.05
+        #     )
+        # )
+        # self.wait(3.8)
 
         # show simple real world circuit
         self.lamp_circuit = BatteryLampCircuit().to_edge(LEFT)
@@ -239,14 +239,14 @@ class CircuitDefinition(Scene):
                 ),
                 lag_ratio=0.05
             ),
-            FadeOut(
-                Group(
-                    brace_inter, brace_ee,
-                    text_inter, text_ee
-                )
-            )
+            # FadeOut(
+            #     Group(
+            #         brace_inter, brace_ee,
+            #         text_inter, text_ee
+            #     )
+            # )
         )
-        self.wait(4.7)
+        self.wait(6.18)
 
         # add Electrical Element label
         elements_text = TextMobject("2 electrical elements", color=YELLOW)\
@@ -256,10 +256,9 @@ class CircuitDefinition(Scene):
         self.play(
             Write(
                 elements_text,
-                run_time=1.77
+                run_time=1.5
             )
         )
-        self.wait(1.93)
 
         # add rectangles around electrical elements
         elements_label = VGroup()
@@ -297,7 +296,6 @@ class CircuitDefinition(Scene):
                 ]
             )
         )
-        self.wait(0.57)
 
         underline1 = Line(LEFT, RIGHT, color=RED_C) \
             .match_width(definition[2]) \
@@ -531,7 +529,7 @@ class CompsDisplay(Scene):
         comps_group.add(ee_text)
         self.play(
             get_comps_anim(run_time=14.93),
-            Write(ee_text)
+            Write(ee_text, run_time=1.5)
         )
 
         # shift up and add note about other EE
@@ -648,7 +646,7 @@ class ComplexCircuitOverview(Scene):
                 run_time=2
             )
         )
-        self.wait(3.4)
+        self.wait(2.17)
 
         electrical_elem_label = TextMobject("\\underline{44 Electrical Elements}", color=YELLOW) \
             .scale(1.5) \

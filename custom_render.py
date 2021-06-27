@@ -5,10 +5,10 @@ import string
 
 scenes_dir = "episodes/ep1/"
 output_dir = "media/videos/"
-# quality_arg = "-l"
-# quality_ending = "480p15"
-quality_arg = "--high_quality"
-quality_ending = "1080p60"
+quality_arg = "-l"
+quality_ending = "480p15"
+# quality_arg = "--high_quality"
+# quality_ending = "1080p60"
 scenes_map = {
     "hook.py":
         [
@@ -133,6 +133,8 @@ for file, scenes in scenes_map.items():
         selected_file = file
         cmd = "python manim.py " + scenes_dir + file + " " + scene_to_render + " " + quality_arg + " -o " + \
               scene_to_render + quality_ending + "_" + rand_string + " -p"
+        # cmd = "python manim.py " + scenes_dir + file + " " + scene_to_render + " " + quality_arg + " -o " + \
+        #       scene_to_render + quality_ending + "_" + rand_string + r" -p --video_output_dir C:\Users\pjsho\Documents\Circuit_Analyzer\video_series\dailys\11032020\videos"
         print("executing: " + cmd)
         os.system(cmd)
 

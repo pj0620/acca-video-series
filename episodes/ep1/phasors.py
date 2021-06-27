@@ -1335,6 +1335,14 @@ class EulersFormula(SineWaveCharacteristics):
     }
 
     def construct(self):
+        self.add(
+            Rectangle(
+                width=FRAME_WIDTH,
+                height=FRAME_HEIGHT,
+                color=PURPLE
+            )
+        )
+
         # add eulers formula
         eulers_formula = TexMobject(
             "Im \\{ e^{j \\theta} \\}", " = ", "cos(", "\\theta", ")"," + j ", "sin(", "\\theta", ")",
@@ -1688,8 +1696,13 @@ class EulersFormula(SineWaveCharacteristics):
         )
         time_brace_width = time_brace.get_width()
         time_brace.set_width(1.1 * time_brace_width, stretch=True)
-        time_text = time_brace.get_tex("0")\
-            .scale(1.75)
+        time_text = DecimalNumber(
+            0,
+            num_decimal_places=1
+        )\
+            .scale(1.65)\
+            .next_to(time_brace, direction=DOWN, buff=0.1)\
+            .shift(0.25*LEFT)
         self.play(
             ShowCreation(time_brace),
         )
@@ -1697,6 +1710,7 @@ class EulersFormula(SineWaveCharacteristics):
         self.play(
             FadeInFrom(time_text, direction=DOWN),
         )
+        time_text.add_updater(lambda x: x.set_value(self.time_value.get_value()))
 
         # note that theta is equal to zero
         new_equals = TexMobject("=", color=YELLOW)\
@@ -1726,7 +1740,7 @@ class EulersFormula(SineWaveCharacteristics):
         multiples_two_pi.scale(2)
         multiples_two_pi.arrange(RIGHT, buff=1)\
             .to_edge(LEFT)\
-            .shift(3.7*DOWN + 0.5*LEFT)
+            .shift(4.3*DOWN + 0.5*LEFT)
         self.play(
             FadeIn(multiples_two_pi[0])
         )
@@ -1739,11 +1753,6 @@ class EulersFormula(SineWaveCharacteristics):
         # add updater for second theta label
         theta_label2.add_updater(
             lambda x: x.set_value(self.get_ang() / PI)
-        )
-
-        self.play(
-            FadeOut(time_brace),
-            FadeOut(time_text),
         )
 
         # complete one rotation

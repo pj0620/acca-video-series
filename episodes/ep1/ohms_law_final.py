@@ -6,6 +6,7 @@ import progressbar
 from accalib.tools import rule_of_thirds_guide
 from functools import partial
 
+
 class IntroOhmsLawPart(Scene):
     def construct(self):
         section_label = TextMobject(
@@ -64,7 +65,7 @@ class OhmsLawIntro(Scene):
         self.play(Write(equation[1], run_time=0.35))
         self.play(Write(equation[2], run_time=0.35))
         self.play(Write(equation[3], run_time=0.35))
-        self.wait()
+        self.wait(1.1)
 
         # label voltage
         v_rect = SurroundingRectangle(
@@ -83,7 +84,7 @@ class OhmsLawIntro(Scene):
             Write(v_rect),
             FadeInFrom(v_text, direction=DOWN)
         )
-        self.wait(0.3)
+        self.wait(0.83)
 
         # label current
         i_rect = SurroundingRectangle(
@@ -99,8 +100,8 @@ class OhmsLawIntro(Scene):
             .next_to(i_rect, direction=DOWN, buff=0.25) \
             .align_to(i_rect, RIGHT)
         self.play(
-            Write(i_rect),
-            FadeInFrom(i_text, direction=DOWN)
+            Write(i_rect, run_time=0.9),
+            FadeInFrom(i_text, direction=DOWN, run_time=0.9)
         )
 
         # label resistance
@@ -183,8 +184,8 @@ class OhmsLawIntro(Scene):
             self.setup_vector_fields()
         self.play(
             FadeOut(cover_rect_2),
-            self.hydraulic_circuit.get_rotate_anim(4.09),
-            self.electric_circuit.get_electron_anim(4.09)
+            self.hydraulic_circuit.get_rotate_anim(3.46),
+            self.electric_circuit.get_electron_anim(3.46)
         )
 
         # indicate pump
@@ -230,8 +231,8 @@ class OhmsLawIntro(Scene):
         )
         VGroup(*self.hydraulic_circuit.body.small_tube).set_color(WHITE)
         self.play(
-            self.hydraulic_circuit.get_rotate_anim(8.96),
-            self.electric_circuit.get_electron_anim(8.96)
+            self.hydraulic_circuit.get_rotate_anim(7.94),
+            self.electric_circuit.get_electron_anim(7.94)
         )
 
         # indicate flow
@@ -280,7 +281,7 @@ class OhmsLawIntro(Scene):
             AnimationGroup(
                 FadeInFrom(current_arrow, direction=UP),
                 FadeInFrom(i_label[0], direction=UP),
-                lag_ratio=0.7
+                lag_ratio=0.1
             ),
             self.electric_circuit.get_electron_anim(6.26),
             self.hydraulic_circuit.get_rotate_anim(6.26)

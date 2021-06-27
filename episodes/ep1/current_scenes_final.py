@@ -6,7 +6,7 @@ class IntroCurrentPart(Scene):
     def construct(self):
         section_label = TextMobject(
             "Part 2: \\\\",
-            "Current", " - AC vs DC"
+            "Current"
         ).scale(1.5)
         self.play(
             Write(section_label[0]),
@@ -14,10 +14,6 @@ class IntroCurrentPart(Scene):
         self.wait()
         self.play(
             Write(section_label[1])
-        )
-        self.wait()
-        self.play(
-            Write(section_label[2])
         )
         self.wait()
 
@@ -37,7 +33,7 @@ class CurrentOverview(Scene):
         ) \
             .shift(UP)
         self.add(circuit)
-        self.wait(2.73)
+        self.wait(2.09)
 
         # label elements
         elements_label = VGroup()
@@ -65,7 +61,6 @@ class CurrentOverview(Scene):
         self.play(
             FadeOut(elements_label),
         )
-        self.wait(0.35)
 
         # add electrons
         circuit.setup_electrons()
@@ -89,7 +84,7 @@ class CurrentOverview(Scene):
             circuit.get_electron_anim(5)
         )
         self.play(
-            circuit.get_electron_anim(2.74)
+            circuit.get_electron_anim(1.48)
         )
 
         # fade in current label
@@ -117,10 +112,6 @@ class CurrentOverview(Scene):
             .scale(1.5) \
             .next_to(current_text, direction=RIGHT, buff=0.3)
         current_tracker = ValueTracker(1)
-        current_value.add_updater(
-            lambda x:
-            x.set_value(current_tracker.get_value())
-        )
         self.play(
             FadeInFrom(current_arrow, direction=UP),
             FadeInFrom(current_text, direction=UP),
@@ -128,45 +119,24 @@ class CurrentOverview(Scene):
             circuit.get_electron_anim()
         )
         self.play(
-            circuit.get_electron_anim()
+            circuit.get_electron_anim(5.66)
         )
 
-        # remove battery
-        circuit.electrons_flowing = False
-        circuit.set_light_bulb_state(False)
-        for i in range(len(circuit.electrons)):
-            cur = (circuit.electron_loc.get_value() + i / circuit.num_of_electrons + circuit.electron_disps[i]) % 1
-            if 0.755 < cur < 1:
-                circuit.electrons[i].set_opacity(0)
-        # stop electrons
-        circuit.set_electron_freq(0)
+        # draw square around amp
         self.play(
-            FadeOutAndShift(
-                circuit.battery,
-                direction=LEFT,
-                run_time=1
+            ShowCreationThenDestructionAround(
+                current_value.submobjects[-1],
+                surrounding_rectangle_config={"stroke_width": 7},
+                run_time=2
             ),
-            circuit.get_electron_anim(5.17)
+            circuit.get_electron_anim(1.67)
         )
 
-        circuit.electrons_flowing = True
-        circuit.set_light_bulb_state(True)
-        circuit.set_electron_freq(self.electron_freq_0)
-        for i in range(len(circuit.electrons)):
-            cur = (circuit.electron_loc.get_value() + i / circuit.num_of_electrons +
-                   circuit.electron_disps[i]) % 1
-            if 0.755 < cur < 1:
-                circuit.electrons[i].set_opacity(1)
-                circuit.electrons[i].set_stroke(BLUE, opacity=0)
-        self.play(
-            FadeInFrom(
-                circuit.battery,
-                direction=LEFT,
-                run_time=1
-            ),
-            circuit.get_electron_anim()
+        current_value.add_updater(
+            lambda x:
+            x.set_value(current_tracker.get_value())
         )
-
+        
         # label equivalent electrons per second
         current_1 = DecimalNumber(
             1,
@@ -194,7 +164,7 @@ class CurrentOverview(Scene):
             .scale(1.5) \
             .next_to(current_1_eq, direction=RIGHT, buff=1)
         elec_per_sec.add_updater(
-            lambda x: x.set_value(6246000000000000*current_tracker.get_value()),
+            lambda x: x.set_value(6242000000000000*current_tracker.get_value()),
             call_updater=True
         )
         elec_per_sec_unit_tex = TexMobject(
@@ -217,7 +187,7 @@ class CurrentOverview(Scene):
                 elec_per_sec_unit,
                 direction=DOWN
             ),
-            circuit.get_electron_anim(7.2)
+            circuit.get_electron_anim(6.08)
         )
 
         # set current to 2 A
@@ -228,7 +198,7 @@ class CurrentOverview(Scene):
             circuit.get_electron_acceleration_anim(self.electron_freq_0 * 3)
         )
         self.play(
-            circuit.get_electron_anim(4)
+            circuit.get_electron_anim(7.53)
         )
 
         # set current to 40 A
@@ -239,12 +209,54 @@ class CurrentOverview(Scene):
             circuit.get_electron_acceleration_anim(self.electron_freq_0 * 10)
         )
         self.play(
-            circuit.get_electron_anim(11.87)
+            circuit.get_electron_anim(8.67)
+        )
+
+        # remove battery
+        circuit.electrons_flowing = False
+        circuit.set_light_bulb_state(False)
+        for i in range(len(circuit.electrons)):
+            cur = (circuit.electron_loc.get_value() + i / circuit.num_of_electrons + circuit.electron_disps[i]) % 1
+            if 0.755 < cur < 1:
+                circuit.electrons[i].set_opacity(0)
+        # stop electrons
+        circuit.set_electron_freq(0)
+        self.play(
+            FadeOutAndShift(
+                circuit.battery,
+                direction=LEFT,
+                run_time=1
+            ),
+            ApplyMethod(
+                current_tracker.set_value, 0
+            ),
+            circuit.get_electron_anim(13.65)
+        )
+
+        circuit.electrons_flowing = True
+        circuit.set_light_bulb_state(True)
+        circuit.set_electron_freq(self.electron_freq_0)
+        for i in range(len(circuit.electrons)):
+            cur = (circuit.electron_loc.get_value() + i / circuit.num_of_electrons +
+                   circuit.electron_disps[i]) % 1
+            if 0.755 < cur < 1:
+                circuit.electrons[i].set_opacity(1)
+                circuit.electrons[i].set_stroke(BLUE, opacity=0)
+        self.play(
+            FadeInFrom(
+                circuit.battery,
+                direction=LEFT,
+                run_time=1
+            ),
+            ApplyMethod(
+                current_tracker.set_value, 1
+            ),
+            circuit.get_electron_anim(2.15)
         )
 
         # show definition
         definition = TextMobject(
-            "current - measure of ", "electrons", " per second passing through a circuit",
+            "current - measure of flow of electrons in a circuit",
             color=YELLOW
         ) \
             .scale(1) \
