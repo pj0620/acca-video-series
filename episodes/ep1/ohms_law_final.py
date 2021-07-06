@@ -42,7 +42,7 @@ class OhmsLawIntro(Scene):
         self.play(
             Write(
                 title,
-                run_time=1
+                run_time=0.95
             )
         )
 
@@ -184,8 +184,8 @@ class OhmsLawIntro(Scene):
             self.setup_vector_fields()
         self.play(
             FadeOut(cover_rect_2),
-            self.hydraulic_circuit.get_rotate_anim(3.46),
-            self.electric_circuit.get_electron_anim(3.46)
+            self.hydraulic_circuit.get_rotate_anim(3.33),
+            self.electric_circuit.get_electron_anim(3.33)
         )
 
         # indicate pump
@@ -194,8 +194,8 @@ class OhmsLawIntro(Scene):
                 self.hydraulic_circuit.body.circle,
                 run_time=1
             ),
-            self.hydraulic_circuit.get_rotate_anim(2),
-            self.electric_circuit.get_electron_anim(2)
+            self.hydraulic_circuit.get_rotate_anim(1.23),
+            self.electric_circuit.get_electron_anim(1.23)
         )
 
         # indicate large tubes
@@ -231,8 +231,8 @@ class OhmsLawIntro(Scene):
         )
         VGroup(*self.hydraulic_circuit.body.small_tube).set_color(WHITE)
         self.play(
-            self.hydraulic_circuit.get_rotate_anim(7.94),
-            self.electric_circuit.get_electron_anim(7.94)
+            self.hydraulic_circuit.get_rotate_anim(7.46),
+            self.electric_circuit.get_electron_anim(7.46)
         )
 
         # indicate flow
@@ -293,8 +293,8 @@ class OhmsLawIntro(Scene):
                 FadeIn(mob)
                 for mob in (flow_line, flow_arrow)
             ],
-            self.electric_circuit.get_electron_anim(3.17),
-            self.hydraulic_circuit.get_rotate_anim(3.17)
+            self.electric_circuit.get_electron_anim(1.99),
+            self.hydraulic_circuit.get_rotate_anim(1.99)
         )
 
         # fade in 2A

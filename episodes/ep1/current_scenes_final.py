@@ -122,14 +122,14 @@ class CurrentOverview(Scene):
             circuit.get_electron_anim(5.66)
         )
 
-        # draw square around amp
+        # draw square around amp /
         self.play(
             ShowCreationThenDestructionAround(
                 current_value.submobjects[-1],
                 surrounding_rectangle_config={"stroke_width": 7},
-                run_time=2
+                run_time=1
             ),
-            circuit.get_electron_anim(1.67)
+            circuit.get_electron_anim(1)
         )
 
         current_value.add_updater(
@@ -187,7 +187,7 @@ class CurrentOverview(Scene):
                 elec_per_sec_unit,
                 direction=DOWN
             ),
-            circuit.get_electron_anim(6.08)
+            circuit.get_electron_anim(5.31)
         )
 
         # set current to 2 A
@@ -209,7 +209,7 @@ class CurrentOverview(Scene):
             circuit.get_electron_acceleration_anim(self.electron_freq_0 * 10)
         )
         self.play(
-            circuit.get_electron_anim(8.67)
+            circuit.get_electron_anim(7.8)
         )
 
         # remove battery
@@ -242,6 +242,12 @@ class CurrentOverview(Scene):
             if 0.755 < cur < 1:
                 circuit.electrons[i].set_opacity(1)
                 circuit.electrons[i].set_stroke(BLUE, opacity=0)
+        definition = TextMobject(
+            "current - measure of flow of electrons in a circuit",
+            color=YELLOW
+        ) \
+            .scale(1) \
+            .to_corner(DOWN)
         self.play(
             FadeInFrom(
                 circuit.battery,
@@ -251,31 +257,14 @@ class CurrentOverview(Scene):
             ApplyMethod(
                 current_tracker.set_value, 1
             ),
-            circuit.get_electron_anim(2.15)
-        )
-
-        # show definition
-        definition = TextMobject(
-            "current - measure of flow of electrons in a circuit",
-            color=YELLOW
-        ) \
-            .scale(1) \
-            .to_corner(DOWN)
-        self.play(
             Write(
                 definition,
                 run_time=2
             ),
-            circuit.get_electron_anim(3.74)
+            circuit.get_electron_anim(2.15)
         )
 
-        # set current to 1 A
-        self.play(
-            ApplyMethod(
-                current_tracker.set_value, 1
-            ),
-            circuit.get_electron_acceleration_anim(self.electron_freq_0)
-        )
+        # wait for scene to end
         self.play(
             circuit.get_electron_anim(14.7)
         )
