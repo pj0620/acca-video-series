@@ -257,16 +257,12 @@ class OhmsLawIntro(Scene):
         #     .scale(1.25) \
         #     .next_to(flow_arrow, direction=LEFT, buff=1.5)
         flow_label = DecimalNumber(
-            2,
+            1.5,
             color=self.current_color,
             num_decimal_places=1
         ) \
             .scale(1.25) \
             .next_to(flow_arrow, direction=LEFT, buff=0.7)
-        flow_label.add_updater(
-            lambda x:
-            x.set_value(i_value.get_value() * 0.75)
-        )
         flow_unit = TexMobject(
             "{L", "\\over", "s}",
             color=self.current_color
@@ -278,41 +274,55 @@ class OhmsLawIntro(Scene):
 
         # fade in "current ="
         self.play(
-            AnimationGroup(
-                FadeInFrom(current_arrow, direction=UP),
-                FadeInFrom(i_label[0], direction=UP),
-                lag_ratio=0.1
+            TransformFromCopy(
+                VGroup(equation[2], i_text, i_rect,),
+                VGroup(current_arrow, i_label)
             ),
             self.electric_circuit.get_electron_anim(6.26),
             self.hydraulic_circuit.get_rotate_anim(6.26)
         )
 
         # fade in current arrow
+        flow_label_copy = flow_label.copy()
         self.play(
-            *[
-                FadeIn(mob)
-                for mob in (flow_line, flow_arrow)
-            ],
+            TransformFromCopy(
+                VGroup(equation[2], i_text, i_rect),
+                VGroup(flow_line, flow_arrow, flow_label_copy, flow_unit)
+            ),
             self.electric_circuit.get_electron_anim(1.99),
             self.hydraulic_circuit.get_rotate_anim(1.99)
         )
 
         # fade in 2A
         self.play(
-            FadeInFrom(i_label[1], direction=UP),
+            # FadeInFrom(i_label[1], direction=UP),
+            ShowPassingFlashAround(i_label[1].copy(), time_width=0.5, run_time=1.5),
             self.electric_circuit.get_electron_anim(3.26),
             self.hydraulic_circuit.get_rotate_anim(3.26)
         )
 
         # fade in 1.5 L/s
         self.play(
-            *[
-                FadeIn(mob)
-                for mob in (flow_label, flow_unit)
-            ],
+            # *[
+            #     FadeIn(mob)
+            #     for mob in (flow_label, flow_unit)
+            # ],
+            ShowPassingFlashAround(
+                VGroup(flow_label_copy, flow_unit),
+                time_width=0.5, run_time=1.5
+            ),
             self.electric_circuit.get_electron_anim(4.48),
             self.hydraulic_circuit.get_rotate_anim(4.48)
         )
+
+        # must add updater after all animations are finished
+        self.remove(flow_label_copy)
+        flow_label.add_updater(
+            lambda x:
+            x.set_value(i_value.get_value() * 0.75),
+            call_updater=True
+        )
+        self.add(flow_label)
 
         # fade in voltage label
         self.play(
