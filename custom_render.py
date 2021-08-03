@@ -2,7 +2,6 @@ import os
 import sys
 import random
 import string
-import time
 
 scenes_dir = "episodes/ep1/"
 output_dir = "media/videos/"

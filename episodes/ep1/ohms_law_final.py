@@ -42,7 +42,7 @@ class OhmsLawIntro(Scene):
         self.play(
             Write(
                 title,
-                run_time=0.95
+                run_time=0.55
             )
         )
 
@@ -231,8 +231,8 @@ class OhmsLawIntro(Scene):
         )
         VGroup(*self.hydraulic_circuit.body.small_tube).set_color(WHITE)
         self.play(
-            self.hydraulic_circuit.get_rotate_anim(7.46),
-            self.electric_circuit.get_electron_anim(7.46)
+            self.hydraulic_circuit.get_rotate_anim(8.53),
+            self.electric_circuit.get_electron_anim(8.53)
         )
 
         # indicate flow
@@ -272,30 +272,29 @@ class OhmsLawIntro(Scene):
         flow_unit[0].shift(0.01 * DOWN)
         flow_unit[2].shift(0.09 * UP)
 
-        # fade in "current ="
+        # transform I into "I = 2A"
         self.play(
             TransformFromCopy(
                 VGroup(equation[2], i_text, i_rect,),
                 VGroup(current_arrow, i_label)
             ),
-            self.electric_circuit.get_electron_anim(6.26),
-            self.hydraulic_circuit.get_rotate_anim(6.26)
+            self.electric_circuit.get_electron_anim(4.49),
+            self.hydraulic_circuit.get_rotate_anim(4.49)
         )
 
-        # fade in current arrow
+        # transform I into flow label
         flow_label_copy = flow_label.copy()
         self.play(
             TransformFromCopy(
                 VGroup(equation[2], i_text, i_rect),
                 VGroup(flow_line, flow_arrow, flow_label_copy, flow_unit)
             ),
-            self.electric_circuit.get_electron_anim(1.99),
-            self.hydraulic_circuit.get_rotate_anim(1.99)
+            self.electric_circuit.get_electron_anim(3.18),
+            self.hydraulic_circuit.get_rotate_anim(3.18)
         )
 
-        # fade in 2A
+        # show rectangle around 2A
         self.play(
-            # FadeInFrom(i_label[1], direction=UP),
             ShowPassingFlashAround(i_label[1].copy(), time_width=0.5, run_time=1.5),
             self.electric_circuit.get_electron_anim(3.26),
             self.hydraulic_circuit.get_rotate_anim(3.26)
@@ -311,8 +310,8 @@ class OhmsLawIntro(Scene):
                 VGroup(flow_label_copy, flow_unit),
                 time_width=0.5, run_time=1.5
             ),
-            self.electric_circuit.get_electron_anim(4.48),
-            self.hydraulic_circuit.get_rotate_anim(4.48)
+            self.electric_circuit.get_electron_anim(4.05),
+            self.hydraulic_circuit.get_rotate_anim(4.05)
         )
 
         # must add updater after all animations are finished
@@ -324,25 +323,38 @@ class OhmsLawIntro(Scene):
         )
         self.add(flow_label)
 
-        # fade in voltage label
+        # transform voltage in equation to "V = 12V"
         self.play(
-            FadeIn(v_label),
-            self.electric_circuit.get_electron_anim(10.65),
-            self.hydraulic_circuit.get_rotate_anim(10.65)
+            TransformFromCopy(
+                VGroup(equation[0], v_text, v_rect),
+                v_label
+            ),
+            self.electric_circuit.get_electron_anim(7.23),
+            self.hydraulic_circuit.get_rotate_anim(7.23)
+        )
+
+        # show rectangle around 12V
+        self.play(
+            ShowPassingFlashAround(v_label[2].copy(), time_width=0.5, run_time=1.5),
+            self.electric_circuit.get_electron_anim(2.23),
+            self.hydraulic_circuit.get_rotate_anim(2.23)
         )
 
         # indicate pump body
+        pump_ind_rect = SurroundingRectangle(self.hydraulic_circuit.body.circle)
         self.play(
-            ShowPassingFlashAround(
-                VGroup(
-                    self.hydraulic_circuit.body.circle,
-                    self.hydraulic_circuit.fins
-                ),
-                time_width=1,
-                run_time=2
+            TransformFromCopy(
+                VGroup(equation[0], v_text, v_rect),
+                pump_ind_rect,
+                run_time=1
             ),
-            self.electric_circuit.get_electron_anim(3),
-            self.hydraulic_circuit.get_rotate_anim(3)
+            self.electric_circuit.get_electron_anim(2),
+            self.hydraulic_circuit.get_rotate_anim(2)
+        )
+        self.play(
+            FadeOut(pump_ind_rect, run_time=0.5),
+            self.electric_circuit.get_electron_anim(1.4),
+            self.hydraulic_circuit.get_rotate_anim(1.4)
         )
 
         in_kw={
@@ -372,10 +384,6 @@ class OhmsLawIntro(Scene):
         # self.hydraulic_circuit.ang_freq = 2*PI
         if self.add_vector_fields:
             self.add(self.animated_stream_lines_2)
-        self.play( # remove
-            self.hydraulic_circuit.get_rotate_anim(3),
-            self.electric_circuit.get_electron_anim(3)
-        )
         self.play(
             ApplyMethod(
                 self.v_value.set_value, 24,
@@ -392,8 +400,8 @@ class OhmsLawIntro(Scene):
                 FadeIn(pump_rect),
                 lag_ratio=0
             ),
-            self.hydraulic_circuit.get_rotate_anim(9.61),
-            self.electric_circuit.get_electron_anim(9.61)
+            self.hydraulic_circuit.get_rotate_anim(7.74),
+            self.electric_circuit.get_electron_anim(7.74)
         )
 
         # transform rectangle from pump to flow rate
@@ -406,46 +414,94 @@ class OhmsLawIntro(Scene):
         # transform rectangle from voltage label to current label
         self.play(
             Transform(volt_rect, cur_rect),
-            self.hydraulic_circuit.get_rotate_anim(3),
-            self.electric_circuit.get_electron_anim(3)
+            self.hydraulic_circuit.get_rotate_anim(2),
+            self.electric_circuit.get_electron_anim(2)
         )
 
-        # fade out purple rectangles
+        # fade out voltage rectangles
         self.play(
-            FadeOut(volt_rect),
-            FadeOut(pump_rect),
-            self.hydraulic_circuit.get_rotate_anim(1.08),
-            self.electric_circuit.get_electron_anim(1.08)
+            FadeOut(volt_rect, run_time=0.4),
+            FadeOut(pump_rect, run_time=0.4),
+            self.hydraulic_circuit.get_rotate_anim(0.4),
+            self.electric_circuit.get_electron_anim(0.4)
         )
 
-        # add resistance label
+        # indicate current
+        self.play(
+            ApplyWave(
+                VGroup(
+                    equation[2], i_text, i_rect
+                ),
+                amplitude=1,
+                run_time=0.5
+            ),
+            self.hydraulic_circuit.get_rotate_anim(0.92),
+            self.electric_circuit.get_electron_anim(0.92)
+        )
+
+        # indicate voltage
+        self.play(
+            ApplyWave(
+                VGroup(
+                    equation[0], v_text, v_rect
+                ),
+                amplitude=1,
+                run_time=0.5
+            ),
+            self.hydraulic_circuit.get_rotate_anim(1),
+            self.electric_circuit.get_electron_anim(1)
+        )
+
+        # indicate resistance
+        self.play(
+            ApplyWave(
+                VGroup(
+                    equation[3], r_text, r_rect
+                ),
+                amplitude=1,
+                run_time=0.5
+            ),
+            self.hydraulic_circuit.get_rotate_anim(1.7),
+            self.electric_circuit.get_electron_anim(1.7)
+        )
+
+        # add "R = 6 ohm"
         self.play(
             FadeIn(r_label),
-            self.hydraulic_circuit.get_rotate_anim(9.43),
-            self.electric_circuit.get_electron_anim(9.43)
+            self.hydraulic_circuit.get_rotate_anim(3.01),
+            self.electric_circuit.get_electron_anim(3.01)
         )
 
-        # show square around resistance label
+        # draw rectangle around ohm
+        r_label_cp = r_label.copy()
+        r_label_cp.clear_updaters()
+        self.play(
+            ShowCreationThenDestructionAround(
+                r_label_cp[1].submobjects[-1],
+                time_width=0.5,
+            ),
+            self.hydraulic_circuit.get_rotate_anim(5.57),
+            self.electric_circuit.get_electron_anim(5.57)
+        )
+
+        # show rectangle around resistance and small tube
         r_ind_rect = SurroundingRectangle(
             r_label,
             **in_kw
-        )\
-            .scale(1.2)\
-            .shift(0.1*RIGHT)
-
-        # transform to square around small tube
+        ) \
+            .scale(1.2) \
+            .shift(0.1 * RIGHT)
         r_ind_small_tube = Rectangle(
             width=1.25,
             height=2,
             **in_kw
         )\
             .move_to(VGroup(*self.hydraulic_circuit.body.small_tube).get_center())
-
         self.play(
             FadeIn(r_ind_rect),
             FadeIn(r_ind_small_tube),
-            self.hydraulic_circuit.get_rotate_anim(4.65),
-            self.electric_circuit.get_electron_anim(4.65)
+            self.hydraulic_circuit.get_rotate_anim(2.3),
+            self.electric_circuit.get_electron_anim(2.3)
         )
 
         # set small tube radius
@@ -475,8 +531,8 @@ class OhmsLawIntro(Scene):
                 i_value.set_value, 2,
                 run_time=3
             ),
-            self.hydraulic_circuit.get_rotate_anim(10.91),
-            self.electric_circuit.get_electron_anim(10.91)
+            self.hydraulic_circuit.get_rotate_anim(9.38),
+            self.electric_circuit.get_electron_anim(9.38)
         )
 
         # transform rectangle around small pipe to flow rate label rectangle
