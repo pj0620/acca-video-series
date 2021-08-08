@@ -29,7 +29,7 @@ class OhmsLawIntro(Scene):
         "voltage_color": RED_D,  # RED_A,RED_B,
         "resistance_color": ORANGE,
         "indication_color": BLUE_D,
-        "add_vector_fields": False,
+        "add_vector_fields": True,
         "pump_ang_freq": 0.5 * PI,
         "A": 3.125  # (r^4)(\\Delta P)/Q [m^4 kPa s / L] from Hagen–Poiseuille equation
     }
@@ -364,7 +364,7 @@ class OhmsLawIntro(Scene):
             'fill_color': YELLOW
         }
         volt_rect = SurroundingRectangle(
-            v_label[1], **in_kw
+            v_label[2], **in_kw
         )
         cur_rect = SurroundingRectangle(
             i_label[1], **in_kw
@@ -466,15 +466,22 @@ class OhmsLawIntro(Scene):
         )
 
         # add "R = 6 ohm"
+        r_label_cp = r_label.copy()
+        r_label_cp.clear_updaters()
         self.play(
-            FadeIn(r_label),
+            TransformFromCopy(
+                VGroup(
+                    equation[3], r_text, r_rect
+                ),
+                r_label_cp
+            ),
             self.hydraulic_circuit.get_rotate_anim(3.01),
             self.electric_circuit.get_electron_anim(3.01)
         )
+        self.remove(r_label_cp)
+        self.add(r_label)
 
         # draw rectangle around ohm
-        r_label_cp = r_label.copy()
-        r_label_cp.clear_updaters()
         self.play(
             ShowCreationThenDestructionAround(
                 r_label_cp[1].submobjects[-1],
@@ -557,8 +564,8 @@ class OhmsLawIntro(Scene):
         self.play(
             FadeOut(r_ind_rect),
             FadeOut(r_ind_small_tube),
-            self.hydraulic_circuit.get_rotate_anim(2),
-            self.electric_circuit.get_electron_anim(2)
+            self.hydraulic_circuit.get_rotate_anim(1.12),
+            self.electric_circuit.get_electron_anim(1.12)
         )
 
         v_kw = {
@@ -594,16 +601,16 @@ class OhmsLawIntro(Scene):
 
         # FadeIn rectangle around voltage
         self.play(
-            FadeIn(volt_rect, run_time=0.66),
-            self.hydraulic_circuit.get_rotate_anim(0.66),
-            self.electric_circuit.get_electron_anim(0.66)
+            FadeIn(volt_rect, run_time=0.53),
+            self.hydraulic_circuit.get_rotate_anim(0.53),
+            self.electric_circuit.get_electron_anim(0.53)
         )
 
         # FadeIn rectangle around current
         self.play(
-            FadeIn(cur_rect, run_time=0.91),
-            self.hydraulic_circuit.get_rotate_anim(0.91),
-            self.electric_circuit.get_electron_anim(0.91)
+            FadeIn(cur_rect, run_time=0.4),
+            self.hydraulic_circuit.get_rotate_anim(0.4),
+            self.electric_circuit.get_electron_anim(0.4)
         )
 
         # FadeIn rectangle around resistance
@@ -1124,9 +1131,9 @@ class CircuitsTable(CurrentCalculation):
             .shift(2.3 * DOWN)
         self.add(rect_1, rect_2, rect_3)
 
-        self.play(FadeOut(rect_1))
-        self.play(FadeOut(rect_2))
-        self.play(FadeOut(rect_3))
+        self.play(FadeOut(rect_1, run_time=0.9))
+        self.play(FadeOut(rect_2, run_time=0.9))
+        self.play(FadeOut(rect_3, run_time=0.9))
 
         # add ohms law
         ohms_law_label = TextMobject(
